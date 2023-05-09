@@ -21,7 +21,7 @@
 
 
 // User init function 
-void user_init()
+void mtbdl_init()
 {
     //===================================================
     // General setup 
@@ -37,7 +37,7 @@ void user_init()
     //===================================================
     // Timers 
 
-    // General purpose counter 
+    // General purpose 1us counter 
     tim_9_to_11_counter_init(
         TIM9, 
         TIM_84MHZ_1US_PSC, 
@@ -53,8 +53,10 @@ void user_init()
     // For MPU-6050, LCD screen and M*Q GPS 
     i2c_init(
         I2C1, 
-        I2C1_SDA_PB9,
-        I2C1_SCL_PB8,
+        PIN_9, 
+        GPIOB, 
+        PIN_8, 
+        GPIOB, 
         I2C_MODE_SM,
         I2C_APB1_42MHZ,
         I2C_CCR_SM_42_100,
@@ -103,5 +105,9 @@ void user_init()
 
     //===================================================
     // SD card setup 
+    //===================================================
+
+    //===================================================
+    // System setup 
     //===================================================
 }

@@ -83,7 +83,7 @@ int main(void)
   /* USER CODE BEGIN SysInit */
 
   // Run setup code
-  user_init();
+  mtbdl_init();
 
   /* USER CODE END SysInit */
 
@@ -99,7 +99,7 @@ int main(void)
   while (1)
   {
     // Run looped code
-    user_app();
+    mtbdl_app();
     
     /* USER CODE END WHILE */
 

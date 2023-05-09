@@ -29,9 +29,8 @@
 
 /**
  * @brief Function that gets called once. Initialization function calls go here.
- * 
  */
-void user_init(void);
+void mtbdl_init(void);
 
 //=======================================================================================
 

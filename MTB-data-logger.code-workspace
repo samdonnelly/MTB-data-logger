@@ -7,5 +7,13 @@
 			"path": "../STM32F4-driver-library"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"user_init.h": "c",
+			"includes_app.h": "c",
+			"includes_drivers.h": "c",
+			"int_handlers.h": "c",
+			"main.h": "c"
+		}
+	}
 }

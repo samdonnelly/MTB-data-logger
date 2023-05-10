@@ -43,6 +43,8 @@ void int_handler_init(void)
     handler_flags.exti2_flag = 0; 
     handler_flags.exti3_flag = 0; 
     handler_flags.exti4_flag = 0; 
+    handler_flags.exti5_9_flag = CLEAR; 
+    handler_flags.exti10_15_flag = CLEAR; 
 
     // DMA1 interrupt flags 
     handler_flags.dma1_0_flag = 0; 
@@ -123,6 +125,22 @@ void EXTI4_IRQHandler(void)
 {
     handler_flags.exti4_flag = SET_BIT; 
     exti_pr_clear(EXTI_L4); 
+}
+
+
+// EXTI lines 5-9 
+void EXTI9_5_IRQHandler(void)
+{
+    handler_flags.exti5_9_flag = SET_BIT; 
+    exti_pr_clear(EXTI_L5 | EXTI_L6 | EXTI_L7 | EXTI_L8 | EXTI_L9); 
+}
+
+
+// EXTI lines 10-15 
+void EXTI15_10_IRQHandler(void)
+{
+    handler_flags.exti10_15_flag = SET_BIT; 
+    exti_pr_clear(EXTI_L10 | EXTI_L11 | EXTI_L12 | EXTI_L13 | EXTI_L14 | EXTI_L15); 
 }
 
 
@@ -258,6 +276,7 @@ void DMA2_Stream7_IRQHandler(void)
 void TIM1_BRK_TIM9_IRQHandler(void)
 {
     handler_flags.tim1_brk_tim9_glbl_flag = SET_BIT; 
+    tim_uif_clear(TIM1); 
     tim_uif_clear(TIM9); 
 }
 
@@ -266,6 +285,8 @@ void TIM1_BRK_TIM9_IRQHandler(void)
 void TIM1_UP_TIM10_IRQHandler(void)
 {
     handler_flags.tim1_up_tim10_glbl_flag = SET_BIT; 
+    tim_uif_clear(TIM1); 
+    tim_uif_clear(TIM10); 
 }
 
 
@@ -273,6 +294,8 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void TIM1_TRG_COM_TIM11_IRQHandler(void)
 {
     handler_flags.tim1_trg_tim11_glbl_flag = SET_BIT; 
+    tim_uif_clear(TIM1); 
+    tim_uif_clear(TIM11); 
 }
 
 
@@ -280,6 +303,7 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
 void TIM1_CC_IRQHandler(void)
 {
     handler_flags.tim1_cc_flag = SET_BIT; 
+    tim_uif_clear(TIM1); 
 }
 
 
@@ -287,6 +311,7 @@ void TIM1_CC_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
     handler_flags.tim2_glbl_flag = SET_BIT; 
+    tim_uif_clear(TIM2); 
 }
 
 
@@ -294,6 +319,7 @@ void TIM2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
     handler_flags.tim3_glbl_flag = SET_BIT; 
+    tim_uif_clear(TIM3); 
 }
 
 
@@ -301,6 +327,7 @@ void TIM3_IRQHandler(void)
 void TIM4_IRQHandler(void)
 {
     handler_flags.tim4_glbl_flag = SET_BIT; 
+    tim_uif_clear(TIM4); 
 }
 
 
@@ -308,6 +335,7 @@ void TIM4_IRQHandler(void)
 void TIM5_IRQHandler(void)
 {
     handler_flags.tim5_glbl_flag = SET_BIT; 
+    tim_uif_clear(TIM5); 
 }
 
 

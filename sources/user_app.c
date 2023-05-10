@@ -23,54 +23,92 @@
 //=======================================================================================
 // Function prototypes 
 
-/**
- * @brief 
- * 
- * @details 
- */
-void mtbdl_user_input_check(void); 
-
-
-/**
- * @brief 
- * 
- * @details 
- * 
- * @param mtbdl 
- */
+// Initialization state 
 void mtbdl_init_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-/**
- * @brief 
- * 
- * @details 
- * 
- * @param mtbdl 
- */
+// Idle state 
 void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-/**
- * @brief 
- * 
- * @details 
- * 
- * @param mtbdl 
- */
+// Calibrate state 
+void mtbdl_calibrate_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Pre run state 
+void mtbdl_prerun_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Run state 
+void mtbdl_run_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Post run state 
+void mtbdl_postrun_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Pre RX state 
+void mtbdl_prerx_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// RX state 
+void mtbdl_rx_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Post RX state 
+void mtbdl_postrx_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// PRE TX state 
+void mtbdl_pretx_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// TX state 
+void mtbdl_tx_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Post TX state 
+void mtbdl_posttx_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Pre low power state 
+void mtbdl_prelowpwr_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Low power state 
+void mtbdl_lowpwr_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Post low power state 
+void mtbdl_postlowpwr_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Charge state 
+void mtbdl_charge_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Fault state 
 void mtbdl_fault_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-/**
- * @brief 
- * 
- * @details 
- * 
- * @param mtbdl 
- */
+// Reset state 
 void mtbdl_reset_state(
     mtbdl_trackers_t *mtbdl); 
 
@@ -81,7 +119,7 @@ void mtbdl_reset_state(
 // Global variables 
 
 // Instance of the system data trackers 
-static mtbdl_trackers_t mtbdl_system_trackers; 
+static mtbdl_trackers_t mtbdl_trackers; 
 
 
 // Function pointers to system controller states 
@@ -89,6 +127,20 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
 {
     &mtbdl_init_state, 
     &mtbdl_idle_state, 
+    &mtbdl_calibrate_state, 
+    &mtbdl_prerun_state, 
+    &mtbdl_run_state, 
+    &mtbdl_postrun_state, 
+    &mtbdl_prerx_state, 
+    &mtbdl_rx_state, 
+    &mtbdl_postrx_state, 
+    &mtbdl_pretx_state, 
+    &mtbdl_tx_state, 
+    &mtbdl_posttx_state, 
+    &mtbdl_prelowpwr_state, 
+    &mtbdl_lowpwr_state, 
+    &mtbdl_postlowpwr_state, 
+    &mtbdl_charge_state, 
     &mtbdl_fault_state, 
     &mtbdl_reset_state
 }; 
@@ -100,30 +152,39 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
 // System controller 
 
 // MTB DL controller init 
-void mtbdl_controller_init(void)
+void mtbdl_app_init(
+    GPIO_TypeDef *user_btn_gpio, 
+    gpio_pin_num_t user_btn_1, 
+    gpio_pin_num_t user_btn_2, 
+    gpio_pin_num_t user_btn_3, 
+    gpio_pin_num_t user_btn_4)
 {
-    // Device and controller information 
-    mtbdl_system_trackers.state = MTBDL_INIT_STATE; 
+    // System information 
+    mtbdl_trackers.state = MTBDL_INIT_STATE; 
+    mtbdl_trackers.user_btn_port = user_btn_gpio; 
+    mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
+    mtbdl_trackers.user_btn_2 = (uint8_t)user_btn_2; 
+    mtbdl_trackers.user_btn_3 = (uint8_t)user_btn_3; 
+    mtbdl_trackers.user_btn_4 = (uint8_t)user_btn_4; 
 
     // State flags 
-    mtbdl_system_trackers.init = SET_BIT; 
+    mtbdl_trackers.init = SET_BIT; 
 }
 
 
 // MTB DL application 
-void mtbdl_app()
+void mtbdl_app(void)
 {
     // Local variables 
-    mtbdl_states_t next_state = mtbdl_system_trackers.state; 
+    mtbdl_states_t next_state = mtbdl_trackers.state; 
 
     // Check device statuses 
 
-    // Update user inputs 
+    // Update user input button status 
     if (handler_flags.tim1_up_tim10_glbl_flag)
     {
         handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
-        // debounce((uint8_t)gpio_port_read(GPIOC)); 
-        // mtbdl_user_input_check(); 
+        debounce((uint8_t)gpio_port_read(mtbdl_trackers.user_btn_port)); 
     }
 
     //===================================================
@@ -132,7 +193,7 @@ void mtbdl_app()
     switch (next_state)
     {
         case MTBDL_INIT_STATE: 
-            if (!mtbdl_system_trackers.init)
+            if (!mtbdl_trackers.init)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
@@ -140,6 +201,48 @@ void mtbdl_app()
             break; 
 
         case MTBDL_IDLE_STATE: 
+            break; 
+
+        case MTBDL_CALIBRATE_STATE: 
+            break; 
+
+        case MTBDL_PRERUN_STATE: 
+            break; 
+
+        case MTBDL_RUN_STATE: 
+            break; 
+
+        case MTBDL_POSTRUN_STATE: 
+            break; 
+
+        case MTBDL_PRERX_STATE: 
+            break; 
+
+        case MTBDL_RX_STATE: 
+            break; 
+
+        case MTBDL_POSTRX_STATE: 
+            break; 
+
+        case MTBDL_PRETX_STATE: 
+            break; 
+
+        case MTBDL_TX_STATE: 
+            break; 
+
+        case MTBDL_POSTTX_STATE: 
+            break; 
+
+        case MTBDL_PRELOWPWR_STATE: 
+            break; 
+
+        case MTBDL_LOWPWR_STATE: 
+            break; 
+
+        case MTBDL_POSTLOWPWR_STATE: 
+            break; 
+
+        case MTBDL_CHARGE_STATE: 
             break; 
 
         case MTBDL_FAULT_STATE: 
@@ -157,10 +260,12 @@ void mtbdl_app()
     //===================================================
 
     // Execute the state 
-    mtbdl_state_table[next_state](&mtbdl_system_trackers); 
+    mtbdl_state_table[next_state](&mtbdl_trackers); 
 
     // Update the state 
-    mtbdl_system_trackers.state = next_state; 
+    mtbdl_trackers.state = next_state; 
+
+    // Call device controllers 
 }
 
 //=======================================================================================
@@ -168,14 +273,6 @@ void mtbdl_app()
 
 //=======================================================================================
 // State functions 
-
-// Check for user inputs 
-void mtbdl_user_input_check(void)
-{
-    // Check which buttons are pressed 
-    // Check which buttons are released 
-}
-
 
 // Init state 
 void mtbdl_init_state(
@@ -188,6 +285,118 @@ void mtbdl_init_state(
 
 // Idle state 
 void mtbdl_idle_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Calibrate state 
+void mtbdl_calibrate_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Pre run state 
+void mtbdl_prerun_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Run state 
+void mtbdl_run_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Post run state 
+void mtbdl_postrun_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Pre RX state 
+void mtbdl_prerx_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// RX state 
+void mtbdl_rx_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Post RX state 
+void mtbdl_postrx_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// PRE TX state 
+void mtbdl_pretx_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// TX state 
+void mtbdl_tx_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Post TX state 
+void mtbdl_posttx_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Pre low power state 
+void mtbdl_prelowpwr_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Low power state 
+void mtbdl_lowpwr_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Post low power state 
+void mtbdl_postlowpwr_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
+}
+
+
+// Charge state 
+void mtbdl_charge_state(
     mtbdl_trackers_t *mtbdl)
 {
     // 

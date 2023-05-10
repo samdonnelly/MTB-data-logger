@@ -23,6 +23,8 @@
 // User init function 
 void mtbdl_init()
 {
+    // Local variables 
+
     //===================================================
     // General setup 
 
@@ -31,6 +33,9 @@ void mtbdl_init()
 
     // Serial terminal output 
     uart_init(USART2, UART_BAUD_9600, UART_CLOCK_42); 
+
+    // Initialize interrupt handler flags 
+    int_handler_init(); 
     
     //===================================================
 
@@ -44,6 +49,18 @@ void mtbdl_init()
         0xFFFF,  // Max ARR value 
         TIM_UP_INT_DISABLE); 
     tim_enable(TIM9); 
+
+    // Periodic (counter update) interrupt timer for user button status checks 
+    tim_9_to_11_counter_init(
+        TIM10, 
+        TIM_84MHZ_100US_PSC, 
+        0x0032,  // ARR=50, (50 counts)*(100us/count) = 5ms 
+        TIM_UP_INT_ENABLE); 
+    // May want to consider enabling this timer only during run mode 
+    tim_enable(TIM10); 
+
+    // Enable the interrupt handlers 
+    nvic_config(TIM1_UP_TIM10_IRQn, EXTI_PRIORITY_1); 
 
     //===================================================
 
@@ -107,7 +124,35 @@ void mtbdl_init()
     // SD card setup 
     //===================================================
 
+
+    //===================================================
+    // User button setup 
+
+    // Configure the GPIO inputs for each user button 
+    gpio_pin_init(GPIOC, PIN_0, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    gpio_pin_init(GPIOC, PIN_1, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    gpio_pin_init(GPIOC, PIN_2, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    gpio_pin_init(GPIOC, PIN_3, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+
+    // Initialize the button debouncer 
+    debounce_init(GPIOX_PIN_0 | GPIOX_PIN_1 | GPIOX_PIN_2 | GPIOX_PIN_3); 
+
+    //===================================================
+
+    //===================================================
+    // Wheel speed sensor setup 
+    //===================================================
+
     //===================================================
     // System setup 
+
+    // MTB DL application init 
+    mtbdl_app_init(
+        GPIOC, 
+        GPIOX_PIN_0, 
+        GPIOX_PIN_1, 
+        GPIOX_PIN_2, 
+        GPIOX_PIN_3); 
+
     //===================================================
 }

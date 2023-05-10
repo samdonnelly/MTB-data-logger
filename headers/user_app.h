@@ -28,7 +28,7 @@
 // Macros 
 
 // System info 
-#define MTBDL_NUM_STATES 19            // Number of system states 
+#define MTBDL_NUM_STATES 18            // Number of system states 
 
 //=======================================================================================
 
@@ -55,10 +55,9 @@ typedef enum {
     MTBDL_PRELOWPWR_STATE,       // State 12 : Pre low power mode 
     MTBDL_LOWPWR_STATE,          // State 13 : Low power mode 
     MTBDL_POSTLOWPWR_STATE,      // State 14 : Post low power mode 
-    MTBDL_LOWBATT_STATE,         // State 15 : Low battery 
-    MTBDL_CHARGE_STATE,          // State 16 : Charge 
-    MTBDL_FAULT_STATE,           // State 17 : Fault 
-    MTBDL_RESET_STATE            // State 18 : Reset 
+    MTBDL_CHARGE_STATE,          // State 15 : Charge 
+    MTBDL_FAULT_STATE,           // State 16 : Fault 
+    MTBDL_RESET_STATE            // State 17 : Reset 
 } mtbdl_states_t; 
 
 //=======================================================================================
@@ -70,8 +69,13 @@ typedef enum {
 // 
 typedef struct mtbdl_trackers_s 
 {
-    // Device and controller information 
+    // System information 
     mtbdl_states_t state;                       // State of the system controller 
+    GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
+    uint8_t user_btn_1;                         // User button 1 pin number 
+    uint8_t user_btn_2;                         // User button 2 pin number 
+    uint8_t user_btn_3;                         // User button 3 pin number 
+    uint8_t user_btn_4;                         // User button 4 pin number 
 
     // State flags 
     uint8_t init : 1;                           // Ensures the init state is run 
@@ -101,7 +105,12 @@ typedef void (*mtbdl_func_ptr_t)(
  * 
  * @details 
  */
-void mtbdl_controller_init(void); 
+void mtbdl_app_init(
+    GPIO_TypeDef *user_btn_gpio, 
+    gpio_pin_num_t user_btn_1, 
+    gpio_pin_num_t user_btn_2, 
+    gpio_pin_num_t user_btn_3, 
+    gpio_pin_num_t user_btn_4); 
 
 
 /**

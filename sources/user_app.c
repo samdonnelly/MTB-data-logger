@@ -27,6 +27,14 @@
  * @brief 
  * 
  * @details 
+ */
+void mtbdl_user_input_check(void); 
+
+
+/**
+ * @brief 
+ * 
+ * @details 
  * 
  * @param mtbdl 
  */
@@ -108,7 +116,15 @@ void mtbdl_app()
     // Local variables 
     mtbdl_states_t next_state = mtbdl_system_trackers.state; 
 
-    // Check user inputs 
+    // Check device statuses 
+
+    // Update user inputs 
+    if (handler_flags.tim1_up_tim10_glbl_flag)
+    {
+        handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
+        // debounce((uint8_t)gpio_port_read(GPIOC)); 
+        // mtbdl_user_input_check(); 
+    }
 
     //===================================================
     // System state machine 
@@ -152,6 +168,14 @@ void mtbdl_app()
 
 //=======================================================================================
 // State functions 
+
+// Check for user inputs 
+void mtbdl_user_input_check(void)
+{
+    // Check which buttons are pressed 
+    // Check which buttons are released 
+}
+
 
 // Init state 
 void mtbdl_init_state(

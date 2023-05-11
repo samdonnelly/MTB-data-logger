@@ -39,8 +39,8 @@ C_SOURCES =  \
 Core/Src/main.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
-sources/user_init.c \
-sources/user_app.c \
+sources/mtbdl_init.c \
+sources/mtbdl_app.c \
 sources/int_handlers.c \
 sources/config_files/m8q_config.c \
 ../STM32F4-driver-library/sources/analog_driver.c \

@@ -162,10 +162,16 @@ void mtbdl_app_init(
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
     mtbdl_trackers.user_btn_port = user_btn_gpio; 
+
+    // User buttons 
     mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
     mtbdl_trackers.user_btn_2 = (uint8_t)user_btn_2; 
     mtbdl_trackers.user_btn_3 = (uint8_t)user_btn_3; 
     mtbdl_trackers.user_btn_4 = (uint8_t)user_btn_4; 
+    mtbdl_trackers.user_btn_1_block = CLEAR; 
+    mtbdl_trackers.user_btn_2_block = CLEAR; 
+    mtbdl_trackers.user_btn_3_block = CLEAR; 
+    mtbdl_trackers.user_btn_4_block = CLEAR; 
 
     // State flags 
     mtbdl_trackers.init = SET_BIT; 
@@ -287,7 +293,21 @@ void mtbdl_init_state(
 void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // 
+    //==================================================
+    // Check user button input 
+
+    // Button 1 
+    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    {
+        mtbdl->run = SET_BIT; 
+        mtbdl->user_btn_1_block = SET_BIT; 
+    }
+    else if (debounce_released(mtbdl->user_btn_1) && mtbdl->user_btn_1_block)
+    {
+        mtbdl->user_btn_1_block = CLEAR; 
+    }
+
+    //==================================================
 }
 
 

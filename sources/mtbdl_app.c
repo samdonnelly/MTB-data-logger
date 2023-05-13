@@ -342,6 +342,12 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTRUN_STATE: 
+            // Idle state flag set 
+            if (mtbdl_trackers.idle)
+            {
+                next_state = MTBDL_IDLE_STATE; 
+            }
+
             break; 
 
         case MTBDL_PRERX_STATE: 
@@ -381,6 +387,12 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTRX_STATE: 
+            // Idle state flag set 
+            if (mtbdl_trackers.idle)
+            {
+                next_state = MTBDL_IDLE_STATE; 
+            }
+
             break; 
 
         case MTBDL_PRETX_STATE: 
@@ -420,6 +432,12 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTTX_STATE: 
+            // Idle state flag set 
+            if (mtbdl_trackers.idle)
+            {
+                next_state = MTBDL_IDLE_STATE; 
+            }
+
             break; 
 
         case MTBDL_PRELOWPWR_STATE: 
@@ -625,7 +643,8 @@ void mtbdl_run_state(
 void mtbdl_postrun_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // 
+    // Set the idle state flag when ready 
+    mtbdl->idle = SET_BIT; 
 }
 
 
@@ -679,7 +698,8 @@ void mtbdl_rx_state(
 void mtbdl_postrx_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // 
+    // Set the idle state flag when ready 
+    mtbdl->idle = SET_BIT; 
 }
 
 
@@ -733,7 +753,8 @@ void mtbdl_tx_state(
 void mtbdl_posttx_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // 
+    // Set the idle state flag when ready 
+    mtbdl->idle = SET_BIT; 
 }
 
 

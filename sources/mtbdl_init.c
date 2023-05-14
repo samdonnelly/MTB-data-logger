@@ -148,6 +148,7 @@ void mtbdl_init()
 
     // MTB DL application init 
     mtbdl_app_init(
+        TIM9, 
         GPIOC, 
         GPIOX_PIN_0, 
         GPIOX_PIN_1, 

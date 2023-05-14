@@ -159,6 +159,7 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
 
 // MTB DL controller init 
 void mtbdl_app_init(
+    TIM_TypeDef *timer_nonblocking, 
     GPIO_TypeDef *user_btn_gpio, 
     gpio_pin_num_t user_btn_1, 
     gpio_pin_num_t user_btn_2, 
@@ -168,6 +169,13 @@ void mtbdl_app_init(
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
     mtbdl_trackers.user_btn_port = user_btn_gpio; 
+
+    // Timing information 
+    mtbdl_trackers.timer_nonblocking = timer_nonblocking; 
+    mtbdl_trackers.screen_sleep.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
+    mtbdl_trackers.screen_sleep.time_cnt_total = CLEAR; 
+    mtbdl_trackers.screen_sleep.time_cnt = CLEAR; 
+    mtbdl_trackers.screen_sleep.time_start = SET_BIT; 
 
     // User buttons 
     mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
@@ -539,6 +547,10 @@ void mtbdl_idle_state(
         mtbdl->user_btn_4_block = SET_BIT; 
     }
     
+    //==================================================
+
+    //==================================================
+    // Screen backlight timer 
     //==================================================
 }
 

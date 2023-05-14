@@ -29,6 +29,7 @@
 
 // System info 
 #define MTBDL_NUM_STATES 19            // Number of system states 
+#define MTBDL_LCD_SLEEP 15000000       // (us) inactive time before screen backlight off 
 
 //=======================================================================================
 
@@ -74,6 +75,10 @@ typedef struct mtbdl_trackers_s
     mtbdl_states_t state;                       // State of the system controller 
     uint16_t fault_code;                        // System fault code 
     GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
+
+    // Timing information 
+    TIM_TypeDef *timer_nonblocking;             // Timer used for non-blocking delays 
+    tim_compare_t screen_sleep;                 // Screen sleep timing info 
 
     // User buttons 
     uint8_t user_btn_1;                         // User button 1 pin number 
@@ -121,6 +126,7 @@ typedef void (*mtbdl_func_ptr_t)(
  * @details 
  */
 void mtbdl_app_init(
+    TIM_TypeDef *timer_nonblocking, 
     GPIO_TypeDef *user_btn_gpio, 
     gpio_pin_num_t user_btn_1, 
     gpio_pin_num_t user_btn_2, 

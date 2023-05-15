@@ -42,6 +42,7 @@ Core/Src/stm32f4xx_hal_msp.c \
 sources/mtbdl_init.c \
 sources/mtbdl_app.c \
 sources/int_handlers.c \
+sources/screen_msgs.c \
 sources/config_files/m8q_config.c \
 ../STM32F4-driver-library/sources/analog_driver.c \
 ../STM32F4-driver-library/sources/data_filters.c \

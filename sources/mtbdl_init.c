@@ -155,8 +155,6 @@ void mtbdl_init()
         GPIOX_PIN_2, 
         GPIOX_PIN_3); 
 
-    // Display welcome message 
-
     //===================================================
 
 

@@ -13,7 +13,8 @@
 			"includes_app.h": "c",
 			"includes_drivers.h": "c",
 			"int_handlers.h": "c",
-			"main.h": "c"
+			"main.h": "c",
+			"m8q_config.h": "c"
 		}
 	}
 }

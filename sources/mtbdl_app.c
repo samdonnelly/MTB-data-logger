@@ -551,6 +551,29 @@ void mtbdl_idle_state(
 
     //==================================================
     // Screen backlight timer 
+    
+    // Turn the backlight on and reset timer if a button is pressed 
+    if (mtbdl->user_btn_1_block | 
+        mtbdl->user_btn_2_block | 
+        mtbdl->user_btn_3_block | 
+        mtbdl->user_btn_4_block)
+    {
+        hd44780u_backlight_on(); 
+        mtbdl->screen_sleep.time_start = SET_BIT; 
+    }
+
+    // If the system has been inactive for long enough then turn the screen backlight off 
+    else if (tim_compare(mtbdl->timer_nonblocking, 
+                         mtbdl->screen_sleep.clk_freq, 
+                         MTBDL_LCD_SLEEP, 
+                         &mtbdl->screen_sleep.time_cnt_total, 
+                         &mtbdl->screen_sleep.time_cnt, 
+                         &mtbdl->screen_sleep.time_start))
+    {
+        hd44780u_backlight_off(); 
+        mtbdl->screen_sleep.time_start = SET_BIT; 
+    }
+
     //==================================================
 }
 

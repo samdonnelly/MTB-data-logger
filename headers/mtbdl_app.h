@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef _USER_APP_H_
-#define _USER_APP_H_
+#ifndef _MTBDL_APP_H_
+#define _MTBDL_APP_H_
 
 //=======================================================================================
 // Includes 
@@ -68,7 +68,7 @@ typedef enum {
 //=======================================================================================
 // Structures 
 
-// 
+// MTB DL system trackers 
 typedef struct mtbdl_trackers_s 
 {
     // System information 
@@ -106,6 +106,11 @@ mtbdl_trackers_t;
 
 
 //=======================================================================================
+// Screen messages 
+//=======================================================================================
+
+
+//=======================================================================================
 // Function pointers 
 
 /**
@@ -124,6 +129,13 @@ typedef void (*mtbdl_func_ptr_t)(
  * @brief MTB DL controller init 
  * 
  * @details 
+ * 
+ * @param timer_nonblocking 
+ * @param user_btn_gpio 
+ * @param user_btn_1 
+ * @param user_btn_2 
+ * @param user_btn_3 
+ * @param user_btn_4 
  */
 void mtbdl_app_init(
     TIM_TypeDef *timer_nonblocking, 
@@ -144,4 +156,4 @@ void mtbdl_app(void);
 //=======================================================================================
 
 
-#endif  // _USER_APP_H_
+#endif  // _MTBDL_APP_H_

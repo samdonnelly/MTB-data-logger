@@ -28,7 +28,7 @@
 // Macros 
 
 // System info 
-#define MTBDL_NUM_STATES 19            // Number of system states 
+#define MTBDL_NUM_STATES 20            // Number of system states 
 #define MTBDL_LCD_SLEEP 15000000       // (us) inactive time before screen backlight off 
 #define MTBDL_INIT_WAIT 3000000        // (us) init state wait time 
 
@@ -44,23 +44,24 @@
 typedef enum {
     MTBDL_INIT_STATE,            // State 0 : Startup 
     MTBDL_IDLE_STATE,            // State 1 : Idle 
-    MTBDL_PRECALIBRATE_STATE,    // State 2 : Calibrate 
-    MTBDL_CALIBRATE_STATE,       // State 3 : Calibrate 
-    MTBDL_PRERUN_STATE,          // State 4 : Pre-run 
-    MTBDL_RUN_STATE,             // State 5 : Run 
-    MTBDL_POSTRUN_STATE,         // State 6 : Post-run 
-    MTBDL_PRERX_STATE,           // State 7 : Pre data receive 
-    MTBDL_RX_STATE,              // State 8 : Data receive 
-    MTBDL_POSTRX_STATE,          // State 9 : Post data receive 
-    MTBDL_PRETX_STATE,           // State 10 : Pre data send 
-    MTBDL_TX_STATE,              // State 11 : Data send 
-    MTBDL_POSTTX_STATE,          // State 12 : Post data send 
-    MTBDL_PRELOWPWR_STATE,       // State 13 : Pre low power mode 
-    MTBDL_LOWPWR_STATE,          // State 14 : Low power mode 
-    MTBDL_POSTLOWPWR_STATE,      // State 15 : Post low power mode 
-    MTBDL_CHARGE_STATE,          // State 16 : Charge 
-    MTBDL_FAULT_STATE,           // State 17 : Fault 
-    MTBDL_RESET_STATE            // State 18 : Reset 
+    MTBDL_PRERUN_STATE,          // State 3 : Pre-run 
+    MTBDL_RUN_STATE,             // State 4 : Run 
+    MTBDL_POSTRUN_STATE,         // State 5 : Post-run 
+    MTBDL_DATA_SELECT_STATE,     // State 2 : Data transfer selection 
+    MTBDL_PRERX_STATE,           // State 6 : Pre data receive 
+    MTBDL_RX_STATE,              // State 7 : Data receive 
+    MTBDL_POSTRX_STATE,          // State 8 : Post data receive 
+    MTBDL_PRETX_STATE,           // State 9 : Pre data send 
+    MTBDL_TX_STATE,              // State 10 : Data send 
+    MTBDL_POSTTX_STATE,          // State 11 : Post data send 
+    MTBDL_PRECALIBRATE_STATE,    // State 12 : Calibrate 
+    MTBDL_CALIBRATE_STATE,       // State 13 : Calibrate 
+    MTBDL_PRELOWPWR_STATE,       // State 14 : Pre low power mode 
+    MTBDL_LOWPWR_STATE,          // State 15 : Low power mode 
+    MTBDL_POSTLOWPWR_STATE,      // State 16 : Post low power mode 
+    MTBDL_CHARGE_STATE,          // State 17 : Charge 
+    MTBDL_FAULT_STATE,           // State 18 : Fault 
+    MTBDL_RESET_STATE            // State 19 : Reset 
 } mtbdl_states_t; 
 
 //=======================================================================================
@@ -92,14 +93,15 @@ typedef struct mtbdl_trackers_s
     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
 
     // State flags 
-    uint8_t init      : 1;                      // Ensures the init state is run 
-    uint8_t idle      : 1;                      // Idle state flag 
-    uint8_t calibrate : 1;                      // Calibration state flag 
-    uint8_t run       : 1;                      // Run state flag 
-    uint8_t tx        : 1;                      // Send/transmit data state flag 
-    uint8_t rx        : 1;                      // Read/receive data state flag 
-    uint8_t low_pwr   : 1;                      // Low power state flag 
-    uint8_t reset     : 1;                      // Reset state flag 
+    uint8_t init        : 1;                    // Ensures the init state is run 
+    uint8_t idle        : 1;                    // Idle state flag 
+    uint8_t run         : 1;                    // Run state flag 
+    uint8_t data_select : 1;                    // Data transfer select state flag 
+    uint8_t tx          : 1;                    // Send/transmit data state flag 
+    uint8_t rx          : 1;                    // Read/receive data state flag 
+    uint8_t calibrate   : 1;                    // Calibration state flag 
+    uint8_t low_pwr     : 1;                    // Low power state flag 
+    uint8_t reset       : 1;                    // Reset state flag 
 }
 mtbdl_trackers_t; 
 

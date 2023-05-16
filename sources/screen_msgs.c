@@ -23,9 +23,19 @@
 //=======================================================================================
 // MTB DL screen messages 
 
-mtbdl_msgs_t mtbdl_welcome[MTBDL_WELCOME_MSG_LEN] = 
+// Init state message 
+mtbdl_msgs_t mtbdl_welcome_msg[MTBDL_WELCOME_MSG_LEN] = 
 {
     {HD44780U_L2, "MTB DL", 7} 
+}; 
+
+// Idle state message 
+mtbdl_msgs_t mtbdl_idle_msg[MTBDL_IDLE_MSG_LEN] = 
+{
+    {HD44780U_L1, "F: PSI:    R:   D:", 0}, 
+    {HD44780U_L2, "S: PSI:    R:   L:", 0}, 
+    {HD44780U_L3, "SOC:    %", 0}, 
+    {HD44780U_L4, "GPS: ", 0} 
 }; 
 
 //=======================================================================================

@@ -29,6 +29,7 @@
 
 // Message lengths 
 #define MTBDL_WELCOME_MSG_LEN 1            // Number of lines in welcome message 
+#define MTBDL_IDLE_MSG_LEN 4               // 
 
 //=======================================================================================
 
@@ -56,7 +57,11 @@ mtbdl_msgs_t;
 //=======================================================================================
 // Message declarations 
 
-extern mtbdl_msgs_t mtbdl_welcome[MTBDL_WELCOME_MSG_LEN]; 
+// Init state message 
+extern mtbdl_msgs_t mtbdl_welcome_msg[MTBDL_WELCOME_MSG_LEN]; 
+
+// Idle state message 
+extern mtbdl_msgs_t mtbdl_idle_msg[MTBDL_IDLE_MSG_LEN]; 
 
 //=======================================================================================
 

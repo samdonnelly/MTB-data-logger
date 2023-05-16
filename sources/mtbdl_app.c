@@ -33,16 +33,6 @@ void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Pre calibration state 
-void mtbdl_precalibrate_state(
-    mtbdl_trackers_t *mtbdl); 
-
-
-// Calibrate state 
-void mtbdl_calibrate_state(
-    mtbdl_trackers_t *mtbdl); 
-
-
 // Pre run state 
 void mtbdl_prerun_state(
     mtbdl_trackers_t *mtbdl); 
@@ -55,6 +45,11 @@ void mtbdl_run_state(
 
 // Post run state 
 void mtbdl_postrun_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Data transfer selection 
+void mtbdl_data_select(
     mtbdl_trackers_t *mtbdl); 
 
 
@@ -85,6 +80,16 @@ void mtbdl_tx_state(
 
 // Post TX state 
 void mtbdl_posttx_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Pre calibration state 
+void mtbdl_precalibrate_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Calibrate state 
+void mtbdl_calibrate_state(
     mtbdl_trackers_t *mtbdl); 
 
 
@@ -132,17 +137,18 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
 {
     &mtbdl_init_state, 
     &mtbdl_idle_state, 
-    &mtbdl_precalibrate_state, 
-    &mtbdl_calibrate_state, 
     &mtbdl_prerun_state, 
     &mtbdl_run_state, 
     &mtbdl_postrun_state, 
+    &mtbdl_data_select, 
     &mtbdl_prerx_state, 
     &mtbdl_rx_state, 
     &mtbdl_postrx_state, 
     &mtbdl_pretx_state, 
     &mtbdl_tx_state, 
     &mtbdl_posttx_state, 
+    &mtbdl_precalibrate_state, 
+    &mtbdl_calibrate_state, 
     &mtbdl_prelowpwr_state, 
     &mtbdl_lowpwr_state, 
     &mtbdl_postlowpwr_state, 
@@ -172,16 +178,11 @@ void mtbdl_app_init(
 
     // Timing information 
     mtbdl_trackers.timer_nonblocking = timer_nonblocking; 
-    // mtbdl_trackers.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
-    // Screen sleep timer 
+    // Screen timer 
     mtbdl_trackers.screen_timer.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
     mtbdl_trackers.screen_timer.time_cnt_total = CLEAR; 
     mtbdl_trackers.screen_timer.time_cnt = CLEAR; 
     mtbdl_trackers.screen_timer.time_start = SET_BIT; 
-    // // General timer 
-    // mtbdl_trackers.init_wait.time_cnt_total = CLEAR; 
-    // mtbdl_trackers.init_wait.time_cnt = CLEAR; 
-    // mtbdl_trackers.init_wait.time_start = SET_BIT; 
 
     // User buttons 
     mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
@@ -197,9 +198,11 @@ void mtbdl_app_init(
     mtbdl_trackers.init = SET_BIT; 
     mtbdl_trackers.idle = CLEAR_BIT; 
     mtbdl_trackers.run = CLEAR_BIT; 
+    mtbdl_trackers.data_select = CLEAR_BIT; 
     mtbdl_trackers.tx = CLEAR_BIT; 
     mtbdl_trackers.rx = CLEAR_BIT; 
     mtbdl_trackers.calibrate = CLEAR_BIT; 
+    mtbdl_trackers.low_pwr = CLEAR_BIT; 
     mtbdl_trackers.reset = CLEAR_BIT; 
 }
 
@@ -269,52 +272,16 @@ void mtbdl_app(void)
                 next_state = MTBDL_PRERUN_STATE; 
             }
 
-            // TX state flag set 
-            else if (mtbdl_trackers.tx)
+            // Data transfer select state flag set 
+            else if (mtbdl_trackers.data_select)
             {
-                next_state = MTBDL_PRETX_STATE; 
-            }
-
-            // RX state flag set 
-            else if (mtbdl_trackers.rx)
-            {
-                next_state = MTBDL_PRERX_STATE; 
+                next_state = MTBDL_DATA_SELECT_STATE; 
             }
 
             // Calibration state flag set 
             else if (mtbdl_trackers.calibrate)
             {
                 next_state = MTBDL_PRECALIBRATE_STATE;  
-            }
-
-            break; 
-
-        case MTBDL_PRECALIBRATE_STATE: 
-            // Fault code set 
-            if (mtbdl_trackers.fault_code)
-            {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-
-            // Idle state flag set 
-            else if (mtbdl_trackers.idle)
-            {
-                next_state = MTBDL_IDLE_STATE; 
-            }
-
-            // Calibration state flag set 
-            else if (mtbdl_trackers.calibrate)
-            {
-                next_state = MTBDL_CALIBRATE_STATE;  
-            }
-
-            break; 
-        
-        case MTBDL_CALIBRATE_STATE: 
-            // Idle state flag set 
-            if (mtbdl_trackers.idle)
-            {
-                next_state = MTBDL_IDLE_STATE; 
             }
 
             break; 
@@ -358,6 +325,33 @@ void mtbdl_app(void)
         case MTBDL_POSTRUN_STATE: 
             // Idle state flag set 
             if (mtbdl_trackers.idle)
+            {
+                next_state = MTBDL_IDLE_STATE; 
+            }
+
+            break; 
+
+        case MTBDL_DATA_SELECT_STATE: 
+            // Fault code set 
+            if (mtbdl_trackers.fault_code)
+            {
+                next_state = MTBDL_FAULT_STATE; 
+            }
+
+            // TX state flag set 
+            else if (mtbdl_trackers.tx)
+            {
+                next_state = MTBDL_PRETX_STATE; 
+            }
+
+            // RX state flag set 
+            else if (mtbdl_trackers.rx)
+            {
+                next_state = MTBDL_PRERX_STATE; 
+            }
+
+            // Idle state flag set 
+            else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
@@ -454,6 +448,36 @@ void mtbdl_app(void)
 
             break; 
 
+        case MTBDL_PRECALIBRATE_STATE: 
+            // Fault code set 
+            if (mtbdl_trackers.fault_code)
+            {
+                next_state = MTBDL_FAULT_STATE; 
+            }
+
+            // Idle state flag set 
+            else if (mtbdl_trackers.idle)
+            {
+                next_state = MTBDL_IDLE_STATE; 
+            }
+
+            // Calibration state flag set 
+            else if (mtbdl_trackers.calibrate)
+            {
+                next_state = MTBDL_CALIBRATE_STATE;  
+            }
+
+            break; 
+        
+        case MTBDL_CALIBRATE_STATE: 
+            // Idle state flag set 
+            if (mtbdl_trackers.idle)
+            {
+                next_state = MTBDL_IDLE_STATE; 
+            }
+
+            break; 
+
         case MTBDL_PRELOWPWR_STATE: 
             break; 
 
@@ -512,15 +536,17 @@ void mtbdl_init_state(
 {
     if (mtbdl->init)
     {
+        // Clear the line data 
+
         // Display the startup message 
-        mtbdl_screen_msg_format(mtbdl_welcome, MTBDL_WELCOME_MSG_LEN); 
+        mtbdl_screen_msg_format(mtbdl_welcome_msg, MTBDL_WELCOME_MSG_LEN); 
         hd44780u_set_write_flag(); 
 
         // Put the HC-05 in low power mode 
 
         // Put the MPU-6050 in low power mode 
 
-        // Check something in the file system? 
+        // Check for existing bike / logging data in the filesystem 
     }
     
     mtbdl->init = CLEAR_BIT; 
@@ -540,7 +566,7 @@ void mtbdl_init_state(
 
         // Clear the screen startup message 
         hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_welcome, MTBDL_WELCOME_MSG_LEN); 
+        mtbdl_screen_line_clear(mtbdl_welcome_msg, MTBDL_WELCOME_MSG_LEN); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -554,6 +580,20 @@ void mtbdl_init_state(
 void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // Idle state screen message 
+
+    if (mtbdl->idle)
+    {
+        // Format the display message with data 
+
+        // Display the idle state message 
+        mtbdl_screen_msg_format(mtbdl_idle_msg, MTBDL_IDLE_MSG_LEN); 
+        hd44780u_set_write_flag(); 
+    }
+
+    //==================================================
+    
     mtbdl->idle = CLEAR_BIT; 
 
     //==================================================
@@ -566,40 +606,44 @@ void mtbdl_idle_state(
         mtbdl->user_btn_1_block = SET_BIT; 
     }
     
-    // Button 2 - triggers the pre send state 
+    // Button 2 - triggers the data transfer selection state 
     else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
     {
-        mtbdl->tx = SET_BIT; 
+        mtbdl->data_select = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
     }
     
-    // Button 3 - triggers the pre receive state 
+    // Button 3 - triggers the alternate functions state 
     else if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
     {
-        mtbdl->rx = SET_BIT; 
+        mtbdl->calibrate = SET_BIT; 
         mtbdl->user_btn_3_block = SET_BIT; 
     }
     
-    // Button 4 - triggers the pre calibration state 
+    // Button 4 - Turns the screen backlight on 
     else if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
     {
-        mtbdl->calibrate = SET_BIT; 
         mtbdl->user_btn_4_block = SET_BIT; 
+        hd44780u_backlight_on(); 
+        mtbdl->screen_timer.time_start = SET_BIT; 
     }
     
     //==================================================
 
     //==================================================
-    // Screen backlight timer 
+    // Screen settings 
     
-    // Turn the backlight on and reset timer if a button is pressed 
-    if (mtbdl->user_btn_1_block | 
-        mtbdl->user_btn_2_block | 
-        mtbdl->user_btn_3_block | 
-        mtbdl->user_btn_4_block)
+    // Turn the screen backlight on and clear the screen when leaving the state 
+    if (mtbdl->run | 
+        mtbdl->data_select | 
+        mtbdl->calibrate)
     {
         hd44780u_backlight_on(); 
         mtbdl->screen_timer.time_start = SET_BIT; 
+
+        // Clear the idle state message 
+        hd44780u_clear(); 
+        mtbdl_screen_line_clear(mtbdl_idle_msg, MTBDL_IDLE_MSG_LEN); 
     }
 
     // If the system has been inactive for long enough then turn the screen backlight off 
@@ -615,44 +659,6 @@ void mtbdl_idle_state(
     }
 
     //==================================================
-}
-
-
-// Pre calibration state 
-void mtbdl_precalibrate_state(
-    mtbdl_trackers_t *mtbdl)
-{
-    mtbdl->calibrate = CLEAR_BIT; 
-
-    //==================================================
-    // Check user button input 
-
-    // Button 1 - triggers the calibration state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->calibrate = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-    }
-    
-    // Button 2 - cancels the calibration state --> triggers idle state 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
-    }
-    
-    //==================================================
-}
-
-
-// Calibration state 
-void mtbdl_calibrate_state(
-    mtbdl_trackers_t *mtbdl)
-{
-    mtbdl->calibrate = CLEAR_BIT; 
-
-    // Set the idle state flag once ready 
-    mtbdl->idle = SET_BIT; 
 }
 
 
@@ -720,6 +726,40 @@ void mtbdl_postrun_state(
 {
     // Set the idle state flag when ready 
     mtbdl->idle = SET_BIT; 
+}
+
+
+// Data transfer selection 
+void mtbdl_data_select(
+    mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->data_select = CLEAR_BIT; 
+
+    //==================================================
+    // Check user button input 
+
+    // Button 1 - triggers the pre send (TX) state 
+    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    {
+        mtbdl->tx = SET_BIT; 
+        mtbdl->user_btn_1_block = SET_BIT; 
+    }
+    
+    // Button 2 - triggers the pre receive (RX) state 
+    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    {
+        mtbdl->rx = SET_BIT; 
+        mtbdl->user_btn_2_block = SET_BIT; 
+    }
+    
+    // Button 3 - triggers the idle state - cancels data selection 
+    else if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
+    {
+        mtbdl->idle = SET_BIT; 
+        mtbdl->user_btn_3_block = SET_BIT; 
+    }
+    
+    //==================================================
 }
 
 
@@ -829,6 +869,44 @@ void mtbdl_posttx_state(
     mtbdl_trackers_t *mtbdl)
 {
     // Set the idle state flag when ready 
+    mtbdl->idle = SET_BIT; 
+}
+
+
+// Pre calibration state 
+void mtbdl_precalibrate_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->calibrate = CLEAR_BIT; 
+
+    //==================================================
+    // Check user button input 
+
+    // Button 1 - triggers the calibration state 
+    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    {
+        mtbdl->calibrate = SET_BIT; 
+        mtbdl->user_btn_1_block = SET_BIT; 
+    }
+    
+    // Button 2 - cancels the calibration state --> triggers idle state 
+    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    {
+        mtbdl->idle = SET_BIT; 
+        mtbdl->user_btn_2_block = SET_BIT; 
+    }
+    
+    //==================================================
+}
+
+
+// Calibration state 
+void mtbdl_calibrate_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->calibrate = CLEAR_BIT; 
+
+    // Set the idle state flag once ready 
     mtbdl->idle = SET_BIT; 
 }
 

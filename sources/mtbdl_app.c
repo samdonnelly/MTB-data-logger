@@ -33,8 +33,13 @@ void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Pre run state 
-void mtbdl_prerun_state(
+// Run prep state 
+void mtbdl_run_prep_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Run countdown state 
+void mtbdl_run_prep_state(
     mtbdl_trackers_t *mtbdl); 
 
 
@@ -48,8 +53,13 @@ void mtbdl_postrun_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Data transfer selection 
-void mtbdl_data_select(
+// Data transfer selection state 
+void mtbdl_data_select_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
+// Search for Bluetooth connection state 
+void mtbdl_dev_search_state(
     mtbdl_trackers_t *mtbdl); 
 
 
@@ -103,16 +113,6 @@ void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Post low power state 
-void mtbdl_postlowpwr_state(
-    mtbdl_trackers_t *mtbdl); 
-
-
-// Charge state 
-void mtbdl_charge_state(
-    mtbdl_trackers_t *mtbdl); 
-
-
 // Fault state 
 void mtbdl_fault_state(
     mtbdl_trackers_t *mtbdl); 
@@ -137,10 +137,11 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
 {
     &mtbdl_init_state, 
     &mtbdl_idle_state, 
-    &mtbdl_prerun_state, 
+    &mtbdl_run_prep_state, 
     &mtbdl_run_state, 
     &mtbdl_postrun_state, 
-    &mtbdl_data_select, 
+    &mtbdl_data_select_state, 
+    &mtbdl_dev_search_state, 
     &mtbdl_prerx_state, 
     &mtbdl_rx_state, 
     &mtbdl_postrx_state, 
@@ -151,8 +152,6 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
     &mtbdl_calibrate_state, 
     &mtbdl_prelowpwr_state, 
     &mtbdl_lowpwr_state, 
-    &mtbdl_postlowpwr_state, 
-    &mtbdl_charge_state, 
     &mtbdl_fault_state, 
     &mtbdl_reset_state
 }; 
@@ -269,7 +268,7 @@ void mtbdl_app(void)
             // Run state flag set 
             else if (mtbdl_trackers.run)
             {
-                next_state = MTBDL_PRERUN_STATE; 
+                next_state = MTBDL_RUN_PREP_STATE; 
             }
 
             // Data transfer select state flag set 
@@ -286,7 +285,7 @@ void mtbdl_app(void)
 
             break; 
 
-        case MTBDL_PRERUN_STATE: 
+        case MTBDL_RUN_PREP_STATE: 
             // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
@@ -305,6 +304,9 @@ void mtbdl_app(void)
                 next_state = MTBDL_RUN_STATE; 
             }
 
+            break; 
+
+        case MTBDL_RUN_COUNTDOWN_STATE: 
             break; 
 
         case MTBDL_RUN_STATE: 
@@ -356,6 +358,9 @@ void mtbdl_app(void)
                 next_state = MTBDL_IDLE_STATE; 
             }
 
+            break; 
+
+        case MTBDL_DEV_SEARCH_STATE: 
             break; 
 
         case MTBDL_PRERX_STATE: 
@@ -484,12 +489,6 @@ void mtbdl_app(void)
         case MTBDL_LOWPWR_STATE: 
             break; 
 
-        case MTBDL_POSTLOWPWR_STATE: 
-            break; 
-
-        case MTBDL_CHARGE_STATE: 
-            break; 
-
         case MTBDL_FAULT_STATE: 
             // Reset flag set 
             if (mtbdl_trackers.reset)
@@ -539,7 +538,7 @@ void mtbdl_init_state(
         // Clear the line data 
 
         // Display the startup message 
-        mtbdl_screen_msg_format(mtbdl_welcome_msg, MTBDL_WELCOME_MSG_LEN); 
+        mtbdl_screen_msg_format(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
         hd44780u_set_write_flag(); 
 
         // Put the HC-05 in low power mode 
@@ -566,7 +565,7 @@ void mtbdl_init_state(
 
         // Clear the screen startup message 
         hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_welcome_msg, MTBDL_WELCOME_MSG_LEN); 
+        mtbdl_screen_line_clear(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -588,7 +587,7 @@ void mtbdl_idle_state(
         // Format the display message with data 
 
         // Display the idle state message 
-        mtbdl_screen_msg_format(mtbdl_idle_msg, MTBDL_IDLE_MSG_LEN); 
+        mtbdl_screen_msg_format(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
         hd44780u_set_write_flag(); 
     }
 
@@ -643,7 +642,7 @@ void mtbdl_idle_state(
 
         // Clear the idle state message 
         hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_idle_msg, MTBDL_IDLE_MSG_LEN); 
+        mtbdl_screen_line_clear(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
     }
 
     // If the system has been inactive for long enough then turn the screen backlight off 
@@ -663,7 +662,7 @@ void mtbdl_idle_state(
 
 
 // Pre run state 
-void mtbdl_prerun_state(
+void mtbdl_run_prep_state(
     mtbdl_trackers_t *mtbdl)
 {
     mtbdl->run = CLEAR_BIT; 
@@ -689,6 +688,14 @@ void mtbdl_prerun_state(
     }
     
     //==================================================
+}
+
+
+// Run countdown state 
+void mtbdl_run_prep_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
 }
 
 
@@ -730,7 +737,7 @@ void mtbdl_postrun_state(
 
 
 // Data transfer selection 
-void mtbdl_data_select(
+void mtbdl_data_select_state(
     mtbdl_trackers_t *mtbdl)
 {
     mtbdl->data_select = CLEAR_BIT; 
@@ -738,17 +745,17 @@ void mtbdl_data_select(
     //==================================================
     // Check user button input 
 
-    // Button 1 - triggers the pre send (TX) state 
+    // Button 1 - triggers the pre receive (RX) state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
     {
-        mtbdl->tx = SET_BIT; 
+        mtbdl->rx = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
     }
     
-    // Button 2 - triggers the pre receive (RX) state 
+    // Button 2 - triggers the pre send (TX) state 
     else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
     {
-        mtbdl->rx = SET_BIT; 
+        mtbdl->tx = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
     }
     
@@ -760,6 +767,14 @@ void mtbdl_data_select(
     }
     
     //==================================================
+}
+
+
+// Search for Bluetooth connection 
+void mtbdl_dev_search_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    // 
 }
 
 
@@ -927,22 +942,6 @@ void mtbdl_lowpwr_state(
 {
     mtbdl->low_pwr = CLEAR_BIT; 
 
-    // 
-}
-
-
-// Post low power state 
-void mtbdl_postlowpwr_state(
-    mtbdl_trackers_t *mtbdl)
-{
-    // 
-}
-
-
-// Charge state 
-void mtbdl_charge_state(
-    mtbdl_trackers_t *mtbdl)
-{
     // 
 }
 

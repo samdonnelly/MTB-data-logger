@@ -28,8 +28,10 @@
 // Macros 
 
 // Message lengths 
-#define MTBDL_WELCOME_MSG_LEN 1            // Number of lines in welcome message 
-#define MTBDL_IDLE_MSG_LEN 4               // 
+#define MTBDL_MSG_LEN_1_LINE 1             // Screen message is 1 line long 
+#define MTBDL_MSG_LEN_2_LINE 2             // Screen message is 2 line long 
+#define MTBDL_MSG_LEN_3_LINE 3             // Screen message is 3 line long 
+#define MTBDL_MSG_LEN_4_LINE 4             // Screen message is 4 line long 
 
 //=======================================================================================
 
@@ -58,10 +60,58 @@ mtbdl_msgs_t;
 // Message declarations 
 
 // Init state message 
-extern mtbdl_msgs_t mtbdl_welcome_msg[MTBDL_WELCOME_MSG_LEN]; 
+extern mtbdl_msgs_t mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Idle state message 
-extern mtbdl_msgs_t mtbdl_idle_msg[MTBDL_IDLE_MSG_LEN]; 
+extern mtbdl_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE]; 
+
+// Pre run state message 
+// extern mtbdl_msgs_t mtbdl_prerun_msg[]; 
+
+// Run state message 
+// extern mtbdl_msgs_t mtbdl_run_msg[]; 
+
+// Post run state message 
+// extern mtbdl_msgs_t mtbdl_postrun_msg[]; 
+
+// Data transfer selection state message 
+extern mtbdl_msgs_t mtbdl_data_select_msg[MTBDL_MSG_LEN_3_LINE]; 
+
+// Device search state message 
+extern mtbdl_msgs_t mtbdl_dev_search_msg[MTBDL_MSG_LEN_2_LINE]; 
+
+// Pre data receive (RX) state message 
+extern mtbdl_msgs_t mtbdl_prerx_msg[MTBDL_MSG_LEN_2_LINE]; 
+
+// Data receive (RX) state message 
+extern mtbdl_msgs_t mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE]; 
+
+// Post data receive (RX) state message 
+extern mtbdl_msgs_t mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE]; 
+
+// Pre data send (TX) state message 
+extern mtbdl_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_2_LINE]; 
+
+// Data send (TX) state message 
+extern mtbdl_msgs_t mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE]; 
+
+// Post data send (TX) state message 
+extern mtbdl_msgs_t mtbdl_posttx_msg[MTBDL_MSG_LEN_1_LINE]; 
+
+// Pre calibration state message 
+extern mtbdl_msgs_t mtbdl_precal_msg[MTBDL_MSG_LEN_4_LINE]; 
+
+// Calibration state message 
+extern mtbdl_msgs_t mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE]; 
+
+// Fault state state message 
+extern mtbdl_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE]; 
+
+// Fault state state message 
+extern mtbdl_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE]; 
+
+// Fault state state message 
+extern mtbdl_msgs_t mtbdl_reset_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 //=======================================================================================
 

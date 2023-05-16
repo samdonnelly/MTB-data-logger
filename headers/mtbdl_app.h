@@ -44,22 +44,22 @@
 typedef enum {
     MTBDL_INIT_STATE,            // State 0 : Startup 
     MTBDL_IDLE_STATE,            // State 1 : Idle 
-    MTBDL_PRERUN_STATE,          // State 3 : Pre-run 
+    MTBDL_RUN_PREP_STATE,        // State 2 : Pre-run 
+    MTBDL_RUN_COUNTDOWN_STATE,   // State 3 : Pre-run 
     MTBDL_RUN_STATE,             // State 4 : Run 
     MTBDL_POSTRUN_STATE,         // State 5 : Post-run 
-    MTBDL_DATA_SELECT_STATE,     // State 2 : Data transfer selection 
-    MTBDL_PRERX_STATE,           // State 6 : Pre data receive 
-    MTBDL_RX_STATE,              // State 7 : Data receive 
-    MTBDL_POSTRX_STATE,          // State 8 : Post data receive 
-    MTBDL_PRETX_STATE,           // State 9 : Pre data send 
-    MTBDL_TX_STATE,              // State 10 : Data send 
-    MTBDL_POSTTX_STATE,          // State 11 : Post data send 
-    MTBDL_PRECALIBRATE_STATE,    // State 12 : Calibrate 
-    MTBDL_CALIBRATE_STATE,       // State 13 : Calibrate 
-    MTBDL_PRELOWPWR_STATE,       // State 14 : Pre low power mode 
-    MTBDL_LOWPWR_STATE,          // State 15 : Low power mode 
-    MTBDL_POSTLOWPWR_STATE,      // State 16 : Post low power mode 
-    MTBDL_CHARGE_STATE,          // State 17 : Charge 
+    MTBDL_DATA_SELECT_STATE,     // State 6 : Data transfer selection 
+    MTBDL_DEV_SEARCH_STATE,      // State 7 : Seach for Bluetooth connection state 
+    MTBDL_PRERX_STATE,           // State 8 : Pre data receive 
+    MTBDL_RX_STATE,              // State 9 : Data receive 
+    MTBDL_POSTRX_STATE,          // State 10 : Post data receive 
+    MTBDL_PRETX_STATE,           // State 11 : Pre data send 
+    MTBDL_TX_STATE,              // State 12 : Data send 
+    MTBDL_POSTTX_STATE,          // State 13 : Post data send 
+    MTBDL_PRECALIBRATE_STATE,    // State 14 : Pre calibration 
+    MTBDL_CALIBRATE_STATE,       // State 15 : Calibration 
+    MTBDL_PRELOWPWR_STATE,       // State 16 : Pre low power mode 
+    MTBDL_LOWPWR_STATE,          // State 17 : Low power mode 
     MTBDL_FAULT_STATE,           // State 18 : Fault 
     MTBDL_RESET_STATE            // State 19 : Reset 
 } mtbdl_states_t; 

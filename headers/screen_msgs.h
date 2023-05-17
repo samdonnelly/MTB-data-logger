@@ -65,14 +65,14 @@ extern mtbdl_msgs_t mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE];
 // Idle state message 
 extern mtbdl_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE]; 
 
-// Pre run state message 
-// extern mtbdl_msgs_t mtbdl_prerun_msg[]; 
+// Run prep state message 
+extern mtbdl_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_4_LINE]; 
 
-// Run state message 
-// extern mtbdl_msgs_t mtbdl_run_msg[]; 
+// Run countdown state message 
+extern mtbdl_msgs_t mtbdl_run_countdown_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Post run state message 
-// extern mtbdl_msgs_t mtbdl_postrun_msg[]; 
+extern mtbdl_msgs_t mtbdl_postrun_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Data transfer selection state message 
 extern mtbdl_msgs_t mtbdl_data_select_msg[MTBDL_MSG_LEN_3_LINE]; 

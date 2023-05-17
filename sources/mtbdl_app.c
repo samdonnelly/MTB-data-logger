@@ -39,7 +39,7 @@ void mtbdl_run_prep_state(
 
 
 // Run countdown state 
-void mtbdl_run_prep_state(
+void mtbdl_run_countdown_state(
     mtbdl_trackers_t *mtbdl); 
 
 
@@ -135,25 +135,26 @@ static mtbdl_trackers_t mtbdl_trackers;
 // Function pointers to system controller states 
 static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] = 
 {
-    &mtbdl_init_state, 
-    &mtbdl_idle_state, 
-    &mtbdl_run_prep_state, 
-    &mtbdl_run_state, 
-    &mtbdl_postrun_state, 
-    &mtbdl_data_select_state, 
-    &mtbdl_dev_search_state, 
-    &mtbdl_prerx_state, 
-    &mtbdl_rx_state, 
-    &mtbdl_postrx_state, 
-    &mtbdl_pretx_state, 
-    &mtbdl_tx_state, 
-    &mtbdl_posttx_state, 
-    &mtbdl_precalibrate_state, 
-    &mtbdl_calibrate_state, 
-    &mtbdl_prelowpwr_state, 
-    &mtbdl_lowpwr_state, 
-    &mtbdl_fault_state, 
-    &mtbdl_reset_state
+    &mtbdl_init_state,                  // State 0 : Startup 
+    &mtbdl_idle_state,                  // State 1 : Idle 
+    &mtbdl_run_prep_state,              // State 2 : Run prep 
+    &mtbdl_run_countdown_state,         // State 3 : Run countdown 
+    &mtbdl_run_state,                   // State 4 : Run 
+    &mtbdl_postrun_state,               // State 5 : Post run 
+    &mtbdl_data_select_state,           // State 6 : Data transfer selection 
+    &mtbdl_dev_search_state,            // State 7 : Search for Bluetooth connection 
+    &mtbdl_prerx_state,                 // State 8 : Pre data receive 
+    &mtbdl_rx_state,                    // State 9 : Data receive 
+    &mtbdl_postrx_state,                // State 10 : Post data receive 
+    &mtbdl_pretx_state,                 // State 11 : Pre data send 
+    &mtbdl_tx_state,                    // State 12 : Data send 
+    &mtbdl_posttx_state,                // State 13 : Post data send 
+    &mtbdl_precalibrate_state,          // State 14 : Pre calibration 
+    &mtbdl_calibrate_state,             // State 15 : Calibration 
+    &mtbdl_prelowpwr_state,             // State 16 : Pre low power mode 
+    &mtbdl_lowpwr_state,                // State 17 : Low power mode 
+    &mtbdl_fault_state,                 // State 18 : Fault 
+    &mtbdl_reset_state                  // State 19 : Reset 
 }; 
 
 //=======================================================================================
@@ -301,12 +302,17 @@ void mtbdl_app(void)
             // Run state flag set 
             else if (mtbdl_trackers.run)
             {
-                next_state = MTBDL_RUN_STATE; 
+                next_state = MTBDL_RUN_COUNTDOWN_STATE; 
             }
 
             break; 
 
         case MTBDL_RUN_COUNTDOWN_STATE: 
+            if (mtbdl_trackers.run)
+            {
+                next_state = MTBDL_RUN_STATE; 
+            }
+
             break; 
 
         case MTBDL_RUN_STATE: 
@@ -316,8 +322,8 @@ void mtbdl_app(void)
                 next_state = MTBDL_FAULT_STATE; 
             }
 
-            // Run state flag cleared 
-            else if (!mtbdl_trackers.run)
+            // Run state flag set 
+            else if (mtbdl_trackers.run)
             {
                 next_state = MTBDL_POSTRUN_STATE; 
             }
@@ -533,6 +539,9 @@ void mtbdl_app(void)
 void mtbdl_init_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+
     if (mtbdl->init)
     {
         // Clear the line data 
@@ -549,9 +558,11 @@ void mtbdl_init_state(
     }
     
     mtbdl->init = CLEAR_BIT; 
+    
+    //==================================================
 
     //==================================================
-    // Init timer 
+    // State exit 
 
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
@@ -580,7 +591,7 @@ void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl)
 {
     //==================================================
-    // Idle state screen message 
+    // State entry 
 
     if (mtbdl->idle)
     {
@@ -591,9 +602,9 @@ void mtbdl_idle_state(
         hd44780u_set_write_flag(); 
     }
 
-    //==================================================
-    
     mtbdl->idle = CLEAR_BIT; 
+
+    //==================================================
 
     //==================================================
     // Check user button input 
@@ -630,23 +641,10 @@ void mtbdl_idle_state(
     //==================================================
 
     //==================================================
-    // Screen settings 
-    
-    // Turn the screen backlight on and clear the screen when leaving the state 
-    if (mtbdl->run | 
-        mtbdl->data_select | 
-        mtbdl->calibrate)
-    {
-        hd44780u_backlight_on(); 
-        mtbdl->screen_timer.time_start = SET_BIT; 
-
-        // Clear the idle state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
-    }
+    // Screen sleep timer 
 
     // If the system has been inactive for long enough then turn the screen backlight off 
-    else if (tim_compare(mtbdl->timer_nonblocking, 
+    if (tim_compare(mtbdl->timer_nonblocking, 
                          mtbdl->screen_timer.clk_freq, 
                          MTBDL_LCD_SLEEP, 
                          &mtbdl->screen_timer.time_cnt_total, 
@@ -658,6 +656,24 @@ void mtbdl_idle_state(
     }
 
     //==================================================
+
+    //==================================================
+    // State exit 
+
+    if (mtbdl->run || 
+        mtbdl->data_select || 
+        mtbdl->calibrate)
+    {
+        // Turn the screen backlight on 
+        hd44780u_backlight_on(); 
+        mtbdl->screen_timer.time_start = SET_BIT; 
+
+        // Clear the idle state message 
+        hd44780u_clear(); 
+        mtbdl_screen_line_clear(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
+    }
+
+    //==================================================
 }
 
 
@@ -665,7 +681,19 @@ void mtbdl_idle_state(
 void mtbdl_run_prep_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+
+    if (mtbdl->run)
+    {
+        // Display the run prep state message 
+        mtbdl_screen_msg_format(mtbdl_run_prep_msg, MTBDL_MSG_LEN_4_LINE); 
+        hd44780u_set_write_flag(); 
+    }
+
     mtbdl->run = CLEAR_BIT; 
+    
+    //==================================================
 
     //==================================================
     // Check user button input 
@@ -676,8 +704,6 @@ void mtbdl_run_prep_state(
     {
         mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
-
-        // Turn the screen backlight off 
     }
     
     // Button 2 - cancels the run state --> triggers idle state 
@@ -688,14 +714,61 @@ void mtbdl_run_prep_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+
+    if (mtbdl->run || mtbdl->idle)
+    {
+        // Clear the run prep state message 
+        hd44780u_clear(); 
+        mtbdl_screen_line_clear(mtbdl_run_prep_msg, MTBDL_MSG_LEN_4_LINE); 
+    }
+
+    //==================================================
 }
 
 
 // Run countdown state 
-void mtbdl_run_prep_state(
+void mtbdl_run_countdown_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // 
+    //==================================================
+    // State entry 
+
+    if (mtbdl->run)
+    {
+        // Display the run countdown state message 
+        mtbdl_screen_msg_format(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
+        hd44780u_set_write_flag(); 
+    }
+
+    mtbdl->run = CLEAR_BIT; 
+
+    //==================================================
+
+    //==================================================
+    // State exit 
+
+    // Wait for a short period of time before leaving the init state 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->screen_timer.clk_freq, 
+                    MTBDL_RUN_WAIT, 
+                    &mtbdl->screen_timer.time_cnt_total, 
+                    &mtbdl->screen_timer.time_cnt, 
+                    &mtbdl->screen_timer.time_start))
+    {
+        mtbdl->screen_timer.time_start = SET_BIT; 
+
+        // Put the screen in low power mode 
+        hd44780u_set_low_pwr_flag(); 
+        mtbdl_screen_line_clear(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
+
+        // Set the run state flag when ready 
+        mtbdl->run = SET_BIT; 
+    }
+
+    //==================================================
 }
 
 
@@ -704,12 +777,19 @@ void mtbdl_run_state(
     mtbdl_trackers_t *mtbdl)
 {
     //==================================================
+    // State entry 
+
+    mtbdl->run = CLEAR_BIT; 
+
+    //==================================================
+    
+    //==================================================
     // Check user button input 
 
     // Button 1 - stops the run state --> triggers the post run state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
     {
-        mtbdl->run = CLEAR_BIT; 
+        mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
 
         // Turn the screen backlight back on 
@@ -723,7 +803,20 @@ void mtbdl_run_state(
     
     //==================================================
 
+    //==================================================
     // Record data 
+    //==================================================
+
+    //==================================================
+    // State exit 
+
+    if (mtbdl->run)
+    {
+        // Take the screen out of low power mode 
+        hd44780u_clear_low_pwr_flag(); 
+    }
+
+    //==================================================
 }
 
 
@@ -731,8 +824,42 @@ void mtbdl_run_state(
 void mtbdl_postrun_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // Set the idle state flag when ready 
-    mtbdl->idle = SET_BIT; 
+    //==================================================
+    // State entry 
+
+    if (mtbdl->run)
+    {
+        // Display the post run state message 
+        mtbdl_screen_msg_format(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_write_flag(); 
+    }
+
+    mtbdl->run = CLEAR_BIT; 
+
+    //==================================================
+    
+    //==================================================
+    // State exit 
+
+    // Wait for a short period of time before leaving the init state 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->screen_timer.clk_freq, 
+                    MTBDL_RUN_WAIT, 
+                    &mtbdl->screen_timer.time_cnt_total, 
+                    &mtbdl->screen_timer.time_cnt, 
+                    &mtbdl->screen_timer.time_start))
+    {
+        mtbdl->screen_timer.time_start = SET_BIT; 
+
+        // Put the screen in low power mode 
+        hd44780u_clear(); 
+        mtbdl_screen_line_clear(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
+
+        // Set the idle state flag when ready 
+        mtbdl->idle = SET_BIT; 
+    }
+    
+    //==================================================
 }
 
 
@@ -740,7 +867,12 @@ void mtbdl_postrun_state(
 void mtbdl_data_select_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+
     mtbdl->data_select = CLEAR_BIT; 
+    
+    //==================================================
 
     //==================================================
     // Check user button input 
@@ -767,6 +899,10 @@ void mtbdl_data_select_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -774,7 +910,13 @@ void mtbdl_data_select_state(
 void mtbdl_dev_search_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // 
+    //==================================================
+    // State entry 
+    //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -782,7 +924,12 @@ void mtbdl_dev_search_state(
 void mtbdl_prerx_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+    
     mtbdl->rx = CLEAR_BIT; 
+    
+    //==================================================
 
     //==================================================
     // Check user button input 
@@ -803,6 +950,10 @@ void mtbdl_prerx_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -810,6 +961,10 @@ void mtbdl_prerx_state(
 void mtbdl_rx_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+    //==================================================
+
     //==================================================
     // Check user button input 
 
@@ -821,6 +976,10 @@ void mtbdl_rx_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -828,8 +987,17 @@ void mtbdl_rx_state(
 void mtbdl_postrx_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+    //==================================================
+
+    //==================================================
+    // State exit 
+
     // Set the idle state flag when ready 
     mtbdl->idle = SET_BIT; 
+    
+    //==================================================
 }
 
 
@@ -837,7 +1005,12 @@ void mtbdl_postrx_state(
 void mtbdl_pretx_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+
     mtbdl->tx = CLEAR_BIT; 
+    
+    //==================================================
 
     //==================================================
     // Check user button input 
@@ -858,6 +1031,10 @@ void mtbdl_pretx_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -865,6 +1042,10 @@ void mtbdl_pretx_state(
 void mtbdl_tx_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+    //==================================================
+
     //==================================================
     // Check user button input 
 
@@ -876,6 +1057,10 @@ void mtbdl_tx_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -883,8 +1068,17 @@ void mtbdl_tx_state(
 void mtbdl_posttx_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+    //==================================================
+
+    //==================================================
+    // State exit 
+
     // Set the idle state flag when ready 
     mtbdl->idle = SET_BIT; 
+    
+    //==================================================
 }
 
 
@@ -892,7 +1086,12 @@ void mtbdl_posttx_state(
 void mtbdl_precalibrate_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+
     mtbdl->calibrate = CLEAR_BIT; 
+    
+    //==================================================
 
     //==================================================
     // Check user button input 
@@ -912,6 +1111,10 @@ void mtbdl_precalibrate_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -919,10 +1122,20 @@ void mtbdl_precalibrate_state(
 void mtbdl_calibrate_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+
     mtbdl->calibrate = CLEAR_BIT; 
+    
+    //==================================================
+
+    //==================================================
+    // State exit 
 
     // Set the idle state flag once ready 
     mtbdl->idle = SET_BIT; 
+    
+    //==================================================
 }
 
 
@@ -930,9 +1143,16 @@ void mtbdl_calibrate_state(
 void mtbdl_prelowpwr_state(
     mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->low_pwr = CLEAR_BIT; 
+    //==================================================
+    // State entry 
 
-    // 
+    mtbdl->low_pwr = CLEAR_BIT; 
+    
+    //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -940,9 +1160,16 @@ void mtbdl_prelowpwr_state(
 void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->low_pwr = CLEAR_BIT; 
+    //==================================================
+    // State entry 
 
-    // 
+    mtbdl->low_pwr = CLEAR_BIT; 
+    
+    //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -950,6 +1177,10 @@ void mtbdl_lowpwr_state(
 void mtbdl_fault_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+    //==================================================
+
     //==================================================
     // Check user button input 
 
@@ -962,6 +1193,10 @@ void mtbdl_fault_state(
     }
     
     //==================================================
+
+    //==================================================
+    // State exit 
+    //==================================================
 }
 
 
@@ -969,10 +1204,20 @@ void mtbdl_fault_state(
 void mtbdl_reset_state(
     mtbdl_trackers_t *mtbdl)
 {
+    //==================================================
+    // State entry 
+
     mtbdl->reset = CLEAR_BIT; 
+    
+    //==================================================
+
+    //==================================================
+    // State exit 
 
     // Set the init state flag once ready 
     mtbdl->init = SET_BIT; 
+    
+    //==================================================
 }
 
 //=======================================================================================

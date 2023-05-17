@@ -39,13 +39,26 @@ mtbdl_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE] =
 }; 
 
 // Pre run state message 
-// mtbdl_msgs_t mtbdl_prerun_msg[]; 
+mtbdl_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_4_LINE] = 
+{
+    {HD44780U_L1, "Preparing for run...", 0}, 
+    {HD44780U_L2, "NAVSTAT: ", 0}, 
+    {HD44780U_L3, "1: Proceed", 0}, 
+    {HD44780U_L4, "2: Cancel", 0} 
+}; 
 
-// Run state message 
-// mtbdl_msgs_t mtbdl_run_msg[]; 
+// Run countdown state message 
+mtbdl_msgs_t mtbdl_run_countdown_msg[MTBDL_MSG_LEN_1_LINE] = 
+{
+    {HD44780U_L1, "Time to shred!", 0}
+}; 
 
 // Post run state message 
-// mtbdl_msgs_t mtbdl_postrun_msg[]; 
+mtbdl_msgs_t mtbdl_postrun_msg[MTBDL_MSG_LEN_2_LINE] = 
+{
+    {HD44780U_L1, "Rad!", 0}, 
+    {HD44780U_L2, "Saving data...", 0} 
+}; 
 
 // Data transfer selection state message 
 mtbdl_msgs_t mtbdl_data_select_msg[MTBDL_MSG_LEN_3_LINE] = 

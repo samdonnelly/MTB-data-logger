@@ -31,6 +31,7 @@
 #define MTBDL_NUM_STATES 20            // Number of system states 
 #define MTBDL_LCD_SLEEP 15000000       // (us) inactive time before screen backlight off 
 #define MTBDL_INIT_WAIT 3000000        // (us) init state wait time 
+#define MTBDL_RUN_WAIT 3000000         // (us) run states timer 
 
 //=======================================================================================
 
@@ -44,12 +45,12 @@
 typedef enum {
     MTBDL_INIT_STATE,            // State 0 : Startup 
     MTBDL_IDLE_STATE,            // State 1 : Idle 
-    MTBDL_RUN_PREP_STATE,        // State 2 : Pre-run 
-    MTBDL_RUN_COUNTDOWN_STATE,   // State 3 : Pre-run 
+    MTBDL_RUN_PREP_STATE,        // State 2 : Run prep 
+    MTBDL_RUN_COUNTDOWN_STATE,   // State 3 : Run countdown 
     MTBDL_RUN_STATE,             // State 4 : Run 
     MTBDL_POSTRUN_STATE,         // State 5 : Post-run 
     MTBDL_DATA_SELECT_STATE,     // State 6 : Data transfer selection 
-    MTBDL_DEV_SEARCH_STATE,      // State 7 : Seach for Bluetooth connection state 
+    MTBDL_DEV_SEARCH_STATE,      // State 7 : Search for Bluetooth connection 
     MTBDL_PRERX_STATE,           // State 8 : Pre data receive 
     MTBDL_RX_STATE,              // State 9 : Data receive 
     MTBDL_POSTRX_STATE,          // State 10 : Post data receive 

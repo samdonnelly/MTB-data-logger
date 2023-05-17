@@ -104,14 +104,11 @@ extern mtbdl_msgs_t mtbdl_precal_msg[MTBDL_MSG_LEN_4_LINE];
 // Calibration state message 
 extern mtbdl_msgs_t mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE]; 
 
-// Fault state state message 
+// Low power state state message 
 extern mtbdl_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Fault state state message 
 extern mtbdl_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE]; 
-
-// Fault state state message 
-extern mtbdl_msgs_t mtbdl_reset_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 //=======================================================================================
 

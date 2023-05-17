@@ -35,7 +35,7 @@ mtbdl_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE] =
     {HD44780U_L1, "F: PSI:    R:   D:", 0}, 
     {HD44780U_L2, "S: PSI:    R:   L:", 0}, 
     {HD44780U_L3, "SOC:    %", 0}, 
-    {HD44780U_L4, "GPS: ", 0} 
+    {HD44780U_L4, "1:RUN 2:TX/RX 3:CAL", 0} 
 }; 
 
 // Pre run state message 
@@ -130,7 +130,7 @@ mtbdl_msgs_t mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE] =
     {HD44780U_L1, "Calibrating...", 0} 
 }; 
 
-// Fault state state message 
+// Low power state state message 
 mtbdl_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE] = 
 {
     {HD44780U_L1, "SOC low. Shut down", 0}, 
@@ -142,12 +142,6 @@ mtbdl_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE] =
 {
     {HD44780U_L1, "System Fault.", 0}, 
     {HD44780U_L2, "4. Reset", 0} 
-}; 
-
-// Fault state state message 
-mtbdl_msgs_t mtbdl_reset_msg[MTBDL_MSG_LEN_1_LINE] = 
-{
-    {HD44780U_L1, "Resetting...", 0}
 }; 
 
 //=======================================================================================

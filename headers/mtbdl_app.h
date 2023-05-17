@@ -28,10 +28,11 @@
 // Macros 
 
 // System info 
-#define MTBDL_NUM_STATES 20            // Number of system states 
-#define MTBDL_LCD_SLEEP 15000000       // (us) inactive time before screen backlight off 
-#define MTBDL_INIT_WAIT 3000000        // (us) init state wait time 
-#define MTBDL_RUN_WAIT 3000000         // (us) run states timer 
+#define MTBDL_NUM_STATES 19              // Number of system states 
+#define MTBDL_LCD_SLEEP 15000000         // (us) inactive time before screen backlight off 
+#define MTBDL_STATE_WAIT 5000000         // (us) general state wait time 
+#define MTBDL_CAL_SAMPLE_TIME 5000000    // (us) calibration state sample time 
+#define MTBDL_LCD_LP_SLEEP 3000000       // (us) low power state message display time 
 
 //=======================================================================================
 
@@ -59,10 +60,9 @@ typedef enum {
     MTBDL_POSTTX_STATE,          // State 13 : Post data send 
     MTBDL_PRECALIBRATE_STATE,    // State 14 : Pre calibration 
     MTBDL_CALIBRATE_STATE,       // State 15 : Calibration 
-    MTBDL_PRELOWPWR_STATE,       // State 16 : Pre low power mode 
-    MTBDL_LOWPWR_STATE,          // State 17 : Low power mode 
-    MTBDL_FAULT_STATE,           // State 18 : Fault 
-    MTBDL_RESET_STATE            // State 19 : Reset 
+    MTBDL_LOWPWR_STATE,          // State 16 : Low power mode 
+    MTBDL_FAULT_STATE,           // State 17 : Fault 
+    MTBDL_RESET_STATE            // State 18 : Reset 
 } mtbdl_states_t; 
 
 //=======================================================================================
@@ -102,6 +102,7 @@ typedef struct mtbdl_trackers_s
     uint8_t rx          : 1;                    // Read/receive data state flag 
     uint8_t calibrate   : 1;                    // Calibration state flag 
     uint8_t low_pwr     : 1;                    // Low power state flag 
+    uint8_t fault       : 1;                    // Fault state flag 
     uint8_t reset       : 1;                    // Reset state flag 
 }
 mtbdl_trackers_t; 

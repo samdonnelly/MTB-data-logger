@@ -37,78 +37,58 @@
 
 
 //=======================================================================================
-// Enums 
-//=======================================================================================
-
-
-//=======================================================================================
-// Structures 
-
-// Screen information 
-typedef struct mtbdl_msgs_s 
-{
-    hd44780u_lines_t line; 
-    char msg[HD44780U_LINE_LEN]; 
-    uint8_t offset; 
-}
-mtbdl_msgs_t; 
-
-//=======================================================================================
-
-
-//=======================================================================================
 // Message declarations 
 
 // Init state message 
-extern mtbdl_msgs_t mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE]; 
+extern hd44780u_msgs_t mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Idle state message 
-extern mtbdl_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE]; 
+extern hd44780u_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE]; 
 
 // Run prep state message 
-extern mtbdl_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_4_LINE]; 
+extern hd44780u_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_4_LINE]; 
 
 // Run countdown state message 
-extern mtbdl_msgs_t mtbdl_run_countdown_msg[MTBDL_MSG_LEN_1_LINE]; 
+extern hd44780u_msgs_t mtbdl_run_countdown_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Post run state message 
-extern mtbdl_msgs_t mtbdl_postrun_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern hd44780u_msgs_t mtbdl_postrun_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Data transfer selection state message 
-extern mtbdl_msgs_t mtbdl_data_select_msg[MTBDL_MSG_LEN_3_LINE]; 
+extern hd44780u_msgs_t mtbdl_data_select_msg[MTBDL_MSG_LEN_3_LINE]; 
 
 // Device search state message 
-extern mtbdl_msgs_t mtbdl_dev_search_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern hd44780u_msgs_t mtbdl_dev_search_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Pre data receive (RX) state message 
-extern mtbdl_msgs_t mtbdl_prerx_msg[MTBDL_MSG_LEN_3_LINE]; 
+extern hd44780u_msgs_t mtbdl_prerx_msg[MTBDL_MSG_LEN_3_LINE]; 
 
 // Data receive (RX) state message 
-extern mtbdl_msgs_t mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern hd44780u_msgs_t mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Post data receive (RX) state message 
-extern mtbdl_msgs_t mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE]; 
+extern hd44780u_msgs_t mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Pre data send (TX) state message 
-extern mtbdl_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_3_LINE]; 
+extern hd44780u_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_3_LINE]; 
 
 // Data send (TX) state message 
-extern mtbdl_msgs_t mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern hd44780u_msgs_t mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Post data send (TX) state message 
-extern mtbdl_msgs_t mtbdl_posttx_msg[MTBDL_MSG_LEN_1_LINE]; 
+extern hd44780u_msgs_t mtbdl_posttx_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Pre calibration state message 
-extern mtbdl_msgs_t mtbdl_precal_msg[MTBDL_MSG_LEN_4_LINE]; 
+extern hd44780u_msgs_t mtbdl_precal_msg[MTBDL_MSG_LEN_4_LINE]; 
 
 // Calibration state message 
-extern mtbdl_msgs_t mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE]; 
+extern hd44780u_msgs_t mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Low power state state message 
-extern mtbdl_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern hd44780u_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Fault state state message 
-extern mtbdl_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern hd44780u_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 //=======================================================================================
 
@@ -116,26 +96,26 @@ extern mtbdl_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE];
 //=======================================================================================
 // 
 
-/**
- * @brief 
- * 
- * @param msg 
- * @param msg_len 
- */
-void mtbdl_screen_msg_format(
-    mtbdl_msgs_t *msg, 
-    uint8_t msg_len); 
+// /**
+//  * @brief 
+//  * 
+//  * @param msg 
+//  * @param msg_len 
+//  */
+// void mtbdl_screen_msg_format(
+//     mtbdl_msgs_t *msg, 
+//     uint8_t msg_len); 
 
 
-/**
- * @brief 
- * 
- * @param msg 
- * @param msg_len 
- */
-void mtbdl_screen_line_clear(
-    mtbdl_msgs_t *msg, 
-    uint8_t msg_len); 
+// /**
+//  * @brief 
+//  * 
+//  * @param msg 
+//  * @param msg_len 
+//  */
+// void mtbdl_screen_line_clear(
+//     mtbdl_msgs_t *msg, 
+//     uint8_t msg_len); 
 
 //=======================================================================================
 

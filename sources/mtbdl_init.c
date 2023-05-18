@@ -108,7 +108,7 @@ void mtbdl_init()
     hd44780u_init(I2C1, TIM9, PCF8574_ADDR_HHH);
 
     // Contoller 
-    hd44780u_controller_init(); 
+    hd44780u_controller_init(TIM9); 
 
     //===================================================
 

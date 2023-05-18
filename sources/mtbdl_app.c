@@ -563,8 +563,7 @@ void mtbdl_init_state(
         // Clear the line data 
 
         // Display the startup message 
-        mtbdl_screen_msg_format(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
 
         // Put the HC-05 in low power mode 
 
@@ -591,8 +590,7 @@ void mtbdl_init_state(
         mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the screen startup message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
+        hd44780u_set_clear_flag(); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -614,8 +612,11 @@ void mtbdl_idle_state(
         // Format the display message with data 
 
         // Display the idle state message 
-        mtbdl_screen_msg_format(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
+
+        // Set the screen to power save mode 
+        hd44780u_set_pwr_save_flag(); 
+        hd44780u_set_sleep_time(MTBDL_LCD_SLEEP); 
     }
 
     mtbdl->idle = CLEAR_BIT; 
@@ -650,8 +651,9 @@ void mtbdl_idle_state(
     else if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
     {
         mtbdl->user_btn_4_block = SET_BIT; 
-        hd44780u_backlight_on(); 
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        hd44780u_wake_up(); 
+        // hd44780u_backlight_on(); 
+        // mtbdl->screen_timer.time_start = SET_BIT; 
     }
     
     //==================================================
@@ -659,17 +661,17 @@ void mtbdl_idle_state(
     //==================================================
     // Screen sleep timer 
 
-    // If the system has been inactive for long enough then turn the screen backlight off 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
-                    MTBDL_LCD_SLEEP, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
-    {
-        hd44780u_backlight_off(); 
-        mtbdl->screen_timer.time_start = SET_BIT; 
-    }
+    // // If the system has been inactive for long enough then turn the screen backlight off 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->screen_timer.clk_freq, 
+    //                 MTBDL_LCD_SLEEP, 
+    //                 &mtbdl->screen_timer.time_cnt_total, 
+    //                 &mtbdl->screen_timer.time_cnt, 
+    //                 &mtbdl->screen_timer.time_start))
+    // {
+    //     hd44780u_backlight_off(); 
+    //     mtbdl->screen_timer.time_start = SET_BIT; 
+    // }
 
     //==================================================
 
@@ -680,13 +682,15 @@ void mtbdl_idle_state(
         mtbdl->data_select || 
         mtbdl->calibrate)
     {
-        // Turn the screen backlight on 
-        hd44780u_backlight_on(); 
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        // // Turn the screen backlight on 
+        // hd44780u_backlight_on(); 
+        // mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the idle state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
+        hd44780u_set_clear_flag(); 
+
+        // Take the screen out of power save mode 
+        hd44780u_clear_pwr_save_flag(); 
     }
 
     //==================================================
@@ -703,8 +707,7 @@ void mtbdl_run_prep_state(
     if (mtbdl->run)
     {
         // Display the run prep state message 
-        mtbdl_screen_msg_format(mtbdl_run_prep_msg, MTBDL_MSG_LEN_4_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_run_prep_msg, MTBDL_MSG_LEN_4_LINE); 
     }
 
     mtbdl->run = CLEAR_BIT; 
@@ -737,8 +740,7 @@ void mtbdl_run_prep_state(
     if (mtbdl->run || mtbdl->idle)
     {
         // Clear the run prep state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_run_prep_msg, MTBDL_MSG_LEN_4_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -755,8 +757,7 @@ void mtbdl_run_countdown_state(
     if (mtbdl->run)
     {
         // Display the run countdown state message 
-        mtbdl_screen_msg_format(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
     }
 
     mtbdl->run = CLEAR_BIT; 
@@ -778,7 +779,6 @@ void mtbdl_run_countdown_state(
 
         // Put the screen in low power mode 
         hd44780u_set_low_pwr_flag(); 
-        mtbdl_screen_line_clear(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
 
         // Set the run state flag when ready 
         mtbdl->run = SET_BIT; 
@@ -846,8 +846,7 @@ void mtbdl_postrun_state(
     if (mtbdl->run)
     {
         // Display the post run state message 
-        mtbdl_screen_msg_format(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
     }
 
     mtbdl->run = CLEAR_BIT; 
@@ -868,8 +867,7 @@ void mtbdl_postrun_state(
         mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the post run state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_clear_flag(); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -889,8 +887,7 @@ void mtbdl_data_select_state(
     if (mtbdl->data_select)
     {
         // Display the data select state message 
-        mtbdl_screen_msg_format(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
     }
 
     mtbdl->data_select = CLEAR_BIT; 
@@ -931,8 +928,7 @@ void mtbdl_data_select_state(
     if (mtbdl->data_select || mtbdl->idle)
     {
         // Clear the data select state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -949,8 +945,7 @@ void mtbdl_dev_search_state(
     if (mtbdl->data_select)
     {
         // Display the device connection search state message 
-        mtbdl_screen_msg_format(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
     }
 
     mtbdl->data_select = CLEAR_BIT; 
@@ -987,8 +982,7 @@ void mtbdl_dev_search_state(
     if (mtbdl->idle || mtbdl->data_select)
     {
         // Clear the device connection search state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -1005,8 +999,7 @@ void mtbdl_prerx_state(
     if (mtbdl->rx)
     {
         // Display the pre rx state message 
-        mtbdl_screen_msg_format(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
     }
     
     mtbdl->rx = CLEAR_BIT; 
@@ -1039,8 +1032,7 @@ void mtbdl_prerx_state(
     if (mtbdl->rx || mtbdl->idle)
     {
         // Clear the pre rx state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -1057,8 +1049,7 @@ void mtbdl_rx_state(
     if (mtbdl->rx)
     {
         // Display the rx state message 
-        mtbdl_screen_msg_format(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
     }
     
     mtbdl->rx = CLEAR_BIT; 
@@ -1087,8 +1078,7 @@ void mtbdl_rx_state(
     if (mtbdl->rx)
     {
         // Clear the rx state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -1105,8 +1095,7 @@ void mtbdl_postrx_state(
     if (mtbdl->rx)
     {
         // Display the post rx state message 
-        mtbdl_screen_msg_format(mtbdl_postrx_msg, MTBDL_MSG_LEN_1_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_postrx_msg, MTBDL_MSG_LEN_1_LINE); 
     }
     
     mtbdl->rx = CLEAR_BIT; 
@@ -1131,8 +1120,7 @@ void mtbdl_postrx_state(
         mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the post rx state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_postrx_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_clear_flag(); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -1152,8 +1140,7 @@ void mtbdl_pretx_state(
     if (mtbdl->tx)
     {
         // Display the pre rx state message 
-        mtbdl_screen_msg_format(mtbdl_pretx_msg, MTBDL_MSG_LEN_3_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_pretx_msg, MTBDL_MSG_LEN_3_LINE); 
     }
     
     mtbdl->tx = CLEAR_BIT; 
@@ -1186,8 +1173,7 @@ void mtbdl_pretx_state(
     if (mtbdl->tx || mtbdl->idle)
     {
         // Clear the pre rx state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_pretx_msg, MTBDL_MSG_LEN_3_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -1204,8 +1190,7 @@ void mtbdl_tx_state(
     if (mtbdl->tx)
     {
         // Display the tx state message 
-        mtbdl_screen_msg_format(mtbdl_tx_msg, MTBDL_MSG_LEN_2_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_tx_msg, MTBDL_MSG_LEN_2_LINE); 
     }
     
     mtbdl->tx = CLEAR_BIT; 
@@ -1234,8 +1219,7 @@ void mtbdl_tx_state(
     if (mtbdl->tx)
     {
         // Clear the tx state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_tx_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -1252,8 +1236,7 @@ void mtbdl_posttx_state(
     if (mtbdl->tx)
     {
         // Display the post tx state message 
-        mtbdl_screen_msg_format(mtbdl_posttx_msg, MTBDL_MSG_LEN_1_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_posttx_msg, MTBDL_MSG_LEN_1_LINE); 
     }
     
     mtbdl->tx = CLEAR_BIT; 
@@ -1278,8 +1261,7 @@ void mtbdl_posttx_state(
         mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the post tx state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_posttx_msg, MTBDL_MSG_LEN_1_LINE); 
+        hd44780u_set_clear_flag(); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -1299,8 +1281,7 @@ void mtbdl_precalibrate_state(
     if (mtbdl->calibrate)
     {
         // Display the pre calibration state message 
-        mtbdl_screen_msg_format(mtbdl_precal_msg, MTBDL_MSG_LEN_4_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_precal_msg, MTBDL_MSG_LEN_4_LINE); 
     }
 
     mtbdl->calibrate = CLEAR_BIT; 
@@ -1332,8 +1313,7 @@ void mtbdl_precalibrate_state(
     if (mtbdl->calibrate || mtbdl->idle)
     {
         // Clear the pre calibration state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_precal_msg, MTBDL_MSG_LEN_4_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================
@@ -1350,8 +1330,7 @@ void mtbdl_calibrate_state(
     if (mtbdl->calibrate)
     {
         // Display the calibration state message 
-        mtbdl_screen_msg_format(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
     }
 
     mtbdl->calibrate = CLEAR_BIT; 
@@ -1376,8 +1355,7 @@ void mtbdl_calibrate_state(
         mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the calibration state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
+        hd44780u_set_clear_flag(); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -1397,8 +1375,11 @@ void mtbdl_lowpwr_state(
     if (mtbdl->low_pwr)
     {
         // Display the low power state message 
-        mtbdl_screen_msg_format(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_2_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_2_LINE); 
+
+        // Put the screen into power save mode 
+        hd44780u_set_pwr_save_flag(); 
+        hd44780u_set_sleep_time(MTBDL_LCD_LP_SLEEP); 
 
         // Put devices into low power mode 
     }
@@ -1414,8 +1395,9 @@ void mtbdl_lowpwr_state(
     if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
     {
         mtbdl->user_btn_4_block = SET_BIT; 
-        hd44780u_backlight_on(); 
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        hd44780u_wake_up(); 
+        // hd44780u_backlight_on(); 
+        // mtbdl->screen_timer.time_start = SET_BIT; 
     }
     
     //==================================================
@@ -1423,17 +1405,17 @@ void mtbdl_lowpwr_state(
     //==================================================
     // Screen sleep timer 
 
-    // If the system has been inactive for long enough then turn the screen backlight off 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
-                    MTBDL_LCD_LP_SLEEP, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
-    {
-        hd44780u_backlight_off(); 
-        mtbdl->screen_timer.time_start = SET_BIT; 
-    }
+    // // If the system has been inactive for long enough then turn the screen backlight off 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->screen_timer.clk_freq, 
+    //                 MTBDL_LCD_LP_SLEEP, 
+    //                 &mtbdl->screen_timer.time_cnt_total, 
+    //                 &mtbdl->screen_timer.time_cnt, 
+    //                 &mtbdl->screen_timer.time_start))
+    // {
+    //     hd44780u_backlight_off(); 
+    //     mtbdl->screen_timer.time_start = SET_BIT; 
+    // }
 
     //==================================================
 
@@ -1458,13 +1440,15 @@ void mtbdl_lowpwr_state(
     {
         mtbdl->low_pwr = CLEAR_BIT; 
 
-        // Turn the screen backlight on 
-        hd44780u_backlight_on(); 
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        // // Turn the screen backlight on 
+        // hd44780u_backlight_on(); 
+        // mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the idle state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_clear_flag(); 
+
+        // Take the screen out of power save mode 
+        hd44780u_clear_pwr_save_flag(); 
 
         // Set the idle state flag 
         mtbdl->idle = SET_BIT; 
@@ -1484,8 +1468,7 @@ void mtbdl_fault_state(
     if (!mtbdl->fault)
     {
         // Display the fault state message 
-        mtbdl_screen_msg_format(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
-        hd44780u_set_write_flag(); 
+        hd44780u_set_msg(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
 
         // Record the fault code in a log 
     }
@@ -1516,8 +1499,7 @@ void mtbdl_fault_state(
         mtbdl->fault = CLEAR_BIT; 
 
         // Clear the fault state message 
-        hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_set_clear_flag(); 
     }
 
     //==================================================

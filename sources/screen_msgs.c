@@ -76,10 +76,11 @@ mtbdl_msgs_t mtbdl_dev_search_msg[MTBDL_MSG_LEN_2_LINE] =
 }; 
 
 // Pre data receive (RX) state message 
-mtbdl_msgs_t mtbdl_prerx_msg[MTBDL_MSG_LEN_2_LINE] = 
+mtbdl_msgs_t mtbdl_prerx_msg[MTBDL_MSG_LEN_3_LINE] = 
 {
-    {HD44780U_L1, "1: Get Data", 0}, 
-    {HD44780U_L2, "2: Cancel", 0} 
+    {HD44780U_L1, "Connected", 0}, 
+    {HD44780U_L2, "1: Get Data", 0}, 
+    {HD44780U_L3, "2: Cancel", 0} 
 }; 
 
 // Data receive (RX) state message 
@@ -92,14 +93,15 @@ mtbdl_msgs_t mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE] =
 // Post data receive (RX) state message 
 mtbdl_msgs_t mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE] = 
 {
-    {HD44780U_L1, "Read Complete.", 0} 
+    {HD44780U_L1, "Read Complete", 0} 
 }; 
 
 // Pre data send (TX) state message 
-mtbdl_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_2_LINE] = 
+mtbdl_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_3_LINE] = 
 {
-    {HD44780U_L1, "1: Send Data", 0}, 
-    {HD44780U_L2, "2: Cancel", 0} 
+    {HD44780U_L1, "Connected", 0}, 
+    {HD44780U_L2, "1: Send Data", 0}, 
+    {HD44780U_L3, "2: Cancel", 0} 
 }; 
 
 // Data send (TX) state message 
@@ -112,7 +114,7 @@ mtbdl_msgs_t mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE] =
 // Post data send (TX) state message 
 mtbdl_msgs_t mtbdl_posttx_msg[MTBDL_MSG_LEN_1_LINE] = 
 {
-    {HD44780U_L1, "Send Complete.", 0} 
+    {HD44780U_L1, "Send Complete", 0} 
 }; 
 
 // Pre calibration state message 

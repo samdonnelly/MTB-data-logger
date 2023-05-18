@@ -81,7 +81,7 @@ extern mtbdl_msgs_t mtbdl_data_select_msg[MTBDL_MSG_LEN_3_LINE];
 extern mtbdl_msgs_t mtbdl_dev_search_msg[MTBDL_MSG_LEN_2_LINE]; 
 
 // Pre data receive (RX) state message 
-extern mtbdl_msgs_t mtbdl_prerx_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern mtbdl_msgs_t mtbdl_prerx_msg[MTBDL_MSG_LEN_3_LINE]; 
 
 // Data receive (RX) state message 
 extern mtbdl_msgs_t mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE]; 
@@ -90,7 +90,7 @@ extern mtbdl_msgs_t mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE];
 extern mtbdl_msgs_t mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Pre data send (TX) state message 
-extern mtbdl_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_2_LINE]; 
+extern mtbdl_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_3_LINE]; 
 
 // Data send (TX) state message 
 extern mtbdl_msgs_t mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE]; 

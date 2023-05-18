@@ -932,7 +932,7 @@ void mtbdl_data_select_state(
     {
         // Clear the data select state message 
         hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_postrun_msg, MTBDL_MSG_LEN_3_LINE); 
+        mtbdl_screen_line_clear(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
     }
 
     //==================================================
@@ -1005,7 +1005,7 @@ void mtbdl_prerx_state(
     if (mtbdl->rx)
     {
         // Display the pre rx state message 
-        mtbdl_screen_msg_format(mtbdl_prerx_msg, MTBDL_MSG_LEN_2_LINE); 
+        mtbdl_screen_msg_format(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
         hd44780u_set_write_flag(); 
     }
     
@@ -1040,7 +1040,7 @@ void mtbdl_prerx_state(
     {
         // Clear the pre rx state message 
         hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_prerx_msg, MTBDL_MSG_LEN_2_LINE); 
+        mtbdl_screen_line_clear(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
     }
 
     //==================================================
@@ -1132,7 +1132,7 @@ void mtbdl_postrx_state(
 
         // Clear the post rx state message 
         hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
+        mtbdl_screen_line_clear(mtbdl_postrx_msg, MTBDL_MSG_LEN_2_LINE); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
@@ -1152,7 +1152,7 @@ void mtbdl_pretx_state(
     if (mtbdl->tx)
     {
         // Display the pre rx state message 
-        mtbdl_screen_msg_format(mtbdl_pretx_msg, MTBDL_MSG_LEN_2_LINE); 
+        mtbdl_screen_msg_format(mtbdl_pretx_msg, MTBDL_MSG_LEN_3_LINE); 
         hd44780u_set_write_flag(); 
     }
     
@@ -1187,7 +1187,7 @@ void mtbdl_pretx_state(
     {
         // Clear the pre rx state message 
         hd44780u_clear(); 
-        mtbdl_screen_line_clear(mtbdl_pretx_msg, MTBDL_MSG_LEN_2_LINE); 
+        mtbdl_screen_line_clear(mtbdl_pretx_msg, MTBDL_MSG_LEN_3_LINE); 
     }
 
     //==================================================

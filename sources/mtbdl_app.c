@@ -173,10 +173,10 @@ void mtbdl_app_init(
     // Timing information 
     mtbdl_trackers.timer_nonblocking = timer_nonblocking; 
     // Screen timer 
-    mtbdl_trackers.screen_timer.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
-    mtbdl_trackers.screen_timer.time_cnt_total = CLEAR; 
-    mtbdl_trackers.screen_timer.time_cnt = CLEAR; 
-    mtbdl_trackers.screen_timer.time_start = SET_BIT; 
+    mtbdl_trackers.delay_timer.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
+    mtbdl_trackers.delay_timer.time_cnt_total = CLEAR; 
+    mtbdl_trackers.delay_timer.time_cnt = CLEAR; 
+    mtbdl_trackers.delay_timer.time_start = SET_BIT; 
 
     // User buttons 
     mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
@@ -581,13 +581,13 @@ void mtbdl_init_state(
 
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
+                    mtbdl->delay_timer.clk_freq, 
                     MTBDL_STATE_WAIT, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
     {
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
 
         // Clear the screen startup message 
         hd44780u_set_clear_flag(); 
@@ -612,7 +612,14 @@ void mtbdl_idle_state(
         // Format the display message with data 
 
         // Display the idle state message 
-        hd44780u_set_msg(mtbdl_idle_msg, MTBDL_MSG_LEN_4_LINE); 
+        mtbdl_set_idle_msg(
+            200,            // Fork pressure (psi) 
+            225,            // Shock pressure (psi) 
+            5,              // Fork compression setting 
+            6,              // Shock compression setting 
+            2,              // Fork rebound setting 
+            3,              // Shock rebound setting 
+            100);           // Battery SOC 
 
         // Set the screen to power save mode 
         hd44780u_set_pwr_save_flag(); 
@@ -652,27 +659,8 @@ void mtbdl_idle_state(
     {
         mtbdl->user_btn_4_block = SET_BIT; 
         hd44780u_wake_up(); 
-        // hd44780u_backlight_on(); 
-        // mtbdl->screen_timer.time_start = SET_BIT; 
     }
     
-    //==================================================
-
-    //==================================================
-    // Screen sleep timer 
-
-    // // If the system has been inactive for long enough then turn the screen backlight off 
-    // if (tim_compare(mtbdl->timer_nonblocking, 
-    //                 mtbdl->screen_timer.clk_freq, 
-    //                 MTBDL_LCD_SLEEP, 
-    //                 &mtbdl->screen_timer.time_cnt_total, 
-    //                 &mtbdl->screen_timer.time_cnt, 
-    //                 &mtbdl->screen_timer.time_start))
-    // {
-    //     hd44780u_backlight_off(); 
-    //     mtbdl->screen_timer.time_start = SET_BIT; 
-    // }
-
     //==================================================
 
     //==================================================
@@ -682,10 +670,6 @@ void mtbdl_idle_state(
         mtbdl->data_select || 
         mtbdl->calibrate)
     {
-        // // Turn the screen backlight on 
-        // hd44780u_backlight_on(); 
-        // mtbdl->screen_timer.time_start = SET_BIT; 
-
         // Clear the idle state message 
         hd44780u_set_clear_flag(); 
 
@@ -707,7 +691,7 @@ void mtbdl_run_prep_state(
     if (mtbdl->run)
     {
         // Display the run prep state message 
-        hd44780u_set_msg(mtbdl_run_prep_msg, MTBDL_MSG_LEN_4_LINE); 
+        hd44780u_set_msg(mtbdl_run_prep_msg, MTBDL_MSG_LEN_3_LINE); 
     }
 
     mtbdl->run = CLEAR_BIT; 
@@ -769,13 +753,13 @@ void mtbdl_run_countdown_state(
 
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
+                    mtbdl->delay_timer.clk_freq, 
                     MTBDL_STATE_WAIT, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
     {
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
 
         // Put the screen in low power mode 
         hd44780u_set_low_pwr_flag(); 
@@ -858,13 +842,13 @@ void mtbdl_postrun_state(
 
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
+                    mtbdl->delay_timer.clk_freq, 
                     MTBDL_STATE_WAIT, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
     {
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
 
         // Clear the post run state message 
         hd44780u_set_clear_flag(); 
@@ -1111,13 +1095,13 @@ void mtbdl_postrx_state(
 
     // Wait for a short period of time before leaving the post rx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
+                    mtbdl->delay_timer.clk_freq, 
                     MTBDL_STATE_WAIT, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
     {
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
 
         // Clear the post rx state message 
         hd44780u_set_clear_flag(); 
@@ -1252,13 +1236,13 @@ void mtbdl_posttx_state(
 
     // Wait for a short period of time before leaving the post tx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
+                    mtbdl->delay_timer.clk_freq, 
                     MTBDL_STATE_WAIT, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
     {
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
 
         // Clear the post tx state message 
         hd44780u_set_clear_flag(); 
@@ -1346,13 +1330,13 @@ void mtbdl_calibrate_state(
 
     // Wait until calibration is done before leaving the state 
     if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->screen_timer.clk_freq, 
+                    mtbdl->delay_timer.clk_freq, 
                     MTBDL_CAL_SAMPLE_TIME, 
-                    &mtbdl->screen_timer.time_cnt_total, 
-                    &mtbdl->screen_timer.time_cnt, 
-                    &mtbdl->screen_timer.time_start))
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
     {
-        mtbdl->screen_timer.time_start = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
 
         // Clear the calibration state message 
         hd44780u_set_clear_flag(); 
@@ -1403,23 +1387,6 @@ void mtbdl_lowpwr_state(
     //==================================================
 
     //==================================================
-    // Screen sleep timer 
-
-    // // If the system has been inactive for long enough then turn the screen backlight off 
-    // if (tim_compare(mtbdl->timer_nonblocking, 
-    //                 mtbdl->screen_timer.clk_freq, 
-    //                 MTBDL_LCD_LP_SLEEP, 
-    //                 &mtbdl->screen_timer.time_cnt_total, 
-    //                 &mtbdl->screen_timer.time_cnt, 
-    //                 &mtbdl->screen_timer.time_start))
-    // {
-    //     hd44780u_backlight_off(); 
-    //     mtbdl->screen_timer.time_start = SET_BIT; 
-    // }
-
-    //==================================================
-
-    //==================================================
     // Check SOC 
 
     // If SOC is above the minimum threshold then we can exit low power state 
@@ -1439,10 +1406,6 @@ void mtbdl_lowpwr_state(
     if (mtbdl->low_pwr)
     {
         mtbdl->low_pwr = CLEAR_BIT; 
-
-        // // Turn the screen backlight on 
-        // hd44780u_backlight_on(); 
-        // mtbdl->screen_timer.time_start = SET_BIT; 
 
         // Clear the idle state message 
         hd44780u_set_clear_flag(); 

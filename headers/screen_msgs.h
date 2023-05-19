@@ -42,11 +42,13 @@
 // Init state message 
 extern hd44780u_msgs_t mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE]; 
 
-// Idle state message 
+// Idle state message and data items per message line 
 extern hd44780u_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE]; 
+extern uint8_t mtbdl_idle_data_nums[MTBDL_MSG_LEN_4_LINE]; 
 
 // Run prep state message 
-extern hd44780u_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_4_LINE]; 
+extern hd44780u_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_3_LINE]; 
+extern uint8_t mtbdl_run_prep_data_nums[MTBDL_MSG_LEN_3_LINE]; 
 
 // Run countdown state message 
 extern hd44780u_msgs_t mtbdl_run_countdown_msg[MTBDL_MSG_LEN_1_LINE]; 
@@ -94,28 +96,40 @@ extern hd44780u_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE];
 
 
 //=======================================================================================
-// 
+// Message formatting 
 
-// /**
-//  * @brief 
-//  * 
-//  * @param msg 
-//  * @param msg_len 
-//  */
-// void mtbdl_screen_msg_format(
-//     mtbdl_msgs_t *msg, 
-//     uint8_t msg_len); 
+/**
+ * @brief Format the idle state message 
+ * 
+ * @details 
+ * 
+ * @param fpsi : fork pressure (psi) 
+ * @param spsi : shock pressure (psi) 
+ * @param fc : fork compression setting 
+ * @param sl : shock lockout setting 
+ * @param fr : fork rebound setting 
+ * @param sr : shock rebound setting 
+ * @param soc : battery SOC 
+ */
+void mtbdl_set_idle_msg(
+    uint8_t fpsi, 
+    uint8_t spsi, 
+    uint8_t fc, 
+    uint8_t sl, 
+    uint8_t fr, 
+    uint8_t sr, 
+    uint8_t soc); 
 
 
-// /**
-//  * @brief 
-//  * 
-//  * @param msg 
-//  * @param msg_len 
-//  */
-// void mtbdl_screen_line_clear(
-//     mtbdl_msgs_t *msg, 
-//     uint8_t msg_len); 
+/**
+ * @brief Format the run prep state message 
+ * 
+ * @details 
+ * 
+ * @param navstat : GPS navigation status 
+ */
+void mtbdl_set_run_prep_msg(
+    uint8_t navstat); 
 
 //=======================================================================================
 

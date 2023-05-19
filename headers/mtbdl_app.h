@@ -81,7 +81,7 @@ typedef struct mtbdl_trackers_s
 
     // Timing information 
     TIM_TypeDef *timer_nonblocking;             // Timer used for non-blocking delays 
-    tim_compare_t screen_timer;                 // Screen sleep timing info 
+    tim_compare_t delay_timer;                  // Screen sleep timing info 
 
     // User buttons 
     uint8_t user_btn_1;                         // User button 1 pin number 

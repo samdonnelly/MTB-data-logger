@@ -28,10 +28,10 @@
 // Macros 
 
 // Message lengths 
-#define MTBDL_MSG_LEN_1_LINE 1             // Screen message is 1 line long 
-#define MTBDL_MSG_LEN_2_LINE 2             // Screen message is 2 line long 
-#define MTBDL_MSG_LEN_3_LINE 3             // Screen message is 3 line long 
-#define MTBDL_MSG_LEN_4_LINE 4             // Screen message is 4 line long 
+#define MTBDL_MSG_LEN_1_LINE 1        // Screen message is 1 line long 
+#define MTBDL_MSG_LEN_2_LINE 2        // Screen message is 2 line long 
+#define MTBDL_MSG_LEN_3_LINE 3        // Screen message is 3 line long 
+#define MTBDL_MSG_LEN_4_LINE 4        // Screen message is 4 line long 
 
 //=======================================================================================
 
@@ -101,15 +101,18 @@ extern hd44780u_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE];
 /**
  * @brief Format the idle state message 
  * 
- * @details 
+ * @details The idle state message contains system values that are relevant to the user 
+ *          and these values can change, This function updates the values of the idle 
+ *          state message and triggers a write of this message to the screen. A list of 
+ *          the values that the message contains are listed in the parameters below. 
  * 
- * @param fpsi : fork pressure (psi) 
- * @param spsi : shock pressure (psi) 
- * @param fc : fork compression setting 
- * @param sl : shock lockout setting 
- * @param fr : fork rebound setting 
- * @param sr : shock rebound setting 
- * @param soc : battery SOC 
+ * @param fpsi : fork pressure (psi) - set by user, read from memory 
+ * @param spsi : shock pressure (psi) - set by user, read from memory 
+ * @param fc : fork compression setting - set by user, read from memory 
+ * @param sl : shock lockout setting - set by user, read from memory 
+ * @param fr : fork rebound setting - set by user, read from memory 
+ * @param sr : shock rebound setting - set by user, read from memory 
+ * @param soc : battery SOC - read from system 
  */
 void mtbdl_set_idle_msg(
     uint8_t fpsi, 
@@ -124,9 +127,13 @@ void mtbdl_set_idle_msg(
 /**
  * @brief Format the run prep state message 
  * 
- * @details 
+ * @details The run prep state message contains the GPS position lock status. This 
+ *          information is displayed to the user before entering the run mode and allows 
+ *          the user to know if they have GPS lock before beginning to record data. This 
+ *          function updates GPS status information and triggers a write of this message 
+ *          to the screen. 
  * 
- * @param navstat : GPS navigation status 
+ * @param navstat : GPS navigation status - read from the system 
  */
 void mtbdl_set_run_prep_msg(
     uint8_t navstat); 

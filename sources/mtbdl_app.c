@@ -172,7 +172,6 @@ void mtbdl_app_init(
 
     // Timing information 
     mtbdl_trackers.timer_nonblocking = timer_nonblocking; 
-    // Screen timer 
     mtbdl_trackers.delay_timer.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
     mtbdl_trackers.delay_timer.time_cnt_total = CLEAR; 
     mtbdl_trackers.delay_timer.time_cnt = CLEAR; 

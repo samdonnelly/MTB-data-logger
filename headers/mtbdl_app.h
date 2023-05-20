@@ -111,11 +111,6 @@ mtbdl_trackers_t;
 
 
 //=======================================================================================
-// Screen messages 
-//=======================================================================================
-
-
-//=======================================================================================
 // Function pointers 
 
 /**
@@ -133,14 +128,15 @@ typedef void (*mtbdl_func_ptr_t)(
 /**
  * @brief MTB DL controller init 
  * 
- * @details 
+ * @details Initializes the main controller tracking information. Must be called during 
+ *          setup of the system. 
  * 
- * @param timer_nonblocking 
- * @param user_btn_gpio 
- * @param user_btn_1 
- * @param user_btn_2 
- * @param user_btn_3 
- * @param user_btn_4 
+ * @param timer_nonblocking : TIM port used for non-blocking delays 
+ * @param user_btn_gpio : GPIO port used for user buttons 
+ * @param user_btn_1 : user button 1 pin number 
+ * @param user_btn_2 : user button 2 pin number 
+ * @param user_btn_3 : user button 3 pin number 
+ * @param user_btn_4 : user button 4 pin number 
  */
 void mtbdl_app_init(
     TIM_TypeDef *timer_nonblocking, 
@@ -154,11 +150,11 @@ void mtbdl_app_init(
 /**
  * @brief MTB DL application 
  * 
- * @details 
+ * @details Contains the applications main state machine that controls the flow of the 
+ *          system. 
  */
 void mtbdl_app(void);
 
 //=======================================================================================
-
 
 #endif  // _MTBDL_APP_H_

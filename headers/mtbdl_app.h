@@ -27,6 +27,9 @@
 //=======================================================================================
 // Macros 
 
+// Testing 
+#define MTBDL_DEBUG 0                    // Conditional compilation for debugging 
+
 // System info 
 #define MTBDL_NUM_STATES 19              // Number of system states 
 #define MTBDL_LCD_SLEEP 15000000         // (us) inactive time before screen backlight off 

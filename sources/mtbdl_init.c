@@ -31,8 +31,12 @@ void mtbdl_init()
     // Initialize GPIO ports 
     gpio_port_init(); 
 
+#ifndef MTBDL_DEBUG 
+
     // Serial terminal output 
     uart_init(USART2, UART_BAUD_9600, UART_CLOCK_42); 
+
+#endif   // MTBDL_DEBUG 
 
     // Initialize interrupt handler flags 
     int_handler_init(); 
@@ -83,6 +87,15 @@ void mtbdl_init()
 
     //===================================================
     // SPI setup 
+
+    // For SD card 
+    spi_init(
+        SPI2, 
+        GPIOB, 
+        SPI_1_SLAVE, 
+        SPI_BR_FPCLK_8, 
+        SPI_CLOCK_MODE_0); 
+
     //===================================================
 
     //===================================================
@@ -122,6 +135,13 @@ void mtbdl_init()
 
     //===================================================
     // SD card setup 
+
+    // User initialization 
+    hw125_user_init(GPIOB, SPI2, GPIOX_PIN_9); 
+
+    // Controller init 
+    hw125_controller_init("mtbdl"); 
+
     //===================================================
 
 

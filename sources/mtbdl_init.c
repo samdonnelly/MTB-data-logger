@@ -140,7 +140,7 @@ void mtbdl_init()
     hw125_user_init(GPIOB, SPI2, GPIOX_PIN_9); 
 
     // Controller init 
-    hw125_controller_init("mtbdl"); 
+    hw125_controller_init(mtbdl_dir); 
 
     //===================================================
 

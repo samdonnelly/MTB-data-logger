@@ -542,6 +542,7 @@ void mtbdl_app(void)
 
     // Call device controllers 
     hd44780u_controller(); 
+    hw125_controller(); 
 }
 
 //=======================================================================================
@@ -564,15 +565,35 @@ void mtbdl_init_state(
         // Display the startup message 
         hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
 
-        // Put the HC-05 in low power mode 
+        // HC-05 
+        // - Put into low power mode 
 
-        // Put the MPU-6050 in low power mode 
-
-        // Check for existing bike / logging data in the filesystem 
+        // MPU-6050 
+        // - Put into low power mode 
     }
     
     mtbdl->init = CLEAR_BIT; 
     
+    //==================================================
+
+    //==================================================
+    // Checks 
+
+    // SD Card 
+    if (hw125_get_state() == HW125_ACCESS_STATE)
+    {
+        // Set the check flag 
+        hw125_set_check_flag(); 
+
+        // Create the parameter directory if it does not already exist 
+        hw125_mkdir(mtbdl_param_dir); 
+
+        // Create the data logging directory if it does not already exist 
+        hw125_mkdir(mtbdl_data_dir); 
+
+        // Check for existing bike / logging data in the filesystem 
+    }
+
     //==================================================
 
     //==================================================
@@ -623,6 +644,8 @@ void mtbdl_idle_state(
         // Set the screen to power save mode 
         hd44780u_set_pwr_save_flag(); 
         hd44780u_set_sleep_time(MTBDL_LCD_SLEEP); 
+
+        // Access the free space on the SD card 
     }
 
     mtbdl->idle = CLEAR_BIT; 
@@ -741,6 +764,9 @@ void mtbdl_run_countdown_state(
     {
         // Display the run countdown state message 
         hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
+
+        // SD Card 
+        // - Clear the check flag 
     }
 
     mtbdl->run = CLEAR_BIT; 

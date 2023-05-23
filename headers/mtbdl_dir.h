@@ -30,11 +30,12 @@
 // Project root directory on SD card 
 extern const char mtbdl_dir[]; 
 
-// Parameters sub-directory 
-extern const char mtbdl_param_dir[]; 
+// Sub-directories 
+extern const char mtbdl_param_dir[];           // Parameters sub-directory 
+extern const char mtbdl_data_dir[];            // Data logging sub-directory 
 
-// Data logging sub-directory 
-extern const char mtbdl_data_dir[]; 
+// File names 
+extern const char mtbdl_param_file[];          // Bike parameter file 
 
 //=======================================================================================
 

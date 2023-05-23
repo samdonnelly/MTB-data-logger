@@ -585,11 +585,20 @@ void mtbdl_init_state(
         // Set the check flag 
         hw125_set_check_flag(); 
 
-        // Create the parameter directory if it does not already exist 
+        // Create a "parameters" and "data" directories if they do not already exist 
         hw125_mkdir(mtbdl_param_dir); 
-
-        // Create the data logging directory if it does not already exist 
         hw125_mkdir(mtbdl_data_dir); 
+
+        // Move to the 'parameters' sub-directory 
+        hw125_set_dir(mtbdl_param_dir); 
+
+        // Check for the existance of the parameter file that contains bike data 
+        if (hw125_get_exists(mtbdl_param_file) == FR_NO_FILE)
+        {
+            uart_sendstring(USART2, "no file"); 
+        }
+
+        // Read the parameters file 
 
         // Check for existing bike / logging data in the filesystem 
     }

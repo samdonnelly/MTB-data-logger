@@ -26,10 +26,11 @@
 // Project root directory on SD card 
 const char mtbdl_dir[] = "mtbdl"; 
 
-// Parameters sub-directory 
-const char mtbdl_param_dir[] = "parameters"; 
+// Sub-directories 
+const char mtbdl_param_dir[] = "parameters";     // Parameters sub-directory 
+const char mtbdl_data_dir[] = "data";            // Data logging sub-directory 
 
-// Data logging sub-directory 
-const char mtbdl_data_dir[] = "data"; 
+// File names 
+const char mtbdl_param_file[] = "bike_params.txt"; 
 
 //=======================================================================================

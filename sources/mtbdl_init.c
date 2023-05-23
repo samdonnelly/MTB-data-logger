@@ -31,7 +31,7 @@ void mtbdl_init()
     // Initialize GPIO ports 
     gpio_port_init(); 
 
-#ifndef MTBDL_DEBUG 
+#if MTBDL_DEBUG 
 
     // Serial terminal output 
     uart_init(USART2, UART_BAUD_9600, UART_CLOCK_42); 
@@ -60,7 +60,6 @@ void mtbdl_init()
         TIM_84MHZ_100US_PSC, 
         0x0032,  // ARR=50, (50 counts)*(100us/count) = 5ms 
         TIM_UP_INT_ENABLE); 
-    // May want to consider enabling this timer only during run mode 
     tim_enable(TIM10); 
 
     // Enable the interrupt handlers 
@@ -92,7 +91,7 @@ void mtbdl_init()
     spi_init(
         SPI2, 
         GPIOB, 
-        SPI_1_SLAVE, 
+        SPI_2_SLAVE, 
         SPI_BR_FPCLK_8, 
         SPI_CLOCK_MODE_0); 
 
@@ -137,7 +136,7 @@ void mtbdl_init()
     // SD card setup 
 
     // User initialization 
-    hw125_user_init(GPIOB, SPI2, GPIOX_PIN_9); 
+    hw125_user_init(GPIOB, SPI2, GPIOX_PIN_12); 
 
     // Controller init 
     hw125_controller_init(mtbdl_dir); 

@@ -15,7 +15,12 @@
 			"int_handlers.h": "c",
 			"main.h": "c",
 			"m8q_config.h": "c",
-			"cstdio": "c"
+			"cstdio": "c",
+			"ff.h": "c",
+			"fatfs.h": "c",
+			"hw125_driver.h": "c",
+			"stm32f411xe.h": "c",
+			"tools.h": "c"
 		}
 	}
 }

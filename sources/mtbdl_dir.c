@@ -33,4 +33,9 @@ const char mtbdl_data_dir[] = "data";            // Data logging sub-directory
 // File names 
 const char mtbdl_param_file[] = "bike_params.txt"; 
 
+// File information 
+// TODO Try to use these in the screen messages 
+const char mtbdl_param_fork_info[] = "F: PSI:%u C:%u R:%u"; 
+const char mtbdl_param_shock_info[] = "S: PSI:%u L:%u R:%u"; 
+
 //=======================================================================================

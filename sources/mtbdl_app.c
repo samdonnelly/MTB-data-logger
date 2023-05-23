@@ -595,12 +595,18 @@ void mtbdl_init_state(
         // Check for the existance of the parameter file that contains bike data 
         if (hw125_get_exists(mtbdl_param_file) == FR_NO_FILE)
         {
-            uart_sendstring(USART2, "no file"); 
+            // No file so create one and write default parameters to it 
+            hw125_open(mtbdl_param_file, HW125_MODE_WW); 
+            // Write parameters to it 
+            // Move the read/write pointer to the beginning of the file 
+        }
+        else 
+        {
+            // File already exists - open the file for reading 
+            hw125_open(mtbdl_param_file, HW125_MODE_OEWR); 
         }
 
-        // Read the parameters file 
-
-        // Check for existing bike / logging data in the filesystem 
+        // Read the file parameters 
     }
 
     //==================================================

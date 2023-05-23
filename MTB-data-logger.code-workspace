@@ -20,7 +20,8 @@
 			"fatfs.h": "c",
 			"hw125_driver.h": "c",
 			"stm32f411xe.h": "c",
-			"tools.h": "c"
+			"tools.h": "c",
+			"screen_msgs.h": "c"
 		}
 	}
 }

@@ -87,13 +87,18 @@ void mtbdl_init()
     //===================================================
     // SPI setup 
 
-    // For SD card 
+    // SPI2 setup 
     spi_init(
         SPI2, 
         GPIOB, 
-        SPI_2_SLAVE, 
+        PIN_10,  // SCK pin 
+        PIN_14,  // MISO pin 
+        PIN_15,  // MOSI pin 
         SPI_BR_FPCLK_8, 
         SPI_CLOCK_MODE_0); 
+
+    // SD card slave select pin setup 
+    spi_ss_init(GPIOB, PIN_12); 
 
     //===================================================
 
@@ -136,7 +141,7 @@ void mtbdl_init()
     // SD card setup 
 
     // User initialization 
-    hw125_user_init(GPIOB, SPI2, GPIOX_PIN_12); 
+    hw125_user_init(SPI2, GPIOB, GPIOX_PIN_12); 
 
     // Controller init 
     hw125_controller_init(mtbdl_dir); 

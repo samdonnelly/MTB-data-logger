@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "mtbdl_dir.h" 
+#include "directories.h" 
 
 //=======================================================================================
 
@@ -35,7 +35,7 @@ const char mtbdl_param_file[] = "bike_params.txt";
 
 // File information 
 // TODO Try to use these in the screen messages 
-const char mtbdl_param_fork_info[] = "F: PSI:%u C:%u R:%u"; 
-const char mtbdl_param_shock_info[] = "S: PSI:%u L:%u R:%u"; 
+const char mtbdl_param_fork_info[] = "Fork: PSI:%u C:%u R:%u\n"; 
+const char mtbdl_param_shock_info[] = "Shock: PSI:%u L:%u R:%u\n"; 
 
 //=======================================================================================

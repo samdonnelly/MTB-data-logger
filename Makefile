@@ -41,7 +41,8 @@ Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
 sources/mtbdl_init.c \
 sources/mtbdl_app.c \
-sources/mtbdl_dir.c \
+sources/data_handling.c \
+sources/directories.c \
 sources/int_handlers.c \
 sources/screen_msgs.c \
 sources/config_files/m8q_config.c \

@@ -595,20 +595,54 @@ void mtbdl_init_state(
         // Check for the existance of the parameter file that contains bike data 
         if (hw125_get_exists(mtbdl_param_file) == FR_NO_FILE)
         {
-            // No file so create one and write default parameters to it 
+            // No file - create one in read and write mode 
             uart_sendstring(USART2, "no file"); 
-            // hw125_open(mtbdl_param_file, HW125_MODE_WW); 
-            // Write parameters to it 
+
+            // Create and open the file in read and write mode 
+            hw125_open(mtbdl_param_file, HW125_MODE_WW); 
+
+            // Write default fork data 
+            snprintf(mtbdl_trackers.data_buff, 
+                     MTBDL_MAX_DATA_STR_LEN, 
+                     mtbdl_param_fork_info, 
+                     CLEAR, CLEAR, CLEAR); 
+            hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+            // Write default shock data 
+            snprintf(mtbdl_trackers.data_buff, 
+                     MTBDL_MAX_DATA_STR_LEN, 
+                     mtbdl_param_shock_info, 
+                     CLEAR, CLEAR, CLEAR); 
+            hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
             // Move the read/write pointer to the beginning of the file 
+            hw125_lseek(RESET_ZERO); 
         }
         else 
         {
             // File already exists - open the file for reading 
-            // hw125_open(mtbdl_param_file, HW125_MODE_OEWR); 
-            uart_sendstring(USART2, "file"); 
+            uart_sendstring(USART2, "yes file"); 
+            hw125_open(mtbdl_param_file, HW125_MODE_OEWR); 
         }
 
-        // Read the file parameters 
+        // Read fork parameters 
+        hw125_gets(mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+        sscanf(mtbdl_trackers.data_buff, 
+               mtbdl_param_fork_info, 
+               &mtbdl_trackers.fork_psi, 
+               &mtbdl_trackers.fork_comp, 
+               &mtbdl_trackers.fork_reb); 
+
+        // Read shock parameters 
+        hw125_gets(mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+        sscanf(mtbdl_trackers.data_buff, 
+               mtbdl_param_shock_info, 
+               &mtbdl_trackers.shock_psi, 
+               &mtbdl_trackers.shock_comp, 
+               &mtbdl_trackers.shock_reb); 
+
+        // Close the file 
+        hw125_close(); 
     }
 
     //==================================================

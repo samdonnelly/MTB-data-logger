@@ -22,7 +22,8 @@
 #include "int_handlers.h"
 #include "mtbdl_init.h"
 #include "mtbdl_app.h"
-#include "mtbdl_dir.h"
+#include "data_handling.h"
+#include "directories.h"
 #include "screen_msgs.h" 
 
 //=======================================================================================

@@ -606,14 +606,16 @@ void mtbdl_init_state(
                      MTBDL_MAX_DATA_STR_LEN, 
                      mtbdl_param_fork_info, 
                      CLEAR, CLEAR, CLEAR); 
-            hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+            // hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+            hw125_puts(mtbdl_trackers.data_buff); 
 
             // Write default shock data 
             snprintf(mtbdl_trackers.data_buff, 
                      MTBDL_MAX_DATA_STR_LEN, 
                      mtbdl_param_shock_info, 
                      CLEAR, CLEAR, CLEAR); 
-            hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+            // hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+            hw125_puts(mtbdl_trackers.data_buff); 
 
             // Move the read/write pointer to the beginning of the file 
             hw125_lseek(RESET_ZERO); 

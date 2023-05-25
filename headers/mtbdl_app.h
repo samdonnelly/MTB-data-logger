@@ -96,18 +96,6 @@ typedef struct mtbdl_trackers_s
     uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
 
-    // Bike data 
-    // TODO move this to a file specific to data handling 
-    uint8_t fork_psi;                           // Fork pressure (psi) 
-    uint8_t fork_comp;                          // Fork compression setting 
-    uint8_t fork_reb;                           // Fork rebound setting 
-    uint8_t shock_psi;                          // Shock pressure (psi) 
-    uint8_t shock_comp;                         // Shock compression setting 
-    uint8_t shock_reb;                          // Shock rebound setting 
-
-    // SD card 
-    char data_buff[50];                         // Buffer for reading and writing 
-
     // State flags 
     uint8_t init        : 1;                    // Ensures the init state is run 
     uint8_t idle        : 1;                    // Idle state flag 

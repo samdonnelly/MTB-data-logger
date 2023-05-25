@@ -179,6 +179,9 @@ void mtbdl_init()
         GPIOX_PIN_2, 
         GPIOX_PIN_3); 
 
+    // Data record init 
+    mtbdl_data_init(); 
+
     //===================================================
 
 

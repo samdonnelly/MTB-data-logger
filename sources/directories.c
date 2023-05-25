@@ -31,7 +31,7 @@ const char mtbdl_param_dir[] = "parameters";     // Parameters sub-directory
 const char mtbdl_data_dir[] = "data";            // Data logging sub-directory 
 
 // File names 
-const char mtbdl_param_file[] = "bike_params.txt"; 
+const char mtbdl_bike_param_file[] = "bike_params.txt"; 
 
 // File information 
 const char mtbdl_param_fork_info[] = "Fork: PSI:%u C:%u R:%u\n"; 

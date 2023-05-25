@@ -35,7 +35,7 @@ extern const char mtbdl_param_dir[];           // Parameters sub-directory
 extern const char mtbdl_data_dir[];            // Data logging sub-directory 
 
 // File names 
-extern const char mtbdl_param_file[];          // Bike parameter file 
+extern const char mtbdl_bike_param_file[];     // Bike parameter file 
 
 // File information 
 extern const char mtbdl_param_fork_info[]; 

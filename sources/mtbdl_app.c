@@ -585,66 +585,8 @@ void mtbdl_init_state(
         // Set the check flag 
         hw125_set_check_flag(); 
 
-        // Create a "parameters" and "data" directories if they do not already exist 
-        hw125_mkdir(mtbdl_param_dir); 
-        hw125_mkdir(mtbdl_data_dir); 
-
-        // Move to the 'parameters' sub-directory 
-        hw125_set_dir(mtbdl_param_dir); 
-
-        // Check for the existance of the parameter file that contains bike data 
-        if (hw125_get_exists(mtbdl_param_file) == FR_NO_FILE)
-        {
-            // No file - create one in read and write mode 
-            uart_sendstring(USART2, "no file"); 
-
-            // Create and open the file in read and write mode 
-            hw125_open(mtbdl_param_file, HW125_MODE_WW); 
-
-            // Write default fork data 
-            snprintf(mtbdl_trackers.data_buff, 
-                     MTBDL_MAX_DATA_STR_LEN, 
-                     mtbdl_param_fork_info, 
-                     CLEAR, CLEAR, CLEAR); 
-            // hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-            hw125_puts(mtbdl_trackers.data_buff); 
-
-            // Write default shock data 
-            snprintf(mtbdl_trackers.data_buff, 
-                     MTBDL_MAX_DATA_STR_LEN, 
-                     mtbdl_param_shock_info, 
-                     CLEAR, CLEAR, CLEAR); 
-            // hw125_f_write((void *)mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-            hw125_puts(mtbdl_trackers.data_buff); 
-
-            // Move the read/write pointer to the beginning of the file 
-            hw125_lseek(RESET_ZERO); 
-        }
-        else 
-        {
-            // File already exists - open the file for reading 
-            uart_sendstring(USART2, "yes file"); 
-            hw125_open(mtbdl_param_file, HW125_MODE_OEWR); 
-        }
-
-        // Read fork parameters 
-        hw125_gets(mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-        sscanf(mtbdl_trackers.data_buff, 
-               mtbdl_param_fork_info, 
-               &mtbdl_trackers.fork_psi, 
-               &mtbdl_trackers.fork_comp, 
-               &mtbdl_trackers.fork_reb); 
-
-        // Read shock parameters 
-        hw125_gets(mtbdl_trackers.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-        sscanf(mtbdl_trackers.data_buff, 
-               mtbdl_param_shock_info, 
-               &mtbdl_trackers.shock_psi, 
-               &mtbdl_trackers.shock_comp, 
-               &mtbdl_trackers.shock_reb); 
-
-        // Close the file 
-        hw125_close(); 
+        // Set up the parameter file and data 
+        mtbdl_parm_setup(); 
     }
 
     //==================================================
@@ -682,17 +624,8 @@ void mtbdl_idle_state(
 
     if (mtbdl->idle)
     {
-        // Format the display message with data 
-
         // Display the idle state message 
-        mtbdl_set_idle_msg(
-            200,            // Fork pressure (psi) 
-            225,            // Shock pressure (psi) 
-            5,              // Fork compression setting 
-            6,              // Shock compression setting 
-            2,              // Fork rebound setting 
-            3,              // Shock rebound setting 
-            100);           // Battery SOC 
+        mtbdl_set_idle_msg(); 
 
         // Set the screen to power save mode 
         hd44780u_set_pwr_save_flag(); 
@@ -736,6 +669,13 @@ void mtbdl_idle_state(
         hd44780u_wake_up(); 
     }
     
+    //==================================================
+
+    //==================================================
+    // Checks 
+
+    // If GPS position lock is found then put the module in LP mode - can hot start 
+
     //==================================================
 
     //==================================================

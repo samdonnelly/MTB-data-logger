@@ -710,6 +710,11 @@ void mtbdl_run_prep_state(
     }
 
     mtbdl->run = CLEAR_BIT; 
+
+    // Generate a new filename 
+    // Create a new run file 
+    // Load file with bike and system parameters and position it to record data 
+    // If aborted then delete the file 
     
     //==================================================
 
@@ -763,6 +768,8 @@ void mtbdl_run_countdown_state(
     }
 
     mtbdl->run = CLEAR_BIT; 
+
+    // Update the log index 
 
     //==================================================
 
@@ -823,6 +830,9 @@ void mtbdl_run_state(
 
     //==================================================
     // Record data 
+
+    // Call the data handling function as needed 
+
     //==================================================
 
     //==================================================
@@ -852,6 +862,8 @@ void mtbdl_postrun_state(
     }
 
     mtbdl->run = CLEAR_BIT; 
+
+    // Close the open file 
 
     //==================================================
     
@@ -1102,10 +1114,8 @@ void mtbdl_postrx_state(
     
     mtbdl->rx = CLEAR_BIT; 
 
-    //==================================================
+    // Write the parameters to the parameters file 
 
-    //==================================================
-    // Save data 
     //==================================================
 
     //==================================================
@@ -1147,6 +1157,11 @@ void mtbdl_pretx_state(
     
     mtbdl->tx = CLEAR_BIT; 
     mtbdl->data_select = CLEAR_BIT; 
+
+    // Move to the data directory 
+    // Get the file name/number from the user to send over 
+    // Check for the existance of the specified file number 
+    // Don't allow start of transfer until file is chosen 
     
     //==================================================
 
@@ -1160,7 +1175,7 @@ void mtbdl_pretx_state(
         mtbdl->user_btn_1_block = SET_BIT; 
     }
     
-    // Button 2 - cancels the rx state --> triggers idle state 
+    // Button 2 - cancels the tx state --> triggers idle state 
     else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
     {
         mtbdl->idle = SET_BIT; 
@@ -1213,6 +1228,11 @@ void mtbdl_tx_state(
 
     //==================================================
     // Send data 
+
+    // Read data from file using the data handling code 
+    // Send the data over Bluetooth 
+    // Look for end of file - when seen set the tx bit 
+
     //==================================================
 
     //==================================================
@@ -1243,14 +1263,14 @@ void mtbdl_posttx_state(
     
     mtbdl->tx = CLEAR_BIT; 
 
-    //==================================================
+    // Close the open file 
 
-    //==================================================
-    // Close file system 
     //==================================================
 
     //==================================================
     // State exit 
+
+    // TODO change this to go back to the pre-tx state 
 
     // Wait for a short period of time before leaving the post tx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
@@ -1341,10 +1361,15 @@ void mtbdl_calibrate_state(
 
     //==================================================
     // Sample data 
+
+    // Record the data as needed in the data handling code 
+
     //==================================================
 
     //==================================================
     // State exit 
+
+    // Save the data to a parameter file 
 
     // Wait until calibration is done before leaving the state 
     if (tim_compare(mtbdl->timer_nonblocking, 

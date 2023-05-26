@@ -35,11 +35,16 @@ extern const char mtbdl_param_dir[];           // Parameters sub-directory
 extern const char mtbdl_data_dir[];            // Data logging sub-directory 
 
 // File names 
-extern const char mtbdl_bike_param_file[];     // Bike parameter file 
+extern const char mtbdl_bike_param_file[];     // Bike parameters file 
+extern const char mtbdl_sys_param_file[];      // System parameters file 
 
-// File information 
-extern const char mtbdl_param_fork_info[]; 
-extern const char mtbdl_param_shock_info[]; 
+// Bike parameter information 
+extern const char mtbdl_param_fork_info[];     // Fork setup parameters 
+extern const char mtbdl_param_shock_info[];    // Shock setup parameters 
+
+// System parameter information 
+extern const char mtbdl_param_accel_cal[];     // Accelerometer calibration data 
+extern const char mtbdl_param_pot_cal[];       // Rotary pot calibration data 
 
 //=======================================================================================
 

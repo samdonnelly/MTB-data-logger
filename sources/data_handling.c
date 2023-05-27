@@ -35,46 +35,69 @@ static mtbdl_data_t mtbdl_data;
 // Initialize data record 
 void mtbdl_data_init(void)
 {
-    // Fork data 
+    // Bike parameters 
     mtbdl_data.fork_psi = CLEAR; 
     mtbdl_data.fork_comp = CLEAR; 
     mtbdl_data.fork_reb = CLEAR; 
-
-    // Shock data 
     mtbdl_data.shock_psi = CLEAR; 
     mtbdl_data.shock_lock = CLEAR; 
     mtbdl_data.shock_reb = CLEAR; 
 
+    // System parameters 
+    mtbdl_data.log_index = CLEAR; 
+    mtbdl_data.accel_x_rest = CLEAR; 
+    mtbdl_data.accel_y_rest = CLEAR; 
+    mtbdl_data.accel_x_rest = CLEAR; 
+    mtbdl_data.pot_fork_rest = CLEAR; 
+    mtbdl_data.pot_shock_rest = CLEAR; 
+
     // SD card 
     memset((void *)mtbdl_data.data_buff, CLEAR, sizeof(mtbdl_data.data_buff)); 
+
+    // System data 
+    mtbdl_data.soc = CLEAR; 
+    mtbdl_data.navstat = CLEAR; 
+    mtbdl_data.accel_x = CLEAR; 
+    mtbdl_data.accel_y = CLEAR; 
+    mtbdl_data.accel_z = CLEAR; 
+    mtbdl_data.pot_fork = CLEAR; 
+    mtbdl_data.pot_shock = CLEAR; 
 }
 
 //=======================================================================================
 
 
 //=======================================================================================
-// Parameter data 
+// Parameters 
 
-// Bike parameter setup 
+// Parameter setup 
 void mtbdl_parm_setup(void)
 {
-    // Create a "parameters" and "data" directories if they do not already exist 
+    // Create a "parameters" directory if it does not already exist 
     hw125_mkdir(mtbdl_param_dir); 
-    hw125_mkdir(mtbdl_data_dir); 
 
-    // Move to the 'parameters' sub-directory 
-    hw125_set_dir(mtbdl_param_dir); 
-
-    // Check for the existance of the parameter file that contains bike data 
+    // Check for the existance of the bike parameters file 
     if (hw125_get_exists(mtbdl_bike_param_file) == FR_NO_FILE)
     {
-        // No file - Create one and write default parameter data to the file 
+        // No file - create one and write default parameter data to it 
         mtbdl_write_bike_params(HW125_MODE_WW); 
     }
     else 
     {
         // File already exists - open the file for reading 
         mtbdl_read_bike_params(HW125_MODE_OEWR); 
+    }
+
+    // Check for the existance of the system parameters file 
+    if (hw125_get_exists(mtbdl_sys_param_file) == FR_NO_FILE)
+    {
+        // No file - create one and write default parameter data to it 
+        mtbdl_write_sys_params(HW125_MODE_WW); 
+    }
+    else 
+    {
+        // File already exists - open the file for reading 
+        mtbdl_read_sys_params(HW125_MODE_OEWR); 
     }
 }
 
@@ -138,6 +161,94 @@ void mtbdl_write_bike_params(
 
     // Close the file 
     hw125_close(); 
+}
+
+
+// Read system parameters on file 
+void mtbdl_read_sys_params(
+    uint8_t mode)
+{
+    // Open the file for reading 
+    hw125_open(mtbdl_sys_param_file, mode); 
+
+    // Read logging parameters 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_log, 
+           &mtbdl_data.log_index); 
+
+    // Read accelerometer calibration data 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_accel_rest, 
+           &mtbdl_data.accel_x_rest, 
+           &mtbdl_data.accel_y_rest, 
+           &mtbdl_data.accel_z_rest); 
+
+    // Read potentiometer starting points 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_pot_rest, 
+           &mtbdl_data.pot_fork_rest, 
+           &mtbdl_data.pot_shock_rest); 
+
+    // Close the file 
+    hw125_close(); 
+}
+
+
+// Write system parameters to file 
+void mtbdl_write_sys_params(
+    uint8_t mode)
+{
+    // Open the file for writing 
+    hw125_open(mtbdl_sys_param_file, mode); 
+
+    // Write logging parameters 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_param_log, 
+             mtbdl_data.log_index); 
+
+    hw125_puts(mtbdl_data.data_buff); 
+    
+    // Write accelerometer calibration data 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_param_accel_rest, 
+             mtbdl_data.accel_x_rest, 
+             mtbdl_data.accel_y_rest, 
+             mtbdl_data.accel_z_rest); 
+    
+    hw125_puts(mtbdl_data.data_buff); 
+
+    // Write potentiometer calibrated starting points 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_param_pot_rest, 
+             mtbdl_data.pot_fork_rest, 
+             mtbdl_data.pot_shock_rest); 
+    
+    hw125_puts(mtbdl_data.data_buff); 
+
+    // Close the file 
+    hw125_close(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Data logging 
+
+// Data loggin setup 
+void mtbdl_data_setup(void)
+{
+    // Create "data" directory if it does not already exist 
+    hw125_mkdir(mtbdl_data_dir); 
 }
 
 //=======================================================================================

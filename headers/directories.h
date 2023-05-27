@@ -43,8 +43,9 @@ extern const char mtbdl_param_fork_info[];     // Fork setup parameters
 extern const char mtbdl_param_shock_info[];    // Shock setup parameters 
 
 // System parameter information 
-extern const char mtbdl_param_accel_cal[];     // Accelerometer calibration data 
-extern const char mtbdl_param_pot_cal[];       // Rotary pot calibration data 
+extern const char mtbdl_param_log[];           // Logging information 
+extern const char mtbdl_param_accel_rest[];    // Resting accelerometer data 
+extern const char mtbdl_param_pot_rest[];      // Resting potentiometer data 
 
 //=======================================================================================
 

@@ -585,8 +585,9 @@ void mtbdl_init_state(
         // Set the check flag 
         hw125_set_check_flag(); 
 
-        // Set up the parameter file and data 
+        // Set up the parameters and data 
         mtbdl_parm_setup(); 
+        mtbdl_data_setup(); 
     }
 
     //==================================================
@@ -1110,11 +1111,12 @@ void mtbdl_postrx_state(
     {
         // Display the post rx state message 
         hd44780u_set_msg(mtbdl_postrx_msg, MTBDL_MSG_LEN_1_LINE); 
+
+        // Save the bike parameters 
+        mtbdl_write_bike_params(HW125_MODE_OEW); 
     }
     
     mtbdl->rx = CLEAR_BIT; 
-
-    // Write the parameters to the parameters file 
 
     //==================================================
 
@@ -1381,6 +1383,9 @@ void mtbdl_calibrate_state(
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
 
+        // Record the calibration data 
+        mtbdl_write_sys_params(HW125_MODE_OEW); 
+
         // Clear the calibration state message 
         hd44780u_set_clear_flag(); 
 
@@ -1423,8 +1428,6 @@ void mtbdl_lowpwr_state(
     {
         mtbdl->user_btn_4_block = SET_BIT; 
         hd44780u_wake_up(); 
-        // hd44780u_backlight_on(); 
-        // mtbdl->screen_timer.time_start = SET_BIT; 
     }
     
     //==================================================

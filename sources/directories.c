@@ -39,7 +39,8 @@ const char mtbdl_param_fork_info[] = "Fork: PSI:%u C:%u R:%u\n";
 const char mtbdl_param_shock_info[] = "Shock: PSI:%u L:%u R:%u\n"; 
 
 // System parameter information 
-const char mtbdl_param_accel_cal[] = "Accel: X:%u Y:%u Z:%u\n"; 
-const char mtbdl_param_pot_cal[] = "Pots: F:%u R:%u"; 
+const char mtbdl_param_log[] = "Index: %u"; 
+const char mtbdl_param_accel_rest[] = "Accel: X:%u Y:%u Z:%u\n"; 
+const char mtbdl_param_pot_rest[] = "Pots: F:%u S:%u"; 
 
 //=======================================================================================

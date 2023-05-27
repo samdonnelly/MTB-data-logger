@@ -38,25 +38,33 @@
 // Data record for the system 
 typedef struct mtbdl_data_s 
 {
-    // Fork parameters 
+    // Bike parameters 
     uint8_t fork_psi;                           // Fork pressure (psi) 
     uint8_t fork_comp;                          // Fork compression setting 
     uint8_t fork_reb;                           // Fork rebound setting 
-
-    // Shock parameters 
     uint8_t shock_psi;                          // Shock pressure (psi) 
     uint8_t shock_lock;                         // Shock lockout setting 
     uint8_t shock_reb;                          // Shock rebound setting 
 
     // System parameters 
     uint8_t log_index;                          // Data log index 
+    uint8_t accel_x_rest;                       // Resting x-axis acceleration offset 
+    uint8_t accel_y_rest;                       // Resting y-axis acceleration offset 
+    uint8_t accel_z_rest;                       // Resting z-axis acceleration offset 
+    uint8_t pot_fork_rest;                      // Resting potentiometer reading for fork 
+    uint8_t pot_shock_rest;                     // Resting potentiometer reading for shock 
 
     // SD card 
-    char data_buff[50];                         // Buffer for reading and writing 
+    char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
 
     // System data 
     uint8_t soc;                                // Battery SOC 
     uint8_t navstat;                            // Navigation status of GPS module 
+    uint8_t accel_x;                            // x-axis acceleration reading 
+    uint8_t accel_y;                            // y-axis acceleration reading 
+    uint8_t accel_z;                            // z-axis acceleration reading 
+    uint8_t pot_fork;                           // Fork potentiometer reading 
+    uint8_t pot_shock;                          // Shock potentiometer reading 
 }
 mtbdl_data_t; 
 
@@ -64,7 +72,7 @@ mtbdl_data_t;
 
 
 //=======================================================================================
-// Function prototypes 
+// Initialization 
 
 /**
  * @brief Initialize data record 
@@ -73,6 +81,11 @@ mtbdl_data_t;
  */
 void mtbdl_data_init(void); 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// Parameters 
 
 /**
  * @brief Bike parameter setup 
@@ -102,6 +115,41 @@ void mtbdl_read_bike_params(
  */
 void mtbdl_write_bike_params(
     uint8_t mode); 
+
+
+/**
+ * @brief Read system parameters on file 
+ * 
+ * @details 
+ * 
+ * @param mode : file open mode flag - see hw125 driver 
+ */
+void mtbdl_read_sys_params(
+    uint8_t mode); 
+
+
+/**
+ * @brief Write system parameters to file 
+ * 
+ * @details 
+ * 
+ * @param mode : file open mode flag - see hw125 driver 
+ */
+void mtbdl_write_sys_params(
+    uint8_t mode); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Data logging 
+
+/**
+ * @brief Data loggin setup 
+ * 
+ * @details 
+ */
+void mtbdl_data_setup(void); 
 
 //=======================================================================================
 

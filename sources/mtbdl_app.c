@@ -707,16 +707,14 @@ void mtbdl_run_prep_state(
     if (mtbdl->run)
     {
         // Display the run prep state message 
-        hd44780u_set_msg(mtbdl_run_prep_msg, MTBDL_MSG_LEN_3_LINE); 
+        mtbdl_set_run_prep_msg(); 
+
+        // Check the data log index is within bounds 
+        // Generate a new file name 
     }
 
     mtbdl->run = CLEAR_BIT; 
 
-    // Generate a new filename 
-    // Create a new run file 
-    // Load file with bike and system parameters and position it to record data 
-    // If aborted then delete the file 
-    
     //==================================================
 
     //==================================================
@@ -728,6 +726,10 @@ void mtbdl_run_prep_state(
     {
         mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+
+        // Create a new file with the filename 
+        // Load the file with bike and system parameters and position it to record data 
+        // Update the log index 
     }
     
     // Button 2 - cancels the run state --> triggers idle state 
@@ -737,6 +739,14 @@ void mtbdl_run_prep_state(
         mtbdl->user_btn_2_block = SET_BIT; 
     }
     
+    //==================================================
+
+    //==================================================
+    // Checks 
+
+    // Check for GPS lock - if not initially connected then a lock is found then update 
+    // the GPS message 
+
     //==================================================
 
     //==================================================
@@ -769,8 +779,6 @@ void mtbdl_run_countdown_state(
     }
 
     mtbdl->run = CLEAR_BIT; 
-
-    // Update the log index 
 
     //==================================================
 

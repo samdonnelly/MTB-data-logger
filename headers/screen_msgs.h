@@ -44,11 +44,9 @@ extern hd44780u_msgs_t mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE];
 
 // Idle state message and data items per message line 
 extern hd44780u_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE]; 
-extern uint8_t mtbdl_idle_data_nums[MTBDL_MSG_LEN_4_LINE]; 
 
 // Run prep state message 
 extern hd44780u_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_3_LINE]; 
-extern uint8_t mtbdl_run_prep_data_nums[MTBDL_MSG_LEN_3_LINE]; 
 
 // Run countdown state message 
 extern hd44780u_msgs_t mtbdl_run_countdown_msg[MTBDL_MSG_LEN_1_LINE]; 

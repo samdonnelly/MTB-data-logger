@@ -39,8 +39,6 @@ hd44780u_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE] =
     {HD44780U_L4, "1:RUN 2:TX/RX 3:CAL", 0} 
 }; 
 
-uint8_t mtbdl_idle_data_nums[MTBDL_MSG_LEN_4_LINE] = {3, 3, 1, 0}; 
-
 
 // Pre run state message and number of data items for each line 
 hd44780u_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_3_LINE] = 
@@ -49,8 +47,6 @@ hd44780u_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_3_LINE] =
     {HD44780U_L2, "1: Proceed to run", 0}, 
     {HD44780U_L3, "2: Cancel", 0} 
 }; 
-
-uint8_t mtbdl_run_prep_data_nums[MTBDL_MSG_LEN_3_LINE] = {1, 0, 0}; 
 
 
 // Run countdown state message 

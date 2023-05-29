@@ -709,8 +709,11 @@ void mtbdl_run_prep_state(
         // Display the run prep state message 
         mtbdl_set_run_prep_msg(); 
 
-        // Check the data log index is within bounds 
-        // Generate a new file name 
+        // Check the log file name 
+        if (mtbdl_log_name_prep() == FALSE) 
+        {
+            // indicate that the number of log files is maxed out and abort the run 
+        }
     }
 
     mtbdl->run = CLEAR_BIT; 
@@ -727,9 +730,8 @@ void mtbdl_run_prep_state(
         mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
 
-        // Create a new file with the filename 
-        // Load the file with bike and system parameters and position it to record data 
-        // Update the log index 
+        // Prepare the log file 
+        mtbdl_log_file_prep(); 
     }
     
     // Button 2 - cancels the run state --> triggers idle state 
@@ -744,8 +746,7 @@ void mtbdl_run_prep_state(
     //==================================================
     // Checks 
 
-    // Check for GPS lock - if not initially connected then a lock is found then update 
-    // the GPS message 
+    // Check for GPS lock - update the display message as needed 
 
     //==================================================
 
@@ -774,8 +775,8 @@ void mtbdl_run_countdown_state(
         // Display the run countdown state message 
         hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
 
-        // SD Card 
-        // - Clear the check flag 
+        // SD card will be written to constantly so no need for the check state 
+        hw125_clear_check_flag(); 
     }
 
     mtbdl->run = CLEAR_BIT; 
@@ -868,11 +869,12 @@ void mtbdl_postrun_state(
     {
         // Display the post run state message 
         hd44780u_set_msg(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
+
+        // Close the open data log file 
+        mtbdl_log_file_close(); 
     }
 
     mtbdl->run = CLEAR_BIT; 
-
-    // Close the open file 
 
     //==================================================
     
@@ -891,6 +893,9 @@ void mtbdl_postrun_state(
 
         // Clear the post run state message 
         hd44780u_set_clear_flag(); 
+
+        // Set the SD card controller check flag 
+        hw125_set_check_flag(); 
 
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 

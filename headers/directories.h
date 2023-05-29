@@ -48,6 +48,9 @@ extern const char mtbdl_param_log[];           // Logging information
 extern const char mtbdl_param_accel_rest[];    // Resting accelerometer data 
 extern const char mtbdl_param_pot_rest[];      // Resting potentiometer data 
 
+// Data log information 
+extern const char mtbdl_data_log_start[];      // Signifies the start of the logging info 
+
 //=======================================================================================
 
 #endif   // _MTBDL_DIRS_H_ 

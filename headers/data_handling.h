@@ -28,6 +28,7 @@
 // Macros 
 
 #define MTBDL_MAX_DATA_STR_LEN 50        // Max string length containing data 
+#define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
 
 //=======================================================================================
 
@@ -150,6 +151,32 @@ void mtbdl_write_sys_params(
  * @details 
  */
 void mtbdl_data_setup(void); 
+
+
+/**
+ * @brief Log name preparation 
+ * 
+ * @details 
+ * 
+ * @return uint8_t 
+ */
+uint8_t mtbdl_log_name_prep(void); 
+
+
+/**
+ * @brief Log file prep 
+ * 
+ * @details 
+ */
+void mtbdl_log_file_prep(void); 
+
+
+/**
+ * @brief Log file close 
+ * 
+ * @details 
+ */
+void mtbdl_log_file_close(void); 
 
 //=======================================================================================
 

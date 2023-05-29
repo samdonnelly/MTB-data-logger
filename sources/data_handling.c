@@ -21,6 +21,27 @@
 
 
 //=======================================================================================
+// Function prototypes 
+
+/**
+ * @brief Format and write the bike parameters 
+ * 
+ * @details 
+ */
+void mtbdl_format_write_bike_params(void); 
+
+
+/**
+ * @brief Format and write the system parameters 
+ * 
+ * @details 
+ */
+void mtbdl_format_write_sys_params(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Variables 
 
 // Data record instance 
@@ -106,6 +127,9 @@ void mtbdl_parm_setup(void)
 void mtbdl_read_bike_params(
     uint8_t mode)
 {
+    // Move to the parameters directory 
+    hw125_set_dir(mtbdl_param_dir); 
+
     // Open the file for reading 
     hw125_open(mtbdl_bike_param_file, mode); 
 
@@ -136,28 +160,14 @@ void mtbdl_read_bike_params(
 void mtbdl_write_bike_params(
     uint8_t mode)
 {
+    // Move to the parameters directory 
+    hw125_set_dir(mtbdl_param_dir); 
+
     // Open the file for writing 
     hw125_open(mtbdl_bike_param_file, mode); 
-    
-    // Write fork parameters 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_param_fork_info, 
-             mtbdl_data.fork_psi, 
-             mtbdl_data.fork_comp, 
-             mtbdl_data.fork_reb); 
-    
-    hw125_puts(mtbdl_data.data_buff); 
 
-    // Write shock parameters 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_param_shock_info, 
-             mtbdl_data.shock_psi, 
-             mtbdl_data.shock_lock, 
-             mtbdl_data.shock_reb); 
-    
-    hw125_puts(mtbdl_data.data_buff); 
+    // Format and write the bike parameters 
+    mtbdl_format_write_bike_params(); 
 
     // Close the file 
     hw125_close(); 
@@ -168,6 +178,9 @@ void mtbdl_write_bike_params(
 void mtbdl_read_sys_params(
     uint8_t mode)
 {
+    // Move to the parameters directory 
+    hw125_set_dir(mtbdl_param_dir); 
+
     // Open the file for reading 
     hw125_open(mtbdl_sys_param_file, mode); 
 
@@ -204,9 +217,48 @@ void mtbdl_read_sys_params(
 void mtbdl_write_sys_params(
     uint8_t mode)
 {
+    // Move to the parameters directory 
+    hw125_set_dir(mtbdl_param_dir); 
+    
     // Open the file for writing 
     hw125_open(mtbdl_sys_param_file, mode); 
 
+    // Format and write the system parameters 
+    mtbdl_format_write_sys_params(); 
+
+    // Close the file 
+    hw125_close(); 
+}
+
+
+// Format and write the bike parameters 
+void mtbdl_format_write_bike_params(void)
+{
+    // Write fork parameters 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_param_fork_info, 
+             mtbdl_data.fork_psi, 
+             mtbdl_data.fork_comp, 
+             mtbdl_data.fork_reb); 
+    
+    hw125_puts(mtbdl_data.data_buff); 
+
+    // Write shock parameters 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_param_shock_info, 
+             mtbdl_data.shock_psi, 
+             mtbdl_data.shock_lock, 
+             mtbdl_data.shock_reb); 
+    
+    hw125_puts(mtbdl_data.data_buff); 
+}
+
+
+// Format and write the system parameters 
+void mtbdl_format_write_sys_params(void)
+{
     // Write logging parameters 
     snprintf(mtbdl_data.data_buff, 
              MTBDL_MAX_DATA_STR_LEN, 
@@ -233,9 +285,6 @@ void mtbdl_write_sys_params(
              mtbdl_data.pot_shock_rest); 
     
     hw125_puts(mtbdl_data.data_buff); 
-
-    // Close the file 
-    hw125_close(); 
 }
 
 //=======================================================================================
@@ -249,6 +298,50 @@ void mtbdl_data_setup(void)
 {
     // Create "data" directory if it does not already exist 
     hw125_mkdir(mtbdl_data_dir); 
+}
+
+
+// Log name preparation 
+uint8_t mtbdl_log_name_prep(void)
+{
+    // Check the data log index is within bounds 
+    if (mtbdl_data.log_index > MTBDL_LOG_NUM_MAX)
+    {
+        // Too many log files on drive - don't create a new file name 
+        return FALSE; 
+    }
+
+    // Number of log files is within the limit - generate a new log file name 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_log_file, 
+             mtbdl_data.log_index); 
+
+    return TRUE; 
+}
+
+
+// Log file prep 
+void mtbdl_log_file_prep(void)
+{
+    // Move to the data directory 
+    hw125_set_dir(mtbdl_data_dir); 
+
+    if (hw125_open(mtbdl_data.data_buff, HW125_MODE_WWX) == FR_OK)
+    {
+        // File successfully created - write parameters to it and update the file index 
+        mtbdl_format_write_bike_params(); 
+        mtbdl_format_write_sys_params(); 
+        hw125_puts(mtbdl_data_log_start); 
+        mtbdl_data.log_index++; 
+    }
+}
+
+
+// Log file close 
+void mtbdl_log_file_close(void)
+{
+    hw125_close(); 
 }
 
 //=======================================================================================

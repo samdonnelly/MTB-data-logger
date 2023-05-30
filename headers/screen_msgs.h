@@ -70,7 +70,7 @@ extern hd44780u_msgs_t mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE];
 extern hd44780u_msgs_t mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Pre data send (TX) state message 
-extern hd44780u_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_3_LINE]; 
+extern hd44780u_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_4_LINE]; 
 
 // Data send (TX) state message 
 extern hd44780u_msgs_t mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE]; 

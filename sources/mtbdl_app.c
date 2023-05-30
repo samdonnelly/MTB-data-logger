@@ -585,9 +585,8 @@ void mtbdl_init_state(
         // Set the check flag 
         hw125_set_check_flag(); 
 
-        // Set up the parameters and data 
-        mtbdl_parm_setup(); 
-        mtbdl_data_setup(); 
+        // Set up the file structure and system info 
+        mtbdl_file_sys_setup(); 
     }
 
     //==================================================
@@ -631,8 +630,6 @@ void mtbdl_idle_state(
         // Set the screen to power save mode 
         hd44780u_set_pwr_save_flag(); 
         hd44780u_set_sleep_time(MTBDL_LCD_SLEEP); 
-
-        // Access the free space on the SD card 
     }
 
     mtbdl->idle = CLEAR_BIT; 
@@ -724,7 +721,6 @@ void mtbdl_run_prep_state(
     // Check user button input 
 
     // Button 1 - triggers the run state 
-    // Add another condition to prevent button 1 press until the system is ready 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
     {
         mtbdl->run = SET_BIT; 
@@ -826,8 +822,6 @@ void mtbdl_run_state(
     {
         mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
-
-        // Turn the screen backlight back on 
     }
     
     // Button 2 - Sets a marker 
@@ -841,7 +835,8 @@ void mtbdl_run_state(
     //==================================================
     // Record data 
 
-    // Call the data handling function as needed 
+    // Log the system data 
+    mtbdl_logging(); 
 
     //==================================================
 
@@ -1166,17 +1161,12 @@ void mtbdl_pretx_state(
 
     if (mtbdl->tx)
     {
-        // Display the pre rx state message 
-        hd44780u_set_msg(mtbdl_pretx_msg, MTBDL_MSG_LEN_3_LINE); 
+        // Display the pre tx state message 
+        mtbdl_set_pretx_msg(); 
     }
     
     mtbdl->tx = CLEAR_BIT; 
     mtbdl->data_select = CLEAR_BIT; 
-
-    // Move to the data directory 
-    // Get the file name/number from the user to send over 
-    // Check for the existance of the specified file number 
-    // Don't allow start of transfer until file is chosen 
     
     //==================================================
 
@@ -1188,6 +1178,9 @@ void mtbdl_pretx_state(
     {
         mtbdl->tx = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+
+        // Prepare the log file to send 
+        mtbdl_tx_prep(); 
     }
     
     // Button 2 - cancels the tx state --> triggers idle state 
@@ -1244,9 +1237,12 @@ void mtbdl_tx_state(
     //==================================================
     // Send data 
 
-    // Read data from file using the data handling code 
-    // Send the data over Bluetooth 
-    // Look for end of file - when seen set the tx bit 
+    // Transfer data log contents 
+    if (mtbdl_tx())
+    {
+        // The transfer has finished 
+        mtbdl->tx = SET_BIT; 
+    }
 
     //==================================================
 

@@ -29,6 +29,8 @@
 
 #define MTBDL_MAX_DATA_STR_LEN 50        // Max string length containing data 
 #define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
+#define MTBDL_LOG_NUM_MIN 0              // Min data log files 
+#define MTBDL_LOG_OFFSET 1               // Log file number offset for the TX state 
 
 //=======================================================================================
 
@@ -57,6 +59,8 @@ typedef struct mtbdl_data_s
 
     // SD card 
     char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
+    char filename[MTBDL_MAX_DATA_STR_LEN];      // Buffer for storing a file name 
+    uint8_t tx_status : 1;                      // TX transaction status 
 
     // System data 
     uint8_t soc;                                // Battery SOC 
@@ -82,19 +86,19 @@ mtbdl_data_t;
  */
 void mtbdl_data_init(void); 
 
-//=======================================================================================
-
-
-//=======================================================================================
-// Parameters 
 
 /**
  * @brief Bike parameter setup 
  * 
  * @details 
  */
-void mtbdl_parm_setup(void); 
+void mtbdl_file_sys_setup(void); 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// Parameters 
 
 /**
  * @brief Read bike parameters on file 
@@ -146,14 +150,6 @@ void mtbdl_write_sys_params(
 // Data logging 
 
 /**
- * @brief Data loggin setup 
- * 
- * @details 
- */
-void mtbdl_data_setup(void); 
-
-
-/**
  * @brief Log name preparation 
  * 
  * @details 
@@ -172,11 +168,63 @@ void mtbdl_log_file_prep(void);
 
 
 /**
+ * @brief Record data 
+ * 
+ * @details 
+ */
+void mtbdl_logging(void); 
+
+
+/**
  * @brief Log file close 
  * 
  * @details 
  */
 void mtbdl_log_file_close(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// User interface 
+
+// RX 
+
+
+/**
+ * @brief TX file name prep 
+ * 
+ * @details 
+ * 
+ * @return uint8_t 
+ */
+uint8_t mtbdl_tx_name_prep(void); 
+
+
+/**
+ * @brief Prepare to send data log info 
+ * 
+ * @details 
+ */
+void mtbdl_tx_prep(void); 
+
+
+/**
+ * @brief Transfer data log contents 
+ * 
+ * @details 
+ * 
+ * @return uint8_t : 
+ */
+uint8_t mtbdl_tx(void); 
+
+
+/**
+ * @brief Close the log file and delete it 
+ * 
+ * @details 
+ */
+void mtbdl_tx_end(void); 
 
 //=======================================================================================
 
@@ -203,10 +251,16 @@ void mtbdl_set_idle_msg(void);
  *          the user to know if they have GPS lock before beginning to record data. This 
  *          function updates GPS status information and triggers a write of this message 
  *          to the screen. 
- * 
- * @param navstat : GPS navigation status - read from the system 
  */
 void mtbdl_set_run_prep_msg(void); 
+
+
+/**
+ * @brief Format the pre TX state message 
+ * 
+ * @details 
+ */
+void mtbdl_set_pretx_msg(void); 
 
 //=======================================================================================
 

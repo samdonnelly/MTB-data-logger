@@ -50,6 +50,12 @@ extern const char mtbdl_param_pot_rest[];      // Resting potentiometer data
 
 // Data log information 
 extern const char mtbdl_data_log_start[];      // Signifies the start of the logging info 
+extern const char mtbdl_data_log_1[];          // Data log message 1 - wheel speed 
+extern const char mtbdl_data_log_2[];          // Data log message 2 - accelerometer 
+extern const char mtbdl_data_log_3[];          // Data log message 3 - GPS 
+
+// RX info 
+extern const char mtbdl_rx_input[];            // User input during the RX state 
 
 //=======================================================================================
 

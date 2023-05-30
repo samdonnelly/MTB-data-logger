@@ -108,6 +108,11 @@ void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl); 
 
 
+// Non-critical fault state 
+void mtbdl_noncrit_fault_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
 // Fault state 
 void mtbdl_fault_state(
     mtbdl_trackers_t *mtbdl); 
@@ -147,8 +152,9 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
     &mtbdl_precalibrate_state,          // State 14 : Pre calibration 
     &mtbdl_calibrate_state,             // State 15 : Calibration 
     &mtbdl_lowpwr_state,                // State 16 : Low power mode 
-    &mtbdl_fault_state,                 // State 17 : Fault 
-    &mtbdl_reset_state                  // State 18 : Reset 
+    &mtbdl_noncrit_fault_state,         // State 17 : Non-critical fault 
+    &mtbdl_fault_state,                 // State 18 : Fault 
+    &mtbdl_reset_state                  // State 19 : Reset 
 }; 
 
 //=======================================================================================
@@ -196,6 +202,7 @@ void mtbdl_app_init(
     mtbdl_trackers.rx = CLEAR_BIT; 
     mtbdl_trackers.calibrate = CLEAR_BIT; 
     mtbdl_trackers.low_pwr = CLEAR_BIT; 
+    mtbdl_trackers.noncrit_fault = CLEAR_BIT; 
     mtbdl_trackers.fault = CLEAR_BIT; 
     mtbdl_trackers.reset = CLEAR_BIT; 
 }
@@ -285,6 +292,12 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+
+            // Non-critical fault state flag set 
+            else if (mtbdl_trackers.noncrit_fault)
+            {
+                next_state = MTBDL_NONCRIT_FAULT_STATE; 
             }
 
             // Idle state flag set 
@@ -433,6 +446,12 @@ void mtbdl_app(void)
                 next_state = MTBDL_FAULT_STATE; 
             }
 
+            // Non-critical fault state flag set 
+            else if (mtbdl_trackers.noncrit_fault)
+            {
+                next_state = MTBDL_NONCRIT_FAULT_STATE; 
+            }
+
             // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
@@ -463,10 +482,10 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTTX_STATE: 
-            // Idle state flag set 
-            if (mtbdl_trackers.idle)
+            // TX flag set 
+            if (mtbdl_trackers.tx)
             {
-                next_state = MTBDL_IDLE_STATE; 
+                next_state = MTBDL_PRETX_STATE; 
             }
 
             break; 
@@ -508,6 +527,14 @@ void mtbdl_app(void)
                 next_state = MTBDL_IDLE_STATE; 
             }
 
+            break; 
+
+        case MTBDL_NONCRIT_FAULT_STATE: 
+            // Idle state flag set 
+            if (mtbdl_trackers.idle)
+            {
+                next_state = MTBDL_IDLE_STATE; 
+            }
             break; 
 
         case MTBDL_FAULT_STATE: 
@@ -579,7 +606,7 @@ void mtbdl_init_state(
     //==================================================
     // Checks 
 
-    // SD Card 
+    // Wait for the SD card to be mounted then access the file system 
     if (hw125_get_state() == HW125_ACCESS_STATE)
     {
         // Set the check flag 
@@ -703,13 +730,17 @@ void mtbdl_run_prep_state(
 
     if (mtbdl->run)
     {
-        // Display the run prep state message 
-        mtbdl_set_run_prep_msg(); 
-
         // Check the log file name 
-        if (mtbdl_log_name_prep() == FALSE) 
+        if (mtbdl_log_name_prep()) 
         {
-            // indicate that the number of log files is maxed out and abort the run 
+            // New file name created - display the run prep state message 
+            mtbdl_set_run_prep_msg(); 
+        }
+        else 
+        {
+            // Too many log files saved - abort 
+            hd44780u_set_msg(mtbdl_ncf_excess_files_msg, MTBDL_MSG_LEN_1_LINE); 
+            mtbdl->noncrit_fault = SET_BIT; 
         }
     }
 
@@ -866,7 +897,7 @@ void mtbdl_postrun_state(
         hd44780u_set_msg(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
 
         // Close the open data log file 
-        mtbdl_log_file_close(); 
+        mtbdl_log_end(); 
     }
 
     mtbdl->run = CLEAR_BIT; 
@@ -1093,6 +1124,9 @@ void mtbdl_rx_state(
 
     //==================================================
     // Read data 
+
+    mtbdl_rx(); 
+
     //==================================================
 
     //==================================================
@@ -1161,8 +1195,18 @@ void mtbdl_pretx_state(
 
     if (mtbdl->tx)
     {
-        // Display the pre tx state message 
-        mtbdl_set_pretx_msg(); 
+        // Prepare the log file to send 
+        if (mtbdl_tx_prep())
+        {
+            // File ready - display the pre tx state message 
+            mtbdl_set_pretx_msg(); 
+        }
+        else 
+        {
+            // File does not exist - display a non-critical fault message 
+            hd44780u_set_msg(mtbdl_ncf_no_files_msg, MTBDL_MSG_LEN_1_LINE); 
+            mtbdl->noncrit_fault = SET_BIT; 
+        }
     }
     
     mtbdl->tx = CLEAR_BIT; 
@@ -1178,9 +1222,6 @@ void mtbdl_pretx_state(
     {
         mtbdl->tx = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
-
-        // Prepare the log file to send 
-        mtbdl_tx_prep(); 
     }
     
     // Button 2 - cancels the tx state --> triggers idle state 
@@ -1188,8 +1229,19 @@ void mtbdl_pretx_state(
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
+
+        // End the data transfer 
+        mtbdl_tx_end(); 
     }
     
+    //==================================================
+
+    //==================================================
+    // Checks 
+
+    // Check that there is still a Bluetooth connection 
+    // If connection lost then revert back to the idle state 
+
     //==================================================
 
     //==================================================
@@ -1237,13 +1289,20 @@ void mtbdl_tx_state(
     //==================================================
     // Send data 
 
-    // Transfer data log contents 
+    // Transfer data log contents and set the tx bit if the transfer finishes 
     if (mtbdl_tx())
     {
-        // The transfer has finished 
         mtbdl->tx = SET_BIT; 
     }
 
+    //==================================================
+
+    //==================================================
+    // Checks 
+
+    // Check that there is still a Bluetooth connection 
+    // If connection lost then stop the transfer and exit the state 
+    
     //==================================================
 
     //==================================================
@@ -1270,18 +1329,17 @@ void mtbdl_posttx_state(
     {
         // Display the post tx state message 
         hd44780u_set_msg(mtbdl_posttx_msg, MTBDL_MSG_LEN_1_LINE); 
+
+        // End the data transfer 
+        mtbdl_tx_end(); 
     }
     
     mtbdl->tx = CLEAR_BIT; 
-
-    // Close the open file 
 
     //==================================================
 
     //==================================================
     // State exit 
-
-    // TODO change this to go back to the pre-tx state 
 
     // Wait for a short period of time before leaving the post tx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
@@ -1296,8 +1354,8 @@ void mtbdl_posttx_state(
         // Clear the post tx state message 
         hd44780u_set_clear_flag(); 
 
-        // Set the idle state flag when ready 
-        mtbdl->idle = SET_BIT; 
+        // Go back to the pre-tx state to send more log data 
+        mtbdl->tx = SET_BIT; 
     }
     
     //==================================================
@@ -1379,8 +1437,6 @@ void mtbdl_calibrate_state(
 
     //==================================================
     // State exit 
-
-    // Save the data to a parameter file 
 
     // Wait until calibration is done before leaving the state 
     if (tim_compare(mtbdl->timer_nonblocking, 
@@ -1469,6 +1525,43 @@ void mtbdl_lowpwr_state(
         hd44780u_clear_pwr_save_flag(); 
 
         // Set the idle state flag 
+        mtbdl->idle = SET_BIT; 
+    }
+
+    //==================================================
+}
+
+
+// Non-critical fault state 
+void mtbdl_noncrit_fault_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    //==================================================
+    // State entry 
+
+    // Message gets displayed from the state that triggered this state 
+
+    mtbdl->noncrit_fault = CLEAR_BIT; 
+
+    //==================================================
+
+    //==================================================
+    // State exit 
+
+    // Allow the non-critical fault message to be displayed before returning to idle 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_WAIT, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        mtbdl->delay_timer.time_start = SET_BIT; 
+
+        // Clear non-critical fault message 
+        hd44780u_set_clear_flag(); 
+
+        // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
     }
 

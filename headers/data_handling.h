@@ -31,6 +31,25 @@
 #define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
 #define MTBDL_LOG_NUM_MIN 0              // Min data log files 
 #define MTBDL_LOG_OFFSET 1               // Log file number offset for the TX state 
+#define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Enums 
+
+/**
+ * @brief User parameter index --> for RX state 
+ */
+typedef enum mtbdl_rx_param_index_s {
+    MTBDL_PARM_FPSI,                     // Fork PSI 
+    MTBDL_PARM_FC,                       // Fork compression setting 
+    MTBDL_PARM_FR,                       // Fork rebound setting 
+    MTBDL_PARM_SPSI,                     // Shock SPI 
+    MTBDL_PARM_SL,                       // Shock lockout setting 
+    MTBDL_PARM_SR                        // Shock rebound setting 
+} mtbdl_rx_param_index_t; 
 
 //=======================================================================================
 
@@ -176,37 +195,39 @@ void mtbdl_logging(void);
 
 
 /**
- * @brief Log file close 
+ * @brief End the data logging 
  * 
  * @details 
  */
-void mtbdl_log_file_close(void); 
+void mtbdl_log_end(void); 
 
 //=======================================================================================
 
 
 //=======================================================================================
-// User interface 
-
-// RX 
-
+// RX state functions 
 
 /**
- * @brief TX file name prep 
+ * @brief Read and assign the user input 
+ * 
+ * @details 
+ */
+void mtbdl_rx(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// TX state functions 
+
+/**
+ * @brief Prepare to send a data log file 
  * 
  * @details 
  * 
  * @return uint8_t 
  */
-uint8_t mtbdl_tx_name_prep(void); 
-
-
-/**
- * @brief Prepare to send data log info 
- * 
- * @details 
- */
-void mtbdl_tx_prep(void); 
+uint8_t mtbdl_tx_prep(void); 
 
 
 /**

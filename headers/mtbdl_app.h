@@ -31,7 +31,7 @@
 #define MTBDL_DEBUG 1                    // Conditional compilation for debugging 
 
 // System info 
-#define MTBDL_NUM_STATES 19              // Number of system states 
+#define MTBDL_NUM_STATES 20              // Number of system states 
 #define MTBDL_LCD_SLEEP 15000000         // (us) inactive time before screen backlight off 
 #define MTBDL_STATE_WAIT 5000000         // (us) general state wait time 
 #define MTBDL_CAL_SAMPLE_TIME 5000000    // (us) calibration state sample time 
@@ -64,8 +64,9 @@ typedef enum {
     MTBDL_PRECALIBRATE_STATE,    // State 14 : Pre calibration 
     MTBDL_CALIBRATE_STATE,       // State 15 : Calibration 
     MTBDL_LOWPWR_STATE,          // State 16 : Low power mode 
-    MTBDL_FAULT_STATE,           // State 17 : Fault 
-    MTBDL_RESET_STATE            // State 18 : Reset 
+    MTBDL_NONCRIT_FAULT_STATE,   // State 17 : Non-critical fault 
+    MTBDL_FAULT_STATE,           // State 18 : Fault 
+    MTBDL_RESET_STATE            // State 19 : Reset 
 } mtbdl_states_t; 
 
 //=======================================================================================
@@ -97,16 +98,17 @@ typedef struct mtbdl_trackers_s
     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
 
     // State flags 
-    uint8_t init        : 1;                    // Ensures the init state is run 
-    uint8_t idle        : 1;                    // Idle state flag 
-    uint8_t run         : 1;                    // Run state flag 
-    uint8_t data_select : 1;                    // Data transfer select state flag 
-    uint8_t tx          : 1;                    // Send/transmit data state flag 
-    uint8_t rx          : 1;                    // Read/receive data state flag 
-    uint8_t calibrate   : 1;                    // Calibration state flag 
-    uint8_t low_pwr     : 1;                    // Low power state flag 
-    uint8_t fault       : 1;                    // Fault state flag 
-    uint8_t reset       : 1;                    // Reset state flag 
+    uint8_t init          : 1;                  // Ensures the init state is run 
+    uint8_t idle          : 1;                  // Idle state flag 
+    uint8_t run           : 1;                  // Run state flag 
+    uint8_t data_select   : 1;                  // Data transfer select state flag 
+    uint8_t tx            : 1;                  // Send/transmit data state flag 
+    uint8_t rx            : 1;                  // Read/receive data state flag 
+    uint8_t calibrate     : 1;                  // Calibration state flag 
+    uint8_t low_pwr       : 1;                  // Low power state flag 
+    uint8_t noncrit_fault : 1;                  // Non-critical fault state flag 
+    uint8_t fault         : 1;                  // Fault state flag 
+    uint8_t reset         : 1;                  // Reset state flag 
 }
 mtbdl_trackers_t; 
 

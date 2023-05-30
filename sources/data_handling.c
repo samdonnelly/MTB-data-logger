@@ -32,11 +32,27 @@ void mtbdl_format_write_bike_params(void);
 
 
 /**
+ * @brief Read and format the bike parameters 
+ * 
+ * @details 
+ */
+void mtbdl_format_read_bike_params(void); 
+
+
+/**
  * @brief Format and write the system parameters 
  * 
  * @details 
  */
 void mtbdl_format_write_sys_params(void); 
+
+
+/**
+ * @brief Read and format the system parameters 
+ * 
+ * @details 
+ */
+void mtbdl_format_read_sys_params(void); 
 
 //=======================================================================================
 
@@ -125,39 +141,6 @@ void mtbdl_file_sys_setup(void)
 //=======================================================================================
 // Parameters 
 
-// Read bike parameter on file 
-void mtbdl_read_bike_params(
-    uint8_t mode)
-{
-    // Move to the parameters directory 
-    hw125_set_dir(mtbdl_param_dir); 
-
-    // Open the file for reading 
-    hw125_open(mtbdl_bike_param_file, mode); 
-
-    // Read fork parameters 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_fork_info, 
-           &mtbdl_data.fork_psi, 
-           &mtbdl_data.fork_comp, 
-           &mtbdl_data.fork_reb); 
-
-    // Read shock parameters 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_shock_info, 
-           &mtbdl_data.shock_psi, 
-           &mtbdl_data.shock_lock, 
-           &mtbdl_data.shock_reb); 
-
-    // Close the file 
-    hw125_close(); 
-}
-
-
 // Write bike parameters to file 
 void mtbdl_write_bike_params(
     uint8_t mode)
@@ -176,39 +159,18 @@ void mtbdl_write_bike_params(
 }
 
 
-// Read system parameters on file 
-void mtbdl_read_sys_params(
+// Read bike parameter on file 
+void mtbdl_read_bike_params(
     uint8_t mode)
 {
     // Move to the parameters directory 
     hw125_set_dir(mtbdl_param_dir); 
 
     // Open the file for reading 
-    hw125_open(mtbdl_sys_param_file, mode); 
+    hw125_open(mtbdl_bike_param_file, mode); 
 
-    // Read logging parameters 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_log, 
-           &mtbdl_data.log_index); 
-
-    // Read accelerometer calibration data 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_accel_rest, 
-           &mtbdl_data.accel_x_rest, 
-           &mtbdl_data.accel_y_rest, 
-           &mtbdl_data.accel_z_rest); 
-
-    // Read potentiometer starting points 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_pot_rest, 
-           &mtbdl_data.pot_fork_rest, 
-           &mtbdl_data.pot_shock_rest); 
+    // Read and format the bikr parameters 
+    mtbdl_format_read_bike_params(); 
 
     // Close the file 
     hw125_close(); 
@@ -227,6 +189,24 @@ void mtbdl_write_sys_params(
 
     // Format and write the system parameters 
     mtbdl_format_write_sys_params(); 
+
+    // Close the file 
+    hw125_close(); 
+}
+
+
+// Read system parameters on file 
+void mtbdl_read_sys_params(
+    uint8_t mode)
+{
+    // Move to the parameters directory 
+    hw125_set_dir(mtbdl_param_dir); 
+
+    // Open the file for reading 
+    hw125_open(mtbdl_sys_param_file, mode); 
+
+    // Read and format the system parameters 
+    mtbdl_format_read_sys_params(); 
 
     // Close the file 
     hw125_close(); 
@@ -255,6 +235,29 @@ void mtbdl_format_write_bike_params(void)
              mtbdl_data.shock_reb); 
     
     hw125_puts(mtbdl_data.data_buff); 
+}
+
+
+// Read and format the bike parameters 
+void mtbdl_format_read_bike_params(void)
+{
+    // Read fork parameters 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_fork_info, 
+           &mtbdl_data.fork_psi, 
+           &mtbdl_data.fork_comp, 
+           &mtbdl_data.fork_reb); 
+
+    // Read shock parameters 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_shock_info, 
+           &mtbdl_data.shock_psi, 
+           &mtbdl_data.shock_lock, 
+           &mtbdl_data.shock_reb); 
 }
 
 
@@ -287,6 +290,35 @@ void mtbdl_format_write_sys_params(void)
              mtbdl_data.pot_shock_rest); 
     
     hw125_puts(mtbdl_data.data_buff); 
+}
+
+
+// Read and format the system parameters 
+void mtbdl_format_read_sys_params(void)
+{
+    // Read logging parameters 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_log, 
+           &mtbdl_data.log_index); 
+
+    // Read accelerometer calibration data 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_accel_rest, 
+           &mtbdl_data.accel_x_rest, 
+           &mtbdl_data.accel_y_rest, 
+           &mtbdl_data.accel_z_rest); 
+
+    // Read potentiometer starting points 
+    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+    sscanf(mtbdl_data.data_buff, 
+           mtbdl_param_pot_rest, 
+           &mtbdl_data.pot_fork_rest, 
+           &mtbdl_data.pot_shock_rest); 
 }
 
 //=======================================================================================
@@ -340,7 +372,7 @@ void mtbdl_logging(void)
 
 
 // Log file close 
-void mtbdl_log_file_close(void)
+void mtbdl_log_end(void)
 {
     hw125_close(); 
 
@@ -352,41 +384,113 @@ void mtbdl_log_file_close(void)
 
 
 //=======================================================================================
-// User interface 
+// RX state functions 
 
-// RX 
-
-
-// TX file name prep 
-uint8_t mtbdl_tx_name_prep(void)
+// Read and assign the user input 
+void mtbdl_rx(void)
 {
-    // Check that there are any log files 
+    // Local variables 
+    uint8_t param_index; 
+    uint8_t temp_data; 
+
+    // TODO Check the HC-05 for data 
+    if (FALSE)
+    {
+        // Read and parse the data from the HC-05 
+
+        sscanf(mtbdl_data.data_buff, 
+               mtbdl_rx_input, 
+               &param_index, 
+               &temp_data); 
+
+        // Check for a data match 
+        switch (param_index)
+        {
+            case MTBDL_PARM_FPSI:
+                mtbdl_data.fork_psi = temp_data; 
+
+                break;
+
+            case MTBDL_PARM_FC:
+                if (temp_data <= MTBDL_MAX_SUS_SETTING)
+                {
+                    mtbdl_data.fork_comp = temp_data; 
+                }
+
+                break;
+
+            case MTBDL_PARM_FR:
+                if (temp_data <= MTBDL_MAX_SUS_SETTING)
+                {
+                    mtbdl_data.fork_reb = temp_data; 
+                }
+
+                break;
+
+            case MTBDL_PARM_SPSI:
+                mtbdl_data.fork_psi = temp_data; 
+
+                break;
+
+            case MTBDL_PARM_SL:
+                if (temp_data <= MTBDL_MAX_SUS_SETTING)
+                {
+                    mtbdl_data.shock_lock = temp_data; 
+                }
+
+                break;
+
+            case MTBDL_PARM_SR:
+                if (temp_data <= MTBDL_MAX_SUS_SETTING)
+                {
+                    mtbdl_data.shock_reb = temp_data; 
+                }
+
+                break;
+            
+            default:
+                break;
+        }
+
+        // Provide a user prompt 
+    }
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// TX state functions 
+
+// Prepare to send a data log file 
+uint8_t mtbdl_tx_prep(void)
+{
+    // Check if there are no log files 
     if (mtbdl_data.log_index == MTBDL_LOG_NUM_MIN)
     {
-        // No log files to send 
         return FALSE; 
     }
 
     // Log files exist - generate a new log file name 
+    // The log index will be one ahead of the most recent log file number 
     snprintf(mtbdl_data.filename, 
              MTBDL_MAX_DATA_STR_LEN, 
              mtbdl_log_file, 
              (mtbdl_data.log_index - MTBDL_LOG_OFFSET)); 
 
-    // Check for the existance of the specified file number 
-
-    return TRUE; 
-}
-
-
-// Prepare to send data log info 
-void mtbdl_tx_prep(void)
-{
     // Move to the data directory 
     hw125_set_dir(mtbdl_data_dir); 
 
+    // Check for the existance of the specified file number 
+    if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
+    {
+        return FALSE; 
+    }
+
     // Open the file 
-    hw125_open(mtbdl_data.filename, HW125_MODE_WWX); 
+    hw125_open(mtbdl_data.filename, HW125_MODE_OAWR); 
+
+    return TRUE; 
 }
 
 

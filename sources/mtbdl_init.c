@@ -34,7 +34,13 @@ void mtbdl_init()
 #if MTBDL_DEBUG 
 
     // Serial terminal output 
-    uart_init(USART2, UART_BAUD_9600, UART_CLOCK_42); 
+    uart_init(
+        USART2, 
+        GPIOA, 
+        PIN_3, 
+        PIN_2, 
+        UART_BAUD_9600, 
+        UART_CLOCK_42); 
 
 #endif   // MTBDL_DEBUG 
 
@@ -87,7 +93,7 @@ void mtbdl_init()
     //===================================================
     // SPI setup 
 
-    // SPI2 setup 
+    // For SD card 
     spi_init(
         SPI2, 
         GPIOB, 
@@ -104,6 +110,16 @@ void mtbdl_init()
 
     //===================================================
     // UART setup 
+
+    // For HC-05 
+    uart_init(
+        USART1, 
+        GPIOA, 
+        PIN_10, 
+        PIN_9, 
+        UART_BAUD_115200, 
+        UART_CLOCK_84); 
+
     //===================================================
 
     //===================================================

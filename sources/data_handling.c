@@ -587,7 +587,7 @@ void mtbdl_set_pretx_msg(void)
 
     // Format the message with data 
     snprintf(msg[1].msg, HD44780U_LINE_LEN, mtbdl_pretx_msg[1].msg, 
-             mtbdl_data.log_index); 
+             (mtbdl_data.log_index - MTBDL_LOG_OFFSET)); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 

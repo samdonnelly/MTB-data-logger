@@ -67,8 +67,8 @@ hd44780u_msgs_t mtbdl_postrun_msg[MTBDL_MSG_LEN_2_LINE] =
 // Data transfer selection state message 
 hd44780u_msgs_t mtbdl_data_select_msg[MTBDL_MSG_LEN_3_LINE] = 
 {
-    {HD44780U_L1, "1: TX", 0}, 
-    {HD44780U_L2, "2: RX", 0}, 
+    {HD44780U_L1, "1: RX", 0}, 
+    {HD44780U_L2, "2: TX", 0}, 
     {HD44780U_L3, "3: Return", 0} 
 }; 
 

@@ -32,7 +32,7 @@ const char mtbdl_data_dir[] = "data";
 
 // File names 
 const char mtbdl_bike_param_file[] = "bike_params.txt"; 
-const char mtbdl_sys_param_file[] = "sys_param.txt"; 
+const char mtbdl_sys_param_file[] = "sys_params.txt"; 
 const char mtbdl_log_file[] = "log_%u.txt"; 
 
 // Bike parameter information 

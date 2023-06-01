@@ -208,6 +208,14 @@ void mtbdl_log_end(void);
 // RX state functions 
 
 /**
+ * @brief RX user interface start 
+ * 
+ * @details 
+ */
+void mtbdl_rx_start(void); 
+
+
+/**
  * @brief Read and assign the user input 
  * 
  * @details 

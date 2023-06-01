@@ -151,6 +151,18 @@ void mtbdl_init()
 
     //===================================================
     // HC-05 Bluetooth setup 
+
+    // HC-05 driver 
+    hc05_init(
+        USART1, 
+        TIM9, 
+        GPIOA,          // AT pin GPIO 
+        PIN_8,          // AT pin 
+        GPIOA,          // EN pin GPIO 
+        PIN_12,         // EN pin 
+        GPIOA,          // STATE pin GPIO 
+        PIN_11);        // STATE pin 
+    
     //===================================================
 
     //===================================================
@@ -163,7 +175,6 @@ void mtbdl_init()
     hw125_controller_init(mtbdl_dir); 
 
     //===================================================
-
 
     //===================================================
     // User button setup 

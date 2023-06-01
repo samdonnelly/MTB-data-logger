@@ -386,6 +386,13 @@ void mtbdl_log_end(void)
 //=======================================================================================
 // RX state functions 
 
+// RX user interface start 
+void mtbdl_rx_start(void)
+{
+    hc05_send(mtbdl_rx_prompt); 
+}
+
+
 // Read and assign the user input 
 void mtbdl_rx(void)
 {
@@ -393,11 +400,11 @@ void mtbdl_rx(void)
     uint8_t param_index; 
     uint8_t temp_data; 
 
-    // TODO Check the HC-05 for data 
-    if (FALSE)
+    // Read Bluetooth data if available 
+    if (hc05_data_status())
     {
         // Read and parse the data from the HC-05 
-
+        hc05_read(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
         sscanf(mtbdl_data.data_buff, 
                mtbdl_rx_input, 
                &param_index, 
@@ -453,6 +460,7 @@ void mtbdl_rx(void)
         }
 
         // Provide a user prompt 
+        mtbdl_rx_start(); 
     }
 }
 
@@ -501,6 +509,7 @@ uint8_t mtbdl_tx(void)
     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
     // Send the data over Bluetooth 
+    hc05_send(mtbdl_data.data_buff); 
 
     // Check for end of file - if true we can stop the transaction 
     if (hw125_eof())

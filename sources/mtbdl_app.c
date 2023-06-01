@@ -401,6 +401,12 @@ void mtbdl_app(void)
                 next_state = MTBDL_FAULT_STATE; 
             }
 
+            // Non-critical fault state flag set 
+            else if (mtbdl_trackers.noncrit_fault)
+            {
+                next_state = MTBDL_NONCRIT_FAULT_STATE; 
+            }
+
             // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
@@ -420,6 +426,12 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+
+            // Non-critical fault state flag set 
+            else if (mtbdl_trackers.noncrit_fault)
+            {
+                next_state = MTBDL_NONCRIT_FAULT_STATE; 
             }
 
             // RX state flag set 
@@ -471,6 +483,12 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+
+            // Non-critical fault state flag set 
+            else if (mtbdl_trackers.noncrit_fault)
+            {
+                next_state = MTBDL_NONCRIT_FAULT_STATE; 
             }
 
             // TX state flag set 
@@ -592,9 +610,6 @@ void mtbdl_init_state(
         // Display the startup message 
         hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
 
-        // HC-05 
-        // - Put into low power mode 
-
         // MPU-6050 
         // - Put into low power mode 
     }
@@ -657,6 +672,9 @@ void mtbdl_idle_state(
         // Set the screen to power save mode 
         hd44780u_set_pwr_save_flag(); 
         hd44780u_set_sleep_time(MTBDL_LCD_SLEEP); 
+
+        // Put the HC-05 into low power mode 
+        hc05_off(); 
     }
 
     mtbdl->idle = CLEAR_BIT; 
@@ -1000,6 +1018,9 @@ void mtbdl_dev_search_state(
     {
         // Display the device connection search state message 
         hd44780u_set_msg(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
+
+        // Take the HC-05 out of low power mode 
+        hc05_on(); 
     }
 
     mtbdl->data_select = CLEAR_BIT; 
@@ -1019,13 +1040,18 @@ void mtbdl_dev_search_state(
     //==================================================
     
     //==================================================
-    // Check for device connection 
+    // Checks 
 
-    // TODO replace this with a check to HC-05 connection status once HC-05 control is added 
-    if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     mtbdl->data_select = SET_BIT; 
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    // }
+
+    // If the HC-05 if connected to a device then move to the next state 
+    if (hc05_status())
     {
         mtbdl->data_select = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
     }
 
     //==================================================
@@ -1081,6 +1107,20 @@ void mtbdl_prerx_state(
     //==================================================
 
     //==================================================
+    // Checks 
+
+    // If the HC-05 gets disconnected then abort the potential transfer 
+    // Display a non-critical fault to the screen 
+    if (!hc05_status())
+    {
+        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
+        mtbdl->noncrit_fault = SET_BIT; 
+        mtbdl->idle = SET_BIT; 
+    }
+
+    //==================================================
+
+    //==================================================
     // State exit 
 
     if (mtbdl->rx || mtbdl->idle)
@@ -1104,6 +1144,9 @@ void mtbdl_rx_state(
     {
         // Display the rx state message 
         hd44780u_set_msg(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
+
+        // Begin the RX user interface 
+        mtbdl_rx_start(); 
     }
     
     mtbdl->rx = CLEAR_BIT; 
@@ -1123,9 +1166,19 @@ void mtbdl_rx_state(
     //==================================================
 
     //==================================================
-    // Read data 
+    // Data transfer 
 
+    // Read the device data 
     mtbdl_rx(); 
+
+    // If the HC-05 gets disconnected then abort the transfer 
+    // Display a non-critical fault to the screen 
+    if (!hc05_status())
+    {
+        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
+        mtbdl->noncrit_fault = SET_BIT; 
+        mtbdl->rx = SET_BIT; 
+    }
 
     //==================================================
 
@@ -1239,8 +1292,14 @@ void mtbdl_pretx_state(
     //==================================================
     // Checks 
 
-    // Check that there is still a Bluetooth connection 
-    // If connection lost then revert back to the idle state 
+    // If the HC-05 gets disconnected then abort the potential transfer 
+    // Display a non-critical fault to the screen 
+    if (!hc05_status())
+    {
+        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
+        mtbdl->noncrit_fault = SET_BIT; 
+        mtbdl->idle = SET_BIT; 
+    }
 
     //==================================================
 
@@ -1300,8 +1359,14 @@ void mtbdl_tx_state(
     //==================================================
     // Checks 
 
-    // Check that there is still a Bluetooth connection 
-    // If connection lost then stop the transfer and exit the state 
+    // If the HC-05 gets disconnected then abort the transfer 
+    // Display a non-critical fault to the screen 
+    if (!hc05_status())
+    {
+        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
+        mtbdl->noncrit_fault = SET_BIT; 
+        mtbdl->tx = SET_BIT; 
+    }
     
     //==================================================
 

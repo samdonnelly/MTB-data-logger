@@ -90,11 +90,19 @@ extern hd44780u_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE];
 // Fault state state message 
 extern hd44780u_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE]; 
 
+//==================================================
+// Non-critical fault messages 
+
 // Non-critical fault (NCF) message: no files to send 
 extern hd44780u_msgs_t mtbdl_ncf_no_files_msg[MTBDL_MSG_LEN_1_LINE]; 
 
 // Non-critical fault (NCF) message: too many files on drive 
 extern hd44780u_msgs_t mtbdl_ncf_excess_files_msg[MTBDL_MSG_LEN_1_LINE]; 
+
+// Non-critical fault (NCF) message: Bluetooth connection lost 
+extern hd44780u_msgs_t mtbdl_ncf_bt_con_lost[MTBDL_MSG_LEN_1_LINE]; 
+
+//==================================================
 
 //=======================================================================================
 

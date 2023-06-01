@@ -163,6 +163,9 @@ hd44780u_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE] =
 }; 
 
 
+//==================================================
+// Non-critical fault messages 
+
 // Non-critical fault (NCF) message: no files to send 
 hd44780u_msgs_t mtbdl_ncf_no_files_msg[MTBDL_MSG_LEN_1_LINE] = 
 {
@@ -175,5 +178,14 @@ hd44780u_msgs_t mtbdl_ncf_excess_files_msg[MTBDL_MSG_LEN_1_LINE] =
 {
     {HD44780U_L2, "Too many files saved", 0}
 }; 
+
+
+// Non-critical fault (NCF) message: Bluetooth connection lost 
+hd44780u_msgs_t mtbdl_ncf_bt_con_lost[MTBDL_MSG_LEN_1_LINE] = 
+{
+    {HD44780U_L2, "BT connection lost!", 0}
+}; 
+
+//==================================================
 
 //=======================================================================================

@@ -56,6 +56,7 @@ extern const char mtbdl_data_log_3[];          // Data log message 3 - includes 
 extern const char mtbdl_data_log_4[];          // Data log message 4 - includes GPS 
 
 // RX info 
+extern const char mtbdl_rx_prompt[];           // User prompt during RX state 
 extern const char mtbdl_rx_input[];            // User input during the RX state 
 
 //=======================================================================================

@@ -54,6 +54,7 @@ const char mtbdl_data_log_3[] = "%u, %u, %u, %u, -, %u, %u, %u, -\n";  // Includ
 const char mtbdl_data_log_4[] = "%u, %u, %u, %u, -, -, -, -, %u\n";    // Includes GPS 
 
 // RX info 
+const char mtbdl_rx_prompt[] = "\r\n>>> "; 
 const char mtbdl_rx_input[] = "%u %u"; 
 
 //=======================================================================================

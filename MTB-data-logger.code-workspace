@@ -21,7 +21,9 @@
 			"hw125_driver.h": "c",
 			"stm32f411xe.h": "c",
 			"tools.h": "c",
-			"screen_msgs.h": "c"
+			"screen_msgs.h": "c",
+			"mtbdl_app.h": "c",
+			"mpu6050_driver.h": "c"
 		}
 	}
 }

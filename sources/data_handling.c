@@ -107,8 +107,8 @@ void mtbdl_data_init(void)
 void mtbdl_file_sys_setup(void)
 {
     // Create "parameters" and "data" directories if they do not already exist 
-    hw125_mkdir(mtbdl_param_dir); 
     hw125_mkdir(mtbdl_data_dir); 
+    hw125_mkdir(mtbdl_param_dir); 
 
     // Check for the existance of the bike parameters file 
     if (hw125_get_exists(mtbdl_bike_param_file) == FR_NO_FILE)
@@ -390,6 +390,7 @@ void mtbdl_log_end(void)
 void mtbdl_rx_start(void)
 {
     hc05_send(mtbdl_rx_prompt); 
+    hc05_clear(); 
 }
 
 
@@ -397,8 +398,8 @@ void mtbdl_rx_start(void)
 void mtbdl_rx(void)
 {
     // Local variables 
-    uint8_t param_index; 
-    uint8_t temp_data; 
+    unsigned int param_index; 
+    unsigned int temp_data; 
 
     // Read Bluetooth data if available 
     if (hc05_data_status())
@@ -435,7 +436,7 @@ void mtbdl_rx(void)
                 break;
 
             case MTBDL_PARM_SPSI:
-                mtbdl_data.fork_psi = temp_data; 
+                mtbdl_data.shock_psi = temp_data; 
 
                 break;
 

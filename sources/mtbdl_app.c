@@ -1042,12 +1042,6 @@ void mtbdl_dev_search_state(
     //==================================================
     // Checks 
 
-    // if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    // {
-    //     mtbdl->data_select = SET_BIT; 
-    //     mtbdl->user_btn_2_block = SET_BIT; 
-    // }
-
     // If the HC-05 if connected to a device then move to the next state 
     if (hc05_status())
     {
@@ -1146,7 +1140,7 @@ void mtbdl_rx_state(
         hd44780u_set_msg(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
 
         // Begin the RX user interface 
-        mtbdl_rx_start(); 
+        mtbdl_rx_prep(); 
     }
     
     mtbdl->rx = CLEAR_BIT; 
@@ -1173,6 +1167,7 @@ void mtbdl_rx_state(
 
     // If the HC-05 gets disconnected then abort the transfer 
     // Display a non-critical fault to the screen 
+    // TODO this message gets erased by the state exit 
     if (!hc05_status())
     {
         hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 

@@ -374,6 +374,7 @@ void mtbdl_logging(void)
 // Log file close 
 void mtbdl_log_end(void)
 {
+    hw125_puts(mtbdl_data_log_end); 
     hw125_close(); 
 
     // Update the log index 
@@ -387,7 +388,7 @@ void mtbdl_log_end(void)
 // RX state functions 
 
 // RX user interface start 
-void mtbdl_rx_start(void)
+void mtbdl_rx_prep(void)
 {
     hc05_send(mtbdl_rx_prompt); 
     hc05_clear(); 
@@ -461,7 +462,7 @@ void mtbdl_rx(void)
         }
 
         // Provide a user prompt 
-        mtbdl_rx_start(); 
+        mtbdl_rx_prep(); 
     }
 }
 
@@ -481,11 +482,12 @@ uint8_t mtbdl_tx_prep(void)
     }
 
     // Log files exist - generate a new log file name 
-    // The log index will be one ahead of the most recent log file number 
+    // The log index is adjusted because it will be one ahead of the most recent log 
+    // file number after the most recent log has been created 
     snprintf(mtbdl_data.filename, 
              MTBDL_MAX_DATA_STR_LEN, 
              mtbdl_log_file, 
-             (mtbdl_data.log_index - MTBDL_LOG_OFFSET)); 
+             (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
 
     // Move to the data directory 
     hw125_set_dir(mtbdl_data_dir); 
@@ -554,11 +556,13 @@ void mtbdl_set_idle_msg(void)
     for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) msg[i] = mtbdl_idle_msg[i]; 
 
     // Format the message with data 
-    snprintf(msg[0].msg, HD44780U_LINE_LEN, mtbdl_idle_msg[0].msg, 
+    // snprintf will NULL terminate the string at the screen line length so in order to use 
+    // the last spot on the screen line the message length must be indexed up by one 
+    snprintf(msg[0].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[0].msg, 
              mtbdl_data.fork_psi, mtbdl_data.fork_comp, mtbdl_data.fork_reb); 
-    snprintf(msg[1].msg, HD44780U_LINE_LEN, mtbdl_idle_msg[1].msg, 
+    snprintf(msg[1].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[1].msg, 
              mtbdl_data.shock_psi, mtbdl_data.shock_lock, mtbdl_data.shock_reb); 
-    snprintf(msg[2].msg, HD44780U_LINE_LEN, mtbdl_idle_msg[2].msg, 
+    snprintf(msg[2].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[2].msg, 
              mtbdl_data.soc); 
 
     // Set the screen message 
@@ -596,8 +600,10 @@ void mtbdl_set_pretx_msg(void)
     for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) msg[i] = mtbdl_pretx_msg[i]; 
 
     // Format the message with data 
+    // The log index is adjusted because it will be one ahead of the most recent log 
+    // file number after the most recent log has been created 
     snprintf(msg[1].msg, HD44780U_LINE_LEN, mtbdl_pretx_msg[1].msg, 
-             (mtbdl_data.log_index - MTBDL_LOG_OFFSET)); 
+             (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 

@@ -36,22 +36,23 @@ const char mtbdl_sys_param_file[] = "sys_params.txt";
 const char mtbdl_log_file[] = "log_%u.txt"; 
 
 // Bike parameter information 
-const char mtbdl_param_fork_info[] = "Fork: PSI:%u C:%u R:%u\n"; 
-const char mtbdl_param_shock_info[] = "Shock: PSI:%u L:%u R:%u\n"; 
+const char mtbdl_param_fork_info[] = "Fork: PSI:%u C:%u R:%u\r\n"; 
+const char mtbdl_param_shock_info[] = "Shock: PSI:%u L:%u R:%u\r\n"; 
 
 // System parameter information 
-const char mtbdl_param_log[] = "Index: %u\n"; 
-const char mtbdl_param_accel_rest[] = "Accel: X:%u Y:%u Z:%u\n"; 
-const char mtbdl_param_pot_rest[] = "Pots: F:%u S:%u\n"; 
+const char mtbdl_param_log[] = "Index: %u\r\n"; 
+const char mtbdl_param_accel_rest[] = "Accel: X:%u Y:%u Z:%u\r\n"; 
+const char mtbdl_param_pot_rest[] = "Pots: F:%u S:%u\r\n"; 
 
 // Data log information 
-const char mtbdl_data_log_start[] = "Data log:\n"; 
+const char mtbdl_data_log_start[] = "Data log:\r\n"; 
+const char mtbdl_data_log_end[] = "End\r\n\n"; 
 // Data order: 
 // <time>, <trail marker>, <fork pot>, <shock pot>, <wheel speed>, <accelerometer>, <GPS> 
-const char mtbdl_data_log_1[] = "%u, %u, %u, %u, -, -, -, -, -\n";     // Standard 
-const char mtbdl_data_log_2[] = "%u, %u, %u, %u, %u, -, -, -, -\n";    // Includes wheel speed 
-const char mtbdl_data_log_3[] = "%u, %u, %u, %u, -, %u, %u, %u, -\n";  // Includes accelerometer 
-const char mtbdl_data_log_4[] = "%u, %u, %u, %u, -, -, -, -, %u\n";    // Includes GPS 
+const char mtbdl_data_log_1[] = "%u, %u, %u, %u, -, -, -, -, -\r\n";     // Standard 
+const char mtbdl_data_log_2[] = "%u, %u, %u, %u, %u, -, -, -, -\r\n";    // Includes wheel speed 
+const char mtbdl_data_log_3[] = "%u, %u, %u, %u, -, %u, %u, %u, -\r\n";  // Includes accelerometer 
+const char mtbdl_data_log_4[] = "%u, %u, %u, %u, -, -, -, -, %u\r\n";    // Includes GPS 
 
 // RX info 
 const char mtbdl_rx_prompt[] = "\r\n>>> "; 

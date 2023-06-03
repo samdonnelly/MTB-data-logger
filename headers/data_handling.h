@@ -30,7 +30,7 @@
 #define MTBDL_MAX_DATA_STR_LEN 50        // Max string length containing data 
 #define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
 #define MTBDL_LOG_NUM_MIN 0              // Min data log files 
-#define MTBDL_LOG_OFFSET 1               // Log file number offset for the TX state 
+#define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
 #define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
 
 //=======================================================================================
@@ -208,11 +208,11 @@ void mtbdl_log_end(void);
 // RX state functions 
 
 /**
- * @brief RX user interface start 
+ * @brief RX user interface preparation 
  * 
  * @details 
  */
-void mtbdl_rx_start(void); 
+void mtbdl_rx_prep(void); 
 
 
 /**

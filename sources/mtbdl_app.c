@@ -404,7 +404,7 @@ void mtbdl_app(void)
             // Non-critical fault state flag set 
             else if (mtbdl_trackers.noncrit_fault)
             {
-                next_state = MTBDL_NONCRIT_FAULT_STATE; 
+                next_state = MTBDL_POSTRX_STATE; 
             }
 
             // Idle state flag set 
@@ -428,13 +428,7 @@ void mtbdl_app(void)
                 next_state = MTBDL_FAULT_STATE; 
             }
 
-            // Non-critical fault state flag set 
-            else if (mtbdl_trackers.noncrit_fault)
-            {
-                next_state = MTBDL_NONCRIT_FAULT_STATE; 
-            }
-
-            // RX state flag set 
+            // RX flag set 
             else if (mtbdl_trackers.rx)
             {
                 next_state = MTBDL_POSTRX_STATE; 
@@ -443,8 +437,14 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTRX_STATE: 
+            // Non-critical fault flag set 
+            if (mtbdl_trackers.noncrit_fault)
+            {
+                next_state = MTBDL_NONCRIT_FAULT_STATE; 
+            }
+
             // Idle state flag set 
-            if (mtbdl_trackers.idle)
+            else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
@@ -1107,9 +1107,8 @@ void mtbdl_prerx_state(
     // Display a non-critical fault to the screen 
     if (!hc05_status())
     {
-        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
         mtbdl->noncrit_fault = SET_BIT; 
-        mtbdl->idle = SET_BIT; 
+        mtbdl->rx; 
     }
 
     //==================================================
@@ -1167,10 +1166,8 @@ void mtbdl_rx_state(
 
     // If the HC-05 gets disconnected then abort the transfer 
     // Display a non-critical fault to the screen 
-    // TODO this message gets erased by the state exit 
     if (!hc05_status())
     {
-        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
         mtbdl->noncrit_fault = SET_BIT; 
         mtbdl->rx = SET_BIT; 
     }
@@ -1199,9 +1196,19 @@ void mtbdl_postrx_state(
 
     if (mtbdl->rx)
     {
-        // Display the post rx state message 
-        hd44780u_set_msg(mtbdl_postrx_msg, MTBDL_MSG_LEN_1_LINE); 
+        if (mtbdl->noncrit_fault)
+        {
+            // Display the connection lost message 
+            hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
 
+            // Temporarily display this fault using the LEDs 
+        }
+        else 
+        {
+            // Display the post rx state message 
+            hd44780u_set_msg(mtbdl_postrx_msg, MTBDL_MSG_LEN_1_LINE); 
+        }
+        
         // Save the bike parameters 
         mtbdl_write_bike_params(HW125_MODE_OEW); 
     }
@@ -1291,9 +1298,8 @@ void mtbdl_pretx_state(
     // Display a non-critical fault to the screen 
     if (!hc05_status())
     {
-        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
         mtbdl->noncrit_fault = SET_BIT; 
-        mtbdl->idle = SET_BIT; 
+        mtbdl->tx = SET_BIT; 
     }
 
     //==================================================
@@ -1341,7 +1347,7 @@ void mtbdl_tx_state(
     //==================================================
 
     //==================================================
-    // Send data 
+    // Checks 
 
     // Transfer data log contents and set the tx bit if the transfer finishes 
     if (mtbdl_tx())
@@ -1349,16 +1355,10 @@ void mtbdl_tx_state(
         mtbdl->tx = SET_BIT; 
     }
 
-    //==================================================
-
-    //==================================================
-    // Checks 
-
     // If the HC-05 gets disconnected then abort the transfer 
     // Display a non-critical fault to the screen 
     if (!hc05_status())
     {
-        hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
         mtbdl->noncrit_fault = SET_BIT; 
         mtbdl->tx = SET_BIT; 
     }
@@ -1385,13 +1385,25 @@ void mtbdl_posttx_state(
     //==================================================
     // State entry 
 
+    // TODO sort out non-crit fault messages 
+    
     if (mtbdl->tx)
     {
-        // Display the post tx state message 
-        hd44780u_set_msg(mtbdl_posttx_msg, MTBDL_MSG_LEN_1_LINE); 
+        if (mtbdl->noncrit_fault)
+        {
+            // Display the connection lost message 
+            hd44780u_set_msg(mtbdl_ncf_bt_con_lost, MTBDL_MSG_LEN_1_LINE); 
+        }
+        else 
+        {
+            // Display the post tx state message 
+            hd44780u_set_msg(mtbdl_posttx_msg, MTBDL_MSG_LEN_1_LINE); 
 
-        // End the data transfer 
-        mtbdl_tx_end(); 
+            // End the data transfer 
+            mtbdl_tx_end(); 
+        }
+
+        mtbdl->noncrit_fault = CLEAR_BIT; 
     }
     
     mtbdl->tx = CLEAR_BIT; 
@@ -1642,6 +1654,8 @@ void mtbdl_fault_state(
         hd44780u_set_msg(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
 
         // Record the fault code in a log 
+
+        // Stop any existing processes - assess each state case 
     }
 
     mtbdl->fault = SET_BIT; 

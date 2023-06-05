@@ -76,7 +76,7 @@ void mtbdl_init()
     //===================================================
     // I2C setup 
 
-    // For MPU-6050, LCD screen and M*Q GPS 
+    // For MPU-6050, LCD screen and M8Q GPS 
     i2c_init(
         I2C1, 
         PIN_9, 
@@ -132,6 +132,24 @@ void mtbdl_init()
 
     //===================================================
     // MPU-6050 IMU setup 
+
+    // Driver 
+    mpu6050_init(
+        DEVICE_ONE, 
+        I2C1, 
+        MPU6050_ADDR_1,
+        MPU6050_STBY_MASK, 
+        MPU6050_DLPF_CFG_1,
+        MPU6050_SMPLRT_DIV,
+        MPU6050_AFS_SEL_4,
+        MPU6050_FS_SEL_500); 
+
+    // Controller 
+    mpu6050_controller_init(
+        DEVICE_ONE, 
+        TIM9, 
+        MPU6050_RATE); 
+
     //===================================================
 
     //===================================================
@@ -210,9 +228,4 @@ void mtbdl_init()
     mtbdl_data_init(); 
 
     //===================================================
-
-
-    //==================================================
-    // Temp - for testing 
-    //==================================================
 }

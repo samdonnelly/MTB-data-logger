@@ -31,7 +31,7 @@
 #define MTBDL_DEBUG 1                    // Conditional compilation for debugging 
 
 // System info 
-#define MTBDL_NUM_STATES 20              // Number of system states 
+#define MTBDL_NUM_STATES 19              // Number of system states 
 #define MTBDL_LCD_SLEEP 15000000         // (us) inactive time before screen backlight off 
 #define MTBDL_STATE_WAIT 5000000         // (us) general state wait time 
 #define MTBDL_CAL_SAMPLE_TIME 5000000    // (us) calibration state sample time 

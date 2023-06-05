@@ -108,11 +108,6 @@ void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Non-critical fault state 
-void mtbdl_noncrit_fault_state(
-    mtbdl_trackers_t *mtbdl); 
-
-
 // Fault state 
 void mtbdl_fault_state(
     mtbdl_trackers_t *mtbdl); 
@@ -152,9 +147,8 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
     &mtbdl_precalibrate_state,          // State 14 : Pre calibration 
     &mtbdl_calibrate_state,             // State 15 : Calibration 
     &mtbdl_lowpwr_state,                // State 16 : Low power mode 
-    &mtbdl_noncrit_fault_state,         // State 17 : Non-critical fault 
-    &mtbdl_fault_state,                 // State 18 : Fault 
-    &mtbdl_reset_state                  // State 19 : Reset 
+    &mtbdl_fault_state,                 // State 17 : Fault 
+    &mtbdl_reset_state                  // State 18 : Reset 
 }; 
 
 //=======================================================================================
@@ -294,16 +288,16 @@ void mtbdl_app(void)
                 next_state = MTBDL_FAULT_STATE; 
             }
 
-            // Non-critical fault state flag set 
-            else if (mtbdl_trackers.noncrit_fault)
-            {
-                next_state = MTBDL_NONCRIT_FAULT_STATE; 
-            }
-
             // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
+            }
+
+            // Non-critical fault state flag set 
+            else if (mtbdl_trackers.noncrit_fault)
+            {
+                next_state = MTBDL_POSTRUN_STATE; 
             }
 
             // Run state flag set 
@@ -541,14 +535,6 @@ void mtbdl_app(void)
 
             break; 
 
-        case MTBDL_NONCRIT_FAULT_STATE: 
-            // Idle state flag set 
-            if (mtbdl_trackers.idle)
-            {
-                next_state = MTBDL_IDLE_STATE; 
-            }
-            break; 
-
         case MTBDL_FAULT_STATE: 
             // Reset flag set 
             if (mtbdl_trackers.reset)
@@ -614,6 +600,8 @@ void mtbdl_init_state(
 
     //==================================================
     // Checks 
+
+    // TODO if the screen doesn't init properly, add a button to trigger a re-try 
 
     // Wait for the SD card to be mounted then access the file system 
     if (hw125_get_state() == HW125_ACCESS_STATE)
@@ -747,16 +735,16 @@ void mtbdl_run_prep_state(
         {
             // New file name created - display the run prep state message 
             mtbdl_set_run_prep_msg(); 
+            mtbdl->run = CLEAR_BIT; 
         }
         else 
         {
             // Too many log files saved - abort 
-            hd44780u_set_msg(mtbdl_ncf_excess_files_msg, MTBDL_MSG_LEN_1_LINE); 
             mtbdl->noncrit_fault = SET_BIT; 
+            mtbdl->msg = mtbdl_ncf_excess_files_msg; 
+            mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
         }
     }
-
-    mtbdl->run = CLEAR_BIT; 
 
     //==================================================
 
@@ -890,6 +878,9 @@ void mtbdl_run_state(
     {
         // Take the screen out of low power mode 
         hd44780u_clear_low_pwr_flag(); 
+
+        mtbdl->msg = mtbdl_postrun_msg; 
+        mtbdl->msg_len = MTBDL_MSG_LEN_2_LINE; 
     }
 
     //==================================================
@@ -905,14 +896,16 @@ void mtbdl_postrun_state(
 
     if (mtbdl->run)
     {
-        // Display the post run state message 
-        hd44780u_set_msg(mtbdl_postrun_msg, MTBDL_MSG_LEN_2_LINE); 
+        // Close the open data log file if there was no non-critical faults 
+        if (!mtbdl->noncrit_fault)
+        {
+            mtbdl_log_end(); 
+        }
 
-        // Close the open data log file 
-        mtbdl_log_end(); 
+        hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
+        mtbdl->noncrit_fault = CLEAR_BIT; 
+        mtbdl->run = CLEAR_BIT; 
     }
-
-    mtbdl->run = CLEAR_BIT; 
 
     //==================================================
     
@@ -1572,47 +1565,6 @@ void mtbdl_lowpwr_state(
         hd44780u_clear_pwr_save_flag(); 
 
         // Set the idle state flag 
-        mtbdl->idle = SET_BIT; 
-    }
-
-    //==================================================
-}
-
-
-// Non-critical fault state 
-void mtbdl_noncrit_fault_state(
-    mtbdl_trackers_t *mtbdl)
-{
-    //==================================================
-    // State entry 
-
-    if (mtbdl->noncrit_fault)
-    {
-        // Display the non-critical fault message on the screen 
-        hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
-    }
-
-    mtbdl->noncrit_fault = CLEAR_BIT; 
-
-    //==================================================
-
-    //==================================================
-    // State exit 
-
-    // Allow the non-critical fault message to be displayed before returning to idle 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
-    {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-
-        // Clear non-critical fault message 
-        hd44780u_set_clear_flag(); 
-
-        // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
     }
 

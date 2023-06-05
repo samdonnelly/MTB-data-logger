@@ -87,6 +87,10 @@ typedef struct mtbdl_trackers_s
     TIM_TypeDef *timer_nonblocking;             // Timer used for non-blocking delays 
     tim_compare_t delay_timer;                  // Delay timing info 
 
+    // Screen message 
+    hd44780u_msgs_t *msg;                       // Message content 
+    uint8_t msg_len;                            // Message length (number of lines) 
+
     // User buttons 
     uint8_t user_btn_1;                         // User button 1 pin number 
     uint8_t user_btn_2;                         // User button 2 pin number 

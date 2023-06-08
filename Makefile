@@ -59,6 +59,7 @@ sources/config_files/m8q_config.c \
 ../STM32F4-driver-library/sources/i2c_comm.c \
 ../STM32F4-driver-library/sources/interrupt_driver.c \
 ../STM32F4-driver-library/sources/linked_list_driver.c \
+../STM32F4-driver-library/sources/lsm303agr_driver.cpp \
 ../STM32F4-driver-library/sources/m8q_driver.c \
 ../STM32F4-driver-library/sources/m8q_controller.c \
 ../STM32F4-driver-library/sources/mpu6050_driver.c \
@@ -92,30 +93,7 @@ Core/Src/system_stm32f4xx.c \
 ../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/ff.c \
 ../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
 ../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/option/syscall.c \
-../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/option/ccsbcs.c  
-# FATFS/Target/user_diskio.c \
-# FATFS/App/fatfs.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c \
-# Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c \
-# Core/Src/system_stm32f4xx.c \
-# Middlewares/Third_Party/FatFs/src/diskio.c \
-# Middlewares/Third_Party/FatFs/src/ff.c \
-# Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
-# Middlewares/Third_Party/FatFs/src/option/syscall.c \
-# Middlewares/Third_Party/FatFs/src/option/ccsbcs.c  
+../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/option/ccsbcs.c 
 
 # ASM sources
 ASM_SOURCES =  \

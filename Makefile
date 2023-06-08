@@ -59,7 +59,6 @@ sources/config_files/m8q_config.c \
 ../STM32F4-driver-library/sources/i2c_comm.c \
 ../STM32F4-driver-library/sources/interrupt_driver.c \
 ../STM32F4-driver-library/sources/linked_list_driver.c \
-../STM32F4-driver-library/sources/lsm303agr_driver.cpp \
 ../STM32F4-driver-library/sources/m8q_driver.c \
 ../STM32F4-driver-library/sources/m8q_controller.c \
 ../STM32F4-driver-library/sources/mpu6050_driver.c \
@@ -94,6 +93,12 @@ Core/Src/system_stm32f4xx.c \
 ../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/ff_gen_drv.c \
 ../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/option/syscall.c \
 ../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src/option/ccsbcs.c 
+
+
+# C++ sources
+CXX_SOURCES = \
+../STM32F4-driver-library/sources/lsm303agr_driver.cpp \
+
 
 # ASM sources
 ASM_SOURCES =  \

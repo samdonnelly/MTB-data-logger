@@ -23,7 +23,8 @@
 #include "mtbdl_init.h"
 #include "mtbdl_app.h"
 #include "data_handling.h"
-#include "directories.h"
+#include "led_colours.h"
+#include "strs.h"
 #include "screen_msgs.h" 
 
 //=======================================================================================

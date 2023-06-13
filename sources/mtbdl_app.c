@@ -220,22 +220,30 @@ void mtbdl_app(void)
         debounce((uint8_t)gpio_port_read(mtbdl_trackers.user_btn_port)); 
     }
 
-    // Free the button pressed status as soon as possible 
+    // Free the button pressed status as soon as possible & turn the LEDs off 
     if (debounce_released(mtbdl_trackers.user_btn_1) && mtbdl_trackers.user_btn_1_block)
     {
         mtbdl_trackers.user_btn_1_block = CLEAR; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led_clear, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     if (debounce_released(mtbdl_trackers.user_btn_2) && mtbdl_trackers.user_btn_2_block)
     {
         mtbdl_trackers.user_btn_2_block = CLEAR; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led_clear, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
     }
     if (debounce_released(mtbdl_trackers.user_btn_3) && mtbdl_trackers.user_btn_3_block)
     {
         mtbdl_trackers.user_btn_3_block = CLEAR; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led_clear, WS2812_LED_5); 
+        ws2812_send(DEVICE_ONE); 
     }
     if (debounce_released(mtbdl_trackers.user_btn_4) && mtbdl_trackers.user_btn_4_block)
     {
         mtbdl_trackers.user_btn_4_block = CLEAR; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led_clear, WS2812_LED_4); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //===================================================
@@ -671,6 +679,8 @@ void mtbdl_idle_state(
     {
         mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 2 - triggers the data transfer selection state 
@@ -678,6 +688,8 @@ void mtbdl_idle_state(
     {
         mtbdl->data_select = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led6_1, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 3 - triggers the alternate functions state 
@@ -685,6 +697,8 @@ void mtbdl_idle_state(
     {
         mtbdl->calibrate = SET_BIT; 
         mtbdl->user_btn_3_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led5_1, WS2812_LED_5); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 4 - Turns the screen backlight on 
@@ -692,6 +706,8 @@ void mtbdl_idle_state(
     {
         mtbdl->user_btn_4_block = SET_BIT; 
         hd44780u_wake_up(); 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led4_1, WS2812_LED_4); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================
@@ -756,6 +772,8 @@ void mtbdl_run_prep_state(
     {
         mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
 
         // Prepare the log file 
         mtbdl_log_file_prep(); 
@@ -766,6 +784,8 @@ void mtbdl_run_prep_state(
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led6_1, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================
@@ -848,17 +868,23 @@ void mtbdl_run_state(
     //==================================================
     // Check user button input 
 
+    // TODO consider incorporating LED writes into the data logging RTOS so it can be scheduled 
+
     // Button 1 - stops the run state --> triggers the post run state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
     {
         mtbdl->run = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 2 - Sets a marker 
     else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
     {
         mtbdl->user_btn_2_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led6_1, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================
@@ -962,6 +988,8 @@ void mtbdl_data_select_state(
         mtbdl->rx = SET_BIT; 
         mtbdl->data_select = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 2 - triggers the pre send (TX) state 
@@ -970,6 +998,8 @@ void mtbdl_data_select_state(
         mtbdl->tx = SET_BIT; 
         mtbdl->data_select = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led6_1, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 3 - triggers the idle state - cancels data selection 
@@ -977,6 +1007,8 @@ void mtbdl_data_select_state(
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->user_btn_3_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led5_1, WS2812_LED_5); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================
@@ -1022,6 +1054,8 @@ void mtbdl_dev_search_state(
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================
@@ -1076,6 +1110,8 @@ void mtbdl_prerx_state(
     {
         mtbdl->rx = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 2 - cancels the rx state --> triggers idle state 
@@ -1083,6 +1119,8 @@ void mtbdl_prerx_state(
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led6_1, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
     }
 
     // If the HC-05 gets disconnected then abort the potential transfer 
@@ -1137,6 +1175,8 @@ void mtbdl_rx_state(
     {
         mtbdl->rx = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
 
         mtbdl->msg = mtbdl_postrx_msg; 
         mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
@@ -1254,6 +1294,8 @@ void mtbdl_pretx_state(
     {
         mtbdl->tx = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 2 - cancels the tx state --> triggers idle state 
@@ -1261,6 +1303,8 @@ void mtbdl_pretx_state(
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led6_1, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
 
         // End the data transfer 
         mtbdl_tx_end(); 
@@ -1321,6 +1365,8 @@ void mtbdl_tx_state(
     {
         mtbdl->tx = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
 
     // Transfer data log contents and set the tx bit if the transfer finishes 
@@ -1427,6 +1473,8 @@ void mtbdl_precalibrate_state(
     {
         mtbdl->calibrate = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led7_1, WS2812_LED_7); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     // Button 2 - cancels the calibration state --> triggers idle state 
@@ -1434,6 +1482,8 @@ void mtbdl_precalibrate_state(
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led6_1, WS2812_LED_6); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================
@@ -1533,6 +1583,8 @@ void mtbdl_lowpwr_state(
     {
         mtbdl->user_btn_4_block = SET_BIT; 
         hd44780u_wake_up(); 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led4_1, WS2812_LED_4); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================
@@ -1602,6 +1654,8 @@ void mtbdl_fault_state(
     {
         mtbdl->reset = SET_BIT; 
         mtbdl->user_btn_4_block = SET_BIT; 
+        ws2812_colour_set(DEVICE_ONE, mtbdl_led4_1, WS2812_LED_4); 
+        ws2812_send(DEVICE_ONE); 
     }
     
     //==================================================

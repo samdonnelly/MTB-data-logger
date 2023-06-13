@@ -1,9 +1,9 @@
 /**
- * @file mtbdl_dir.h
+ * @file strs.h 
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL filesystem directories header 
+ * @brief MTB DL system strings header 
  * 
  * @version 0.1
  * @date 2023-05-21
@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef _MTBDL_DIRS_H_ 
-#define _MTBDL_DIRS_H_ 
+#ifndef _STRS_H_ 
+#define _STRS_H_ 
 
 //=======================================================================================
 // Includes 
@@ -39,6 +39,12 @@ extern const char mtbdl_bike_param_file[];     // Bike parameters file
 extern const char mtbdl_sys_param_file[];      // System parameters file 
 extern const char mtbdl_log_file[];            // Log file name template 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// File information 
+
 // Bike parameter information 
 extern const char mtbdl_param_fork_info[];     // Fork setup parameters 
 extern const char mtbdl_param_shock_info[];    // Shock setup parameters 
@@ -56,10 +62,16 @@ extern const char mtbdl_data_log_2[];          // Data log message 2 - includes 
 extern const char mtbdl_data_log_3[];          // Data log message 3 - includes accelerometer 
 extern const char mtbdl_data_log_4[];          // Data log message 4 - includes GPS 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// User interface strings 
+
 // RX info 
 extern const char mtbdl_rx_prompt[];           // User prompt during RX state 
 extern const char mtbdl_rx_input[];            // User input during the RX state 
 
 //=======================================================================================
 
-#endif   // _MTBDL_DIRS_H_ 
+#endif   // _STRS_H_ 

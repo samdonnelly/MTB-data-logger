@@ -1,9 +1,9 @@
 /**
- * @file mtbdl_dir.c
+ * @file strs.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL filesystem directories 
+ * @brief MTB DL system strings 
  * 
  * @version 0.1
  * @date 2023-05-21
@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "directories.h" 
+#include "strs.h" 
 
 //=======================================================================================
 
@@ -35,6 +35,12 @@ const char mtbdl_bike_param_file[] = "bike_params.txt";
 const char mtbdl_sys_param_file[] = "sys_params.txt"; 
 const char mtbdl_log_file[] = "log_%u.txt"; 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// File information 
+
 // Bike parameter information 
 const char mtbdl_param_fork_info[] = "Fork: PSI:%u C:%u R:%u\r\n"; 
 const char mtbdl_param_shock_info[] = "Shock: PSI:%u L:%u R:%u\r\n"; 
@@ -53,6 +59,12 @@ const char mtbdl_data_log_1[] = "%u, %u, %u, %u, -, -, -, -, -\r\n";     // Stan
 const char mtbdl_data_log_2[] = "%u, %u, %u, %u, %u, -, -, -, -\r\n";    // Includes wheel speed 
 const char mtbdl_data_log_3[] = "%u, %u, %u, %u, -, %u, %u, %u, -\r\n";  // Includes accelerometer 
 const char mtbdl_data_log_4[] = "%u, %u, %u, %u, -, -, -, -, %u\r\n";    // Includes GPS 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// User interface strings 
 
 // RX info 
 const char mtbdl_rx_prompt[] = "\r\n>>> "; 

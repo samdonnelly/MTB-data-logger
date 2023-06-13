@@ -43,9 +43,10 @@ Core/Src/system_stm32f4xx.c \
 sources/mtbdl_init.c \
 sources/mtbdl_app.c \
 sources/data_handling.c \
-sources/directories.c \
 sources/int_handlers.c \
+sources/led_colours.c \
 sources/screen_msgs.c \
+sources/strs.c \
 sources/config_files/m8q_config.c \
 ../STM32F4-driver-library/sources/devices/hc05_driver.c \
 ../STM32F4-driver-library/sources/devices/hc05_controller.c \

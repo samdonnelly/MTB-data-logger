@@ -81,6 +81,9 @@ typedef struct mtbdl_data_s
     char filename[MTBDL_MAX_DATA_STR_LEN];      // Buffer for storing a file name 
     uint8_t tx_status : 1;                      // TX transaction status 
 
+    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+    uint32_t led_colour_data[WS2812_LED_NUM]; 
+
     // System data 
     uint8_t soc;                                // Battery SOC 
     uint8_t navstat;                            // Navigation status of GPS module 
@@ -290,6 +293,17 @@ void mtbdl_set_run_prep_msg(void);
  * @details 
  */
 void mtbdl_set_pretx_msg(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// LEDs 
+
+// Update LED colours 
+void mtbdl_led_update(
+    ws2812_led_index_t led_index, 
+    uint32_t led_code); 
 
 //=======================================================================================
 

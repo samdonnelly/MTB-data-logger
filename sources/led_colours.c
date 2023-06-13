@@ -24,30 +24,30 @@
 // LED colours 
 
 // LED off 
-uint8_t mtbdl_led_clear[WS2812_COLOUR_PER_LED] = {0, 0, 0}; 
+uint32_t mtbdl_led_clear = 0x00000000; 
 
 // LED 0 colours 
-uint8_t mtbdl_led0_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led0_1 = 0x001E1E1E; 
 
 // LED 1 colours 
-uint8_t mtbdl_led1_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led1_1 = 0x001E1E1E; 
 
 // LED 2 colours 
-uint8_t mtbdl_led2_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led2_1 = 0x001E1E1E; 
 
 // LED 3 colours 
-uint8_t mtbdl_led3_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led3_1 = 0x001E1E1E; 
 
 // LED 4 colours 
-uint8_t mtbdl_led4_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led4_1 = 0x001E1E1E; 
 
 // LED 5 colours 
-uint8_t mtbdl_led5_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led5_1 = 0x001E1E1E; 
 
 // LED 6 colours 
-uint8_t mtbdl_led6_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led6_1 = 0x001E1E1E; 
 
 // LED 7 colours 
-uint8_t mtbdl_led7_1[WS2812_COLOUR_PER_LED] = {30, 30, 30}; 
+uint32_t mtbdl_led7_1 = 0x001E1E1E; 
 
 //=======================================================================================

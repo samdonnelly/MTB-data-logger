@@ -92,6 +92,9 @@ void mtbdl_data_init(void)
     memset((void *)mtbdl_data.data_buff, CLEAR, sizeof(mtbdl_data.data_buff)); 
     mtbdl_data.tx_status = CLEAR_BIT; 
 
+    // LEDs 
+    memset((void *)mtbdl_data.led_colour_data, CLEAR, sizeof(mtbdl_data.led_colour_data)); 
+
     // System data 
     mtbdl_data.soc = CLEAR; 
     mtbdl_data.navstat = CLEAR; 
@@ -607,6 +610,21 @@ void mtbdl_set_pretx_msg(void)
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// LEDs 
+
+// Update LED colours 
+void mtbdl_led_update(
+    ws2812_led_index_t led_index, 
+    uint32_t led_code)
+{
+    mtbdl_data.led_colour_data[led_index] = led_code; 
+    ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
 }
 
 //=======================================================================================

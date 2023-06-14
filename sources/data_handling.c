@@ -54,6 +54,46 @@ void mtbdl_format_write_sys_params(void);
  */
 void mtbdl_format_read_sys_params(void); 
 
+
+/**
+ * @brief 
+ * 
+ * @details 
+ */
+void mtbdl_log_stream_standard(void); 
+
+
+/**
+ * @brief 
+ * 
+ * @details 
+ */
+void mtbdl_log_stream_blink(void); 
+
+
+/**
+ * @brief 
+ * 
+ * @details 
+ */
+void mtbdl_log_stream_speed(void); 
+
+
+/**
+ * @brief 
+ * 
+ * @details 
+ */
+void mtbdl_log_stream_accel(void); 
+
+
+/**
+ * @brief 
+ * 
+ * @details 
+ */
+void mtbdl_log_stream_gps(void); 
+
 //=======================================================================================
 
 
@@ -62,6 +102,49 @@ void mtbdl_format_read_sys_params(void);
 
 // Data record instance 
 static mtbdl_data_t mtbdl_data; 
+
+
+// Log stream table 
+static mtbdl_log_stream stream_table[MTBDL_NUM_LOG_STREAMS] = 
+{
+    &mtbdl_log_stream_standard, 
+    &mtbdl_log_stream_blink, 
+    &mtbdl_log_stream_speed, 
+    &mtbdl_log_stream_accel, 
+    &mtbdl_log_stream_gps 
+}; 
+
+
+// Log sequence table 
+static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] = 
+{
+    // {count trigger, repeated occurances, stream to go to on trigger} 
+    {0,    MTBDL_LOG_STREAM_BLINK}, 
+    {13,   MTBDL_LOG_STREAM_ACCEL}, 
+    {14,   MTBDL_LOG_STREAM_ACCEL}, 
+    {20,   MTBDL_LOG_STREAM_BLINK}, 
+    {27,   MTBDL_LOG_STREAM_SPEED}, 
+    {33,   MTBDL_LOG_STREAM_ACCEL}, 
+    {34,   MTBDL_LOG_STREAM_ACCEL}, 
+    {41,   MTBDL_LOG_STREAM_GPS}, 
+    {53,   MTBDL_LOG_STREAM_ACCEL}, 
+    {54,   MTBDL_LOG_STREAM_ACCEL}, 
+    {55,   MTBDL_LOG_STREAM_ACCEL}, 
+    {56,   MTBDL_LOG_STREAM_ACCEL}, 
+    {57,   MTBDL_LOG_STREAM_ACCEL}, 
+    {58,   MTBDL_LOG_STREAM_ACCEL}, 
+    {59,   MTBDL_LOG_STREAM_ACCEL}, 
+    {60,   MTBDL_LOG_STREAM_ACCEL}, 
+    {127,  MTBDL_LOG_STREAM_SPEED}, 
+    {133,  MTBDL_LOG_STREAM_ACCEL}, 
+    {134,  MTBDL_LOG_STREAM_ACCEL}, 
+    {135,  MTBDL_LOG_STREAM_ACCEL}, 
+    {136,  MTBDL_LOG_STREAM_ACCEL}, 
+    {137,  MTBDL_LOG_STREAM_ACCEL}, 
+    {138,  MTBDL_LOG_STREAM_ACCEL}, 
+    {139,  MTBDL_LOG_STREAM_ACCEL}, 
+    {140,  MTBDL_LOG_STREAM_ACCEL} 
+}; 
 
 //=======================================================================================
 
@@ -364,13 +447,137 @@ void mtbdl_log_file_prep(void)
         hw125_puts(mtbdl_data_log_start); 
         mtbdl_data.log_index++; 
     }
+
+    // Enable the wheel speed interrupts 
 }
 
 
 // Record data 
 void mtbdl_logging(void)
 {
+    // Local variables 
+    mtbdl_log_stream_state_t schedule = stream_schedule[mtbdl_data.stream_index]; 
+
+    // Check for sampling trigger 
+    if (mtbdl_data.sample)
+    {
+        mtbdl_data.sample = CLEAR_BIT; 
+
+        //===================================================
+        // Update the next log stream 
+
+        // Check if the next non-standard stream count value has been met 
+        if (mtbdl_data.time_count == schedule.counter)
+        {
+            // Update the log stream 
+            mtbdl_data.log_stream = schedule.stream; 
+
+            // Update the stream index 
+            if (mtbdl_data.stream_index >= MTBDL_NUM_LOG_SEQ)
+            {
+                mtbdl_data.stream_index = CLEAR; 
+            }
+            else 
+            {
+                mtbdl_data.stream_index++; 
+            }
+        }
+        else 
+        {
+            mtbdl_data.log_stream = MTBDL_LOG_STREAM_STANDARD; 
+        }
+        
+        //===================================================
+
+        //===================================================
+        // Record standard data 
+
+        // ADC read 
+
+        // Record wheel speed input if available 
+        
+        //===================================================
+
+        // Execute a log stream 
+        stream_table[mtbdl_data.log_stream](); 
+
+        // Write to SD card with formatted string 
+
+        // Clear the trail marker flag 
+        mtbdl_data.trailmark = CLEAR_BIT; 
+
+        // Update time count 
+        mtbdl_data.time_count++; 
+    }
+}
+
+
+// Standard logging stream 
+void mtbdl_log_stream_standard(void)
+{
+    // Format standard log string 
+}
+
+
+// LED blink logging stream 
+void mtbdl_log_stream_blink(void)
+{
+    // Toggle the LED state (on/off) 
+}
+
+
+// Wheel speed logging stream 
+void mtbdl_log_stream_speed(void)
+{
+    // Update wheel speed calculation 
+
+    // Format wheel speed data log string 
+}
+
+
+// Accelerometer logging stream 
+void mtbdl_log_stream_accel(void)
+{
     // 
+    if (mtbdl_data.run_count)
+    {
+        mtbdl_data.run_count = CLEAR_BIT; 
+
+        // Record new accel data 
+
+        // Format accel data log string 
+    }
+    else 
+    {
+        mtbdl_data.run_count = SET_BIT; 
+
+        // Trigger a read from the accelerometer 
+
+        // Format standard log string 
+    }
+}
+
+
+// GPS logging stream 
+void mtbdl_log_stream_gps(void)
+{
+    // 
+    if (mtbdl_data.run_count)
+    {
+        mtbdl_data.run_count = CLEAR_BIT; 
+
+        // Record new GPS data 
+
+        // Format GPS data log string 
+    }
+    else 
+    {
+        mtbdl_data.run_count = SET_BIT; 
+
+        // Trigger a read from the GPS 
+
+        // Format standard log string 
+    }
 }
 
 
@@ -382,6 +589,11 @@ void mtbdl_log_end(void)
 
     // Update the log index 
     mtbdl_write_sys_params(HW125_MODE_OAWR); 
+
+    // Make sure the log LED is off 
+
+    // Reset the time count to zero 
+    mtbdl_data.time_count = CLEAR; 
 }
 
 //=======================================================================================
@@ -625,6 +837,25 @@ void mtbdl_led_update(
 {
     mtbdl_data.led_colour_data[led_index] = led_code; 
     ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Setters 
+
+// Set sample flag 
+void mtbdl_set_sample(void)
+{
+    mtbdl_data.sample = SET_BIT; 
+}
+
+
+// Set trail marker flag 
+void mtbdl_set_trailmark(void)
+{
+    mtbdl_data.trailmark = SET_BIT; 
 }
 
 //=======================================================================================

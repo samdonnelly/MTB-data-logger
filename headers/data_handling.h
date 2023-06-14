@@ -32,6 +32,8 @@
 #define MTBDL_LOG_NUM_MIN 0              // Min data log files 
 #define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
 #define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
+#define MTBDL_NUM_LOG_STREAMS 5          // Number of data logging streams 
+#define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
 
 //=======================================================================================
 
@@ -42,7 +44,7 @@
 /**
  * @brief User parameter index --> for RX state 
  */
-typedef enum mtbdl_rx_param_index_s {
+typedef enum {
     MTBDL_PARM_FPSI,                     // Fork PSI 
     MTBDL_PARM_FC,                       // Fork compression setting 
     MTBDL_PARM_FR,                       // Fork rebound setting 
@@ -50,6 +52,18 @@ typedef enum mtbdl_rx_param_index_s {
     MTBDL_PARM_SL,                       // Shock lockout setting 
     MTBDL_PARM_SR                        // Shock rebound setting 
 } mtbdl_rx_param_index_t; 
+
+
+/**
+ * @brief Logging streams 
+ */
+typedef enum {
+    MTBDL_LOG_STREAM_STANDARD,           // Standard stream 
+    MTBDL_LOG_STREAM_BLINK,              // LED blink stream 
+    MTBDL_LOG_STREAM_SPEED,              // Wheel speed stream 
+    MTBDL_LOG_STREAM_ACCEL,              // Accelerometer stream 
+    MTBDL_LOG_STREAM_GPS                 // GPS stream 
+} mtbdl_log_streams_t; 
 
 //=======================================================================================
 
@@ -92,8 +106,36 @@ typedef struct mtbdl_data_s
     uint8_t accel_z;                            // z-axis acceleration reading 
     uint8_t pot_fork;                           // Fork potentiometer reading 
     uint8_t pot_shock;                          // Shock potentiometer reading 
+
+    // Log tracking 
+    uint32_t time_count;                        // Keeps track of time during logging 
+    uint8_t stream_index;                       // 
+    uint8_t sample     : 1;                     // 
+    uint8_t run_count  : 1;                     // 
+    uint8_t trailmark  : 1;                     // 
+    uint8_t log_stream : 3;                     // 
 }
 mtbdl_data_t; 
+
+
+// 
+typedef struct mtbdl_log_stream_state_s 
+{
+    uint8_t counter; 
+    mtbdl_log_streams_t stream; 
+}
+mtbdl_log_stream_state_t; 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Function pointers 
+
+/**
+ * @brief Logging state machine function pointer 
+ */
+typedef void (*mtbdl_log_stream)(void); 
 
 //=======================================================================================
 
@@ -304,6 +346,27 @@ void mtbdl_set_pretx_msg(void);
 void mtbdl_led_update(
     ws2812_led_index_t led_index, 
     uint32_t led_code); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Setters 
+
+/**
+ * @brief Set sample flag 
+ * 
+ * @details 
+ */
+void mtbdl_set_sample(void); 
+
+
+/**
+ * @brief Set trail marker flag 
+ * 
+ * @details 
+ */
+void mtbdl_set_trailmark(void); 
 
 //=======================================================================================
 

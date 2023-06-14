@@ -218,6 +218,7 @@ void mtbdl_app(void)
     {
         handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
         debounce((uint8_t)gpio_port_read(mtbdl_trackers.user_btn_port)); 
+        mtbdl_set_sample(); 
     }
 
     // Free the button pressed status as soon as possible & turn the LEDs off 
@@ -872,6 +873,7 @@ void mtbdl_run_state(
     else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
     {
         mtbdl->user_btn_2_block = SET_BIT; 
+        mtbdl_set_trailmark(); 
         mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
     }
     

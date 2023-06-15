@@ -209,7 +209,26 @@ void mtbdl_init()
     //===================================================
 
     //===================================================
-    // Wheel speed sensor setup 
+    // Wheel speed sensor setup (external interrupt) 
+
+    // Enable external interrupts 
+    exti_init(); 
+
+    exti_config(
+        GPIOC, 
+        EXTI_PC, 
+        PIN_4, 
+        PUPDR_PU, 
+        EXTI_L4, 
+        EXTI_INT_NOT_MASKED, 
+        EXTI_EVENT_MASKED, 
+        EXTI_RISE_TRIG_DISABLE, 
+        EXTI_FALL_TRIG_ENABLE); 
+
+    // Set the interrupt priority and disable 
+    NVIC_SetPriority(EXTI4_IRQn, EXTI_PRIORITY_0); 
+    NVIC_DisableIRQ(EXTI4_IRQn); 
+
     //===================================================
 
     //===================================================
@@ -238,7 +257,7 @@ void mtbdl_init()
         GPIOX_PIN_3); 
 
     // Data record init 
-    mtbdl_data_init(); 
+    mtbdl_data_init(EXTI4_IRQn); 
 
     //===================================================
 }

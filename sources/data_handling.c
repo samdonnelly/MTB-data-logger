@@ -154,8 +154,12 @@ static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] =
 // Initialization 
 
 // Initialize data record 
-void mtbdl_data_init(void)
+void mtbdl_data_init(
+    IRQn_Type rpm_irqn)
 {
+    // Peripherals 
+    mtbdl_data.rpm_irq = rpm_irqn; 
+
     // Bike parameters 
     mtbdl_data.fork_psi = CLEAR; 
     mtbdl_data.fork_comp = CLEAR; 
@@ -183,19 +187,12 @@ void mtbdl_data_init(void)
     // System data 
     mtbdl_data.soc = CLEAR; 
     mtbdl_data.navstat = CLEAR; 
+    mtbdl_data.gps = CLEAR; 
     mtbdl_data.accel_x = CLEAR; 
     mtbdl_data.accel_y = CLEAR; 
     mtbdl_data.accel_z = CLEAR; 
     mtbdl_data.pot_fork = CLEAR; 
     mtbdl_data.pot_shock = CLEAR; 
-
-    // Log tracking 
-    mtbdl_data.time_count = CLEAR; 
-    mtbdl_data.stream_index = CLEAR; 
-    mtbdl_data.sample = CLEAR_BIT; 
-    mtbdl_data.run_count = CLEAR_BIT; 
-    mtbdl_data.trailmark = CLEAR_BIT; 
-    mtbdl_data.log_stream = CLEAR_BIT; 
 
 #if MTBDL_DEBUG 
     // Testing 
@@ -467,17 +464,33 @@ void mtbdl_log_file_prep(void)
         hw125_puts(mtbdl_data_log_start); 
         mtbdl_data.log_index++; 
     }
-
-    // Enable the wheel speed interrupts 
 }
 
 
-// Record data 
+// Log data prep 
+void mtbdl_log_data_prep(void)
+{
+    // Wheel RPM info 
+    mtbdl_data.rev_count = CLEAR; 
+    mtbdl_data.rev_buff_index = CLEAR; 
+    memset((void *)mtbdl_data.rev_buff, CLEAR, sizeof(mtbdl_data.rev_buff)); 
+
+    // Log tracking 
+    mtbdl_data.time_count = CLEAR; 
+    mtbdl_data.stream_index = CLEAR; 
+    mtbdl_data.sample = CLEAR_BIT; 
+    mtbdl_data.led_toggle = CLEAR_BIT; 
+    mtbdl_data.run_count = CLEAR_BIT; 
+    mtbdl_data.trailmark = CLEAR_BIT; 
+
+    // Peripherals 
+    NVIC_EnableIRQ(mtbdl_data.rpm_irq);   // Enable the wheel speed interrupts 
+}
+
+
+// Logging data 
 void mtbdl_logging(void)
 {
-    // Local variables 
-    mtbdl_log_stream_state_t schedule = stream_schedule[mtbdl_data.stream_index]; 
-
     // Check for sampling trigger 
 #if MTBDL_DEBUG 
     if (mtbdl_data.sample && (mtbdl_data.time_stop < 599))
@@ -487,14 +500,11 @@ void mtbdl_logging(void)
     {
         mtbdl_data.sample = CLEAR_BIT; 
 
-        //===================================================
         // Update the next log stream 
-
-        // Check if the next non-standard stream count value has been met 
-        if (mtbdl_data.time_count == schedule.counter)
+        if (mtbdl_data.time_count == stream_schedule[mtbdl_data.stream_index].counter)
         {
             // Update the log stream and stream sequence index 
-            mtbdl_data.log_stream = schedule.stream; 
+            mtbdl_data.log_stream = stream_schedule[mtbdl_data.stream_index].stream; 
             mtbdl_data.stream_index = (mtbdl_data.stream_index < (MTBDL_NUM_LOG_SEQ-1)) ? 
                                       (mtbdl_data.stream_index + 1) : CLEAR; 
         }
@@ -503,21 +513,20 @@ void mtbdl_logging(void)
             mtbdl_data.log_stream = MTBDL_LOG_STREAM_STANDARD; 
         }
         
-        //===================================================
-
-        //===================================================
-        // Record standard data 
-
         // ADC read 
 
         // Record wheel speed input if available 
-        
-        //===================================================
+        if (handler_flags.exti4_flag)
+        {
+            handler_flags.exti4_flag = CLEAR; 
+            mtbdl_data.rev_count++; 
+        }
 
         // Execute a log stream 
         stream_table[mtbdl_data.log_stream](); 
 
         // Write to SD card with formatted string 
+        hw125_puts(mtbdl_data.data_buff); 
 
         // Clear the trail marker flag 
         mtbdl_data.trailmark = CLEAR_BIT; 
@@ -536,6 +545,12 @@ void mtbdl_logging(void)
 void mtbdl_log_stream_standard(void)
 {
     // Format standard log string 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_data_log_1, 
+             mtbdl_data.trailmark, 
+             mtbdl_data.pot_fork, 
+             mtbdl_data.pot_shock); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.count_standard++; 
@@ -546,7 +561,25 @@ void mtbdl_log_stream_standard(void)
 // LED blink logging stream 
 void mtbdl_log_stream_blink(void)
 {
+    // Local variables 
+    uint32_t led_colour_code; 
+
     // Toggle the LED state (on/off) 
+    if (mtbdl_data.led_toggle)
+    {
+        mtbdl_data.led_toggle = CLEAR_BIT; 
+        led_colour_code = mtbdl_led_clear; 
+    }
+    else 
+    {
+        mtbdl_data.led_toggle = SET_BIT; 
+        led_colour_code = mtbdl_led0_1; 
+    }
+
+    mtbdl_led_update(WS2812_LED_0, led_colour_code); 
+
+    // Format standard log string 
+    mtbdl_log_stream_standard(); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.count_blink++; 
@@ -557,9 +590,29 @@ void mtbdl_log_stream_blink(void)
 // Wheel speed logging stream 
 void mtbdl_log_stream_speed(void)
 {
-    // Update wheel speed calculation 
+    // Local variables 
+    uint8_t revs; 
+
+    // Update the revolution record 
+    mtbdl_data.rev_buff[mtbdl_data.rev_buff_index] = mtbdl_data.rev_count; 
+    mtbdl_data.rev_count = CLEAR; 
+    mtbdl_data.rev_buff_index = (mtbdl_data.rev_buff_index < (MTBDL_REV_SAMPLE_SIZE-1)) ? 
+                                (mtbdl_data.rev_buff_index + 1) : CLEAR; 
+
+    // Record the total revolutions over the last MTBDL_REV_SAMPLE_SIZE samples 
+    for (uint8_t i = 0; i < MTBDL_REV_SAMPLE_SIZE; i++)
+    {
+        revs += mtbdl_data.rev_buff[i]; 
+    }
 
     // Format wheel speed data log string 
+    snprintf(mtbdl_data.data_buff, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_data_log_2, 
+             mtbdl_data.trailmark, 
+             mtbdl_data.pot_fork, 
+             mtbdl_data.pot_shock, 
+             revs); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.count_speed++; 
@@ -570,7 +623,7 @@ void mtbdl_log_stream_speed(void)
 // Accelerometer logging stream 
 void mtbdl_log_stream_accel(void)
 {
-    // 
+    // Determine whether to trigger an accelerometer read or get the updated data 
     if (mtbdl_data.run_count)
     {
         mtbdl_data.run_count = CLEAR_BIT; 
@@ -578,6 +631,15 @@ void mtbdl_log_stream_accel(void)
         // Record new accel data 
 
         // Format accel data log string 
+        snprintf(mtbdl_data.data_buff, 
+                 MTBDL_MAX_DATA_STR_LEN, 
+                 mtbdl_data_log_3, 
+                 mtbdl_data.trailmark, 
+                 mtbdl_data.pot_fork, 
+                 mtbdl_data.pot_shock, 
+                 mtbdl_data.accel_x, 
+                 mtbdl_data.accel_y, 
+                 mtbdl_data.accel_z); 
     }
     else 
     {
@@ -586,6 +648,7 @@ void mtbdl_log_stream_accel(void)
         // Trigger a read from the accelerometer 
 
         // Format standard log string 
+        mtbdl_log_stream_standard(); 
     }
 
 #if MTBDL_DEBUG 
@@ -597,7 +660,7 @@ void mtbdl_log_stream_accel(void)
 // GPS logging stream 
 void mtbdl_log_stream_gps(void)
 {
-    // 
+    // Determine whether to trigger a GPS read or get the updated data 
     if (mtbdl_data.run_count)
     {
         mtbdl_data.run_count = CLEAR_BIT; 
@@ -605,6 +668,13 @@ void mtbdl_log_stream_gps(void)
         // Record new GPS data 
 
         // Format GPS data log string 
+        snprintf(mtbdl_data.data_buff, 
+                 MTBDL_MAX_DATA_STR_LEN, 
+                 mtbdl_data_log_4, 
+                 mtbdl_data.trailmark, 
+                 mtbdl_data.pot_fork, 
+                 mtbdl_data.pot_shock, 
+                 mtbdl_data.gps); 
     }
     else 
     {
@@ -613,6 +683,7 @@ void mtbdl_log_stream_gps(void)
         // Trigger a read from the GPS 
 
         // Format standard log string 
+        mtbdl_log_stream_standard(); 
     }
 
 #if MTBDL_DEBUG 
@@ -624,16 +695,15 @@ void mtbdl_log_stream_gps(void)
 // Log file close 
 void mtbdl_log_end(void)
 {
+    // Reset log settings 
+    NVIC_DisableIRQ(mtbdl_data.rpm_irq);   // Disable the wheel speed interrupts 
+    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+
     hw125_puts(mtbdl_data_log_end); 
     hw125_close(); 
 
     // Update the log index 
     mtbdl_write_sys_params(HW125_MODE_OAWR); 
-
-    // Make sure the log LED is off 
-
-    // Reset the time count to zero 
-    mtbdl_data.time_count = CLEAR; 
 }
 
 //=======================================================================================

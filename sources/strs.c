@@ -53,12 +53,11 @@ const char mtbdl_param_pot_rest[] = "Pots: F:%u S:%u\r\n";
 // Data log information 
 const char mtbdl_data_log_start[] = "Data log:\r\n"; 
 const char mtbdl_data_log_end[] = "End\r\n\n"; 
-// Data order: 
-// <time>, <trail marker>, <fork pot>, <shock pot>, <wheel speed>, <accelerometer>, <GPS> 
-const char mtbdl_data_log_1[] = "%u, %u, %u, %u, -, -, -, -, -\r\n";     // Standard 
-const char mtbdl_data_log_2[] = "%u, %u, %u, %u, %u, -, -, -, -\r\n";    // Includes wheel speed 
-const char mtbdl_data_log_3[] = "%u, %u, %u, %u, -, %u, %u, %u, -\r\n";  // Includes accelerometer 
-const char mtbdl_data_log_4[] = "%u, %u, %u, %u, -, -, -, -, %u\r\n";    // Includes GPS 
+// Data order: <trail marker>, <fork pot>, <shock pot>, <wheel speed>, <accelerometer>, <GPS> 
+const char mtbdl_data_log_1[] = "%u, %u, %u, -, -, -, -, -\r\n";     // Standard 
+const char mtbdl_data_log_2[] = "%u, %u, %u, %u, -, -, -, -\r\n";    // Includes wheel speed 
+const char mtbdl_data_log_3[] = "%u, %u, %u, -, %u, %u, %u, -\r\n";  // Includes accelerometer 
+const char mtbdl_data_log_4[] = "%u, %u, %u, -, -, -, -, %u\r\n";    // Includes GPS 
 
 //=======================================================================================
 

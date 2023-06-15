@@ -27,7 +27,7 @@
 uint32_t mtbdl_led_clear = 0x00000000; 
 
 // LED 0 colours 
-uint32_t mtbdl_led0_1 = 0x001E1E1E; 
+uint32_t mtbdl_led0_1 = 0x001E1E1E;        // Logging indicator 
 
 // LED 1 colours 
 uint32_t mtbdl_led1_1 = 0x001E1E1E; 

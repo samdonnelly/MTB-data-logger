@@ -27,7 +27,7 @@
 //=======================================================================================
 // Macros 
 
-#define MTBDL_MAX_DATA_STR_LEN 50        // Max string length containing data 
+#define MTBDL_MAX_DATA_STR_LEN 60        // Max string length containing data 
 #define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
 #define MTBDL_LOG_NUM_MIN 0              // Min data log files 
 #define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
@@ -35,6 +35,13 @@
 #define MTBDL_NUM_LOG_STREAMS 5          // Number of data logging streams 
 #define MTBDL_NUM_LOG_SEQ 26             // Number of data logging sequence steps 
 #define MTBDL_LOG_COUNT_CYCLE 199        // Log sample sequence max timer counter value 
+
+// Data logging 
+#define MTBDL_LOG_PERIOD 5               // (ms) Period between data samples 
+
+// Wheel RPM info 
+#define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
+#define MTBDL_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
 
 //=======================================================================================
 
@@ -75,6 +82,9 @@ typedef enum {
 // Data record for the system 
 typedef struct mtbdl_data_s 
 {
+    // Peripherals 
+    IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
+
     // Bike parameters 
     uint8_t fork_psi;                           // Fork pressure (psi) 
     uint8_t fork_comp;                          // Fork compression setting 
@@ -102,19 +112,26 @@ typedef struct mtbdl_data_s
     // System data 
     uint8_t soc;                                // Battery SOC 
     uint8_t navstat;                            // Navigation status of GPS module 
+    uint8_t gps;                                // TODO figure out GPS formatting 
     uint8_t accel_x;                            // x-axis acceleration reading 
     uint8_t accel_y;                            // y-axis acceleration reading 
     uint8_t accel_z;                            // z-axis acceleration reading 
     uint8_t pot_fork;                           // Fork potentiometer reading 
     uint8_t pot_shock;                          // Shock potentiometer reading 
 
+    // Wheel RPM info 
+    uint8_t rev_count;                          // Wheel revolution counter 
+    uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
+    uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
+
     // Log tracking 
-    uint32_t time_count;                        // Keeps track of time during logging 
-    uint8_t stream_index;                       // 
-    uint8_t sample     : 1;                     // 
-    uint8_t run_count  : 1;                     // 
-    uint8_t trailmark  : 1;                     // 
-    uint8_t log_stream : 3;                     // 
+    uint32_t time_count;                        // Time tracking counter for logging 
+    uint8_t stream_index;                       // Index for log stream sequencing 
+    uint8_t sample     : 1;                     // Flag that triggers a data sample 
+    uint8_t led_toggle : 1;                     // LED toggle bit 
+    uint8_t run_count  : 1;                     // Log stream toggle 
+    uint8_t trailmark  : 1;                     // Trail marker flag 
+    uint8_t log_stream : 3;                     // Logging stream number (mtbdl_log_streams_t)
 
 #if MTBDL_DEBUG 
     // Testing 
@@ -158,8 +175,11 @@ typedef void (*mtbdl_log_stream)(void);
  * @brief Initialize data record 
  * 
  * @details 
+ * 
+ * @param rpm_irqn : 
  */
-void mtbdl_data_init(void); 
+void mtbdl_data_init(
+    IRQn_Type rpm_irqn); 
 
 
 /**
@@ -243,7 +263,15 @@ void mtbdl_log_file_prep(void);
 
 
 /**
- * @brief Record data 
+ * @brief Log data prep 
+ * 
+ * @details 
+ */
+void mtbdl_log_data_prep(void); 
+
+
+/**
+ * @brief Logging data 
  * 
  * @details 
  */

@@ -837,6 +837,9 @@ void mtbdl_run_countdown_state(
         // Put the screen in low power mode 
         hd44780u_set_low_pwr_flag(); 
 
+        // Prep the logging data 
+        mtbdl_log_data_prep(); 
+
         // Set the run state flag when ready 
         mtbdl->run = SET_BIT; 
     }

@@ -33,7 +33,8 @@
 #define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
 #define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
 #define MTBDL_NUM_LOG_STREAMS 5          // Number of data logging streams 
-#define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
+#define MTBDL_NUM_LOG_SEQ 26             // Number of data logging sequence steps 
+#define MTBDL_LOG_COUNT_CYCLE 199        // Log sample sequence max timer counter value 
 
 //=======================================================================================
 
@@ -114,6 +115,16 @@ typedef struct mtbdl_data_s
     uint8_t run_count  : 1;                     // 
     uint8_t trailmark  : 1;                     // 
     uint8_t log_stream : 3;                     // 
+
+#if MTBDL_DEBUG 
+    // Testing 
+    uint16_t time_stop; 
+    uint16_t count_standard; 
+    uint8_t count_blink; 
+    uint8_t count_speed; 
+    uint8_t count_accel; 
+    uint8_t count_gps; 
+#endif   // MTBDL_DEBUG 
 }
 mtbdl_data_t; 
 

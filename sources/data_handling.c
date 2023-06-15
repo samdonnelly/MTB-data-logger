@@ -118,7 +118,7 @@ static mtbdl_log_stream stream_table[MTBDL_NUM_LOG_STREAMS] =
 // Log sequence table 
 static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] = 
 {
-    // {count trigger, repeated occurances, stream to go to on trigger} 
+    // {count trigger, stream to go to on trigger} 
     {0,    MTBDL_LOG_STREAM_BLINK}, 
     {13,   MTBDL_LOG_STREAM_ACCEL}, 
     {14,   MTBDL_LOG_STREAM_ACCEL}, 
@@ -127,23 +127,24 @@ static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] =
     {33,   MTBDL_LOG_STREAM_ACCEL}, 
     {34,   MTBDL_LOG_STREAM_ACCEL}, 
     {41,   MTBDL_LOG_STREAM_GPS}, 
+    {42,   MTBDL_LOG_STREAM_GPS}, 
     {53,   MTBDL_LOG_STREAM_ACCEL}, 
     {54,   MTBDL_LOG_STREAM_ACCEL}, 
-    {55,   MTBDL_LOG_STREAM_ACCEL}, 
-    {56,   MTBDL_LOG_STREAM_ACCEL}, 
-    {57,   MTBDL_LOG_STREAM_ACCEL}, 
-    {58,   MTBDL_LOG_STREAM_ACCEL}, 
-    {59,   MTBDL_LOG_STREAM_ACCEL}, 
-    {60,   MTBDL_LOG_STREAM_ACCEL}, 
+    {73,   MTBDL_LOG_STREAM_ACCEL}, 
+    {74,   MTBDL_LOG_STREAM_ACCEL}, 
+    {93,   MTBDL_LOG_STREAM_ACCEL}, 
+    {94,   MTBDL_LOG_STREAM_ACCEL}, 
+    {113,  MTBDL_LOG_STREAM_ACCEL}, 
+    {114,  MTBDL_LOG_STREAM_ACCEL}, 
     {127,  MTBDL_LOG_STREAM_SPEED}, 
     {133,  MTBDL_LOG_STREAM_ACCEL}, 
     {134,  MTBDL_LOG_STREAM_ACCEL}, 
-    {135,  MTBDL_LOG_STREAM_ACCEL}, 
-    {136,  MTBDL_LOG_STREAM_ACCEL}, 
-    {137,  MTBDL_LOG_STREAM_ACCEL}, 
-    {138,  MTBDL_LOG_STREAM_ACCEL}, 
-    {139,  MTBDL_LOG_STREAM_ACCEL}, 
-    {140,  MTBDL_LOG_STREAM_ACCEL} 
+    {153,  MTBDL_LOG_STREAM_ACCEL}, 
+    {154,  MTBDL_LOG_STREAM_ACCEL}, 
+    {173,  MTBDL_LOG_STREAM_ACCEL}, 
+    {174,  MTBDL_LOG_STREAM_ACCEL}, 
+    {193,  MTBDL_LOG_STREAM_ACCEL}, 
+    {194,  MTBDL_LOG_STREAM_ACCEL} 
 }; 
 
 //=======================================================================================
@@ -173,6 +174,7 @@ void mtbdl_data_init(void)
 
     // SD card 
     memset((void *)mtbdl_data.data_buff, CLEAR, sizeof(mtbdl_data.data_buff)); 
+    memset((void *)mtbdl_data.filename, CLEAR, sizeof(mtbdl_data.filename)); 
     mtbdl_data.tx_status = CLEAR_BIT; 
 
     // LEDs 
@@ -186,6 +188,24 @@ void mtbdl_data_init(void)
     mtbdl_data.accel_z = CLEAR; 
     mtbdl_data.pot_fork = CLEAR; 
     mtbdl_data.pot_shock = CLEAR; 
+
+    // Log tracking 
+    mtbdl_data.time_count = CLEAR; 
+    mtbdl_data.stream_index = CLEAR; 
+    mtbdl_data.sample = CLEAR_BIT; 
+    mtbdl_data.run_count = CLEAR_BIT; 
+    mtbdl_data.trailmark = CLEAR_BIT; 
+    mtbdl_data.log_stream = CLEAR_BIT; 
+
+#if MTBDL_DEBUG 
+    // Testing 
+    mtbdl_data.time_stop = CLEAR; 
+    mtbdl_data.count_standard = CLEAR; 
+    mtbdl_data.count_blink = CLEAR; 
+    mtbdl_data.count_speed = CLEAR; 
+    mtbdl_data.count_accel = CLEAR; 
+    mtbdl_data.count_gps = CLEAR;
+#endif   // MTBDL_DEBUG 
 }
 
 
@@ -459,7 +479,11 @@ void mtbdl_logging(void)
     mtbdl_log_stream_state_t schedule = stream_schedule[mtbdl_data.stream_index]; 
 
     // Check for sampling trigger 
+#if MTBDL_DEBUG 
+    if (mtbdl_data.sample && (mtbdl_data.time_stop < 599))
+#else   // MTBDL_DEBUG 
     if (mtbdl_data.sample)
+#endif   // MTBDL_DEBUG 
     {
         mtbdl_data.sample = CLEAR_BIT; 
 
@@ -469,18 +493,10 @@ void mtbdl_logging(void)
         // Check if the next non-standard stream count value has been met 
         if (mtbdl_data.time_count == schedule.counter)
         {
-            // Update the log stream 
+            // Update the log stream and stream sequence index 
             mtbdl_data.log_stream = schedule.stream; 
-
-            // Update the stream index 
-            if (mtbdl_data.stream_index >= MTBDL_NUM_LOG_SEQ)
-            {
-                mtbdl_data.stream_index = CLEAR; 
-            }
-            else 
-            {
-                mtbdl_data.stream_index++; 
-            }
+            mtbdl_data.stream_index = (mtbdl_data.stream_index < (MTBDL_NUM_LOG_SEQ-1)) ? 
+                                      (mtbdl_data.stream_index + 1) : CLEAR; 
         }
         else 
         {
@@ -507,7 +523,11 @@ void mtbdl_logging(void)
         mtbdl_data.trailmark = CLEAR_BIT; 
 
         // Update time count 
-        mtbdl_data.time_count++; 
+        mtbdl_data.time_count = (mtbdl_data.time_count < MTBDL_LOG_COUNT_CYCLE) ? 
+                                (mtbdl_data.time_count + 1) : CLEAR; 
+#if MTBDL_DEBUG 
+        mtbdl_data.time_stop++; 
+#endif   // MTBDL_DEBUG 
     }
 }
 
@@ -516,6 +536,10 @@ void mtbdl_logging(void)
 void mtbdl_log_stream_standard(void)
 {
     // Format standard log string 
+
+#if MTBDL_DEBUG 
+    mtbdl_data.count_standard++; 
+#endif   // MTBDL_DEBUG 
 }
 
 
@@ -523,6 +547,10 @@ void mtbdl_log_stream_standard(void)
 void mtbdl_log_stream_blink(void)
 {
     // Toggle the LED state (on/off) 
+
+#if MTBDL_DEBUG 
+    mtbdl_data.count_blink++; 
+#endif   // MTBDL_DEBUG 
 }
 
 
@@ -532,6 +560,10 @@ void mtbdl_log_stream_speed(void)
     // Update wheel speed calculation 
 
     // Format wheel speed data log string 
+
+#if MTBDL_DEBUG 
+    mtbdl_data.count_speed++; 
+#endif   // MTBDL_DEBUG 
 }
 
 
@@ -555,6 +587,10 @@ void mtbdl_log_stream_accel(void)
 
         // Format standard log string 
     }
+
+#if MTBDL_DEBUG 
+    mtbdl_data.count_accel++; 
+#endif   // MTBDL_DEBUG 
 }
 
 
@@ -578,6 +614,10 @@ void mtbdl_log_stream_gps(void)
 
         // Format standard log string 
     }
+
+#if MTBDL_DEBUG 
+    mtbdl_data.count_gps++; 
+#endif   // MTBDL_DEBUG 
 }
 
 

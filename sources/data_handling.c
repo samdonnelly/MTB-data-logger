@@ -483,6 +483,15 @@ void mtbdl_log_data_prep(void)
     mtbdl_data.run_count = CLEAR_BIT; 
     mtbdl_data.trailmark = CLEAR_BIT; 
 
+#if MTBDL_DEBUG 
+    mtbdl_data.time_stop = CLEAR; 
+    mtbdl_data.count_standard = CLEAR; 
+    mtbdl_data.count_blink = CLEAR; 
+    mtbdl_data.count_speed = CLEAR; 
+    mtbdl_data.count_accel = CLEAR; 
+    mtbdl_data.count_gps = CLEAR; 
+#endif   // MTBDL_DEBUG 
+
     // Peripherals 
     NVIC_EnableIRQ(mtbdl_data.rpm_irq);   // Enable the wheel speed interrupts 
 }
@@ -591,7 +600,7 @@ void mtbdl_log_stream_blink(void)
 void mtbdl_log_stream_speed(void)
 {
     // Local variables 
-    uint8_t revs; 
+    uint8_t revs = CLEAR; 
 
     // Update the revolution record 
     mtbdl_data.rev_buff[mtbdl_data.rev_buff_index] = mtbdl_data.rev_count; 

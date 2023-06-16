@@ -28,16 +28,16 @@
 // Macros 
 
 #define MTBDL_MAX_DATA_STR_LEN 60        // Max string length containing data 
-#define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
-#define MTBDL_LOG_NUM_MIN 0              // Min data log files 
 #define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
 #define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
-#define MTBDL_NUM_LOG_STREAMS 5          // Number of data logging streams 
-#define MTBDL_NUM_LOG_SEQ 26             // Number of data logging sequence steps 
-#define MTBDL_LOG_COUNT_CYCLE 199        // Log sample sequence max timer counter value 
 
 // Data logging 
-#define MTBDL_LOG_PERIOD 5               // (ms) Period between data samples 
+#define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
+#define MTBDL_LOG_NUM_MIN 0              // Min data log files 
+#define MTBDL_LOG_PERIOD 10              // (ms) Period between data samples 
+#define MTBDL_NUM_LOG_STREAMS 6          // Number of data logging streams 
+#define MTBDL_NUM_LOG_SEQ 26             // Number of data logging sequence steps 
+#define MTBDL_LOG_COUNT_CYCLE 99         // Log sample sequence max timer counter value 
 
 // Wheel RPM info 
 #define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
@@ -70,7 +70,8 @@ typedef enum {
     MTBDL_LOG_STREAM_BLINK,              // LED blink stream 
     MTBDL_LOG_STREAM_SPEED,              // Wheel speed stream 
     MTBDL_LOG_STREAM_ACCEL,              // Accelerometer stream 
-    MTBDL_LOG_STREAM_GPS                 // GPS stream 
+    MTBDL_LOG_STREAM_GPS,                // GPS stream 
+    MTBDL_LOG_STREAM_USER                // User input stream 
 } mtbdl_log_streams_t; 
 
 //=======================================================================================
@@ -84,6 +85,7 @@ typedef struct mtbdl_data_s
 {
     // Peripherals 
     IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
+    IRQn_Type log_irq;                          // Log sample period interrupt number 
 
     // Bike parameters 
     uint8_t fork_psi;                           // Fork pressure (psi) 
@@ -127,20 +129,23 @@ typedef struct mtbdl_data_s
     // Log tracking 
     uint32_t time_count;                        // Time tracking counter for logging 
     uint8_t stream_index;                       // Index for log stream sequencing 
-    uint8_t sample     : 1;                     // Flag that triggers a data sample 
     uint8_t led_toggle : 1;                     // LED toggle bit 
     uint8_t run_count  : 1;                     // Log stream toggle 
     uint8_t trailmark  : 1;                     // Trail marker flag 
+    uint8_t user_input : 1;                     // User input flag 
     uint8_t log_stream : 3;                     // Logging stream number (mtbdl_log_streams_t)
 
 #if MTBDL_DEBUG 
     // Testing 
     uint16_t time_stop; 
     uint16_t count_standard; 
+    uint16_t count_wait; 
+    uint8_t time_overflow; 
     uint8_t count_blink; 
     uint8_t count_speed; 
     uint8_t count_accel; 
     uint8_t count_gps; 
+    uint8_t count_user; 
 #endif   // MTBDL_DEBUG 
 }
 mtbdl_data_t; 
@@ -177,9 +182,11 @@ typedef void (*mtbdl_log_stream)(void);
  * @details 
  * 
  * @param rpm_irqn : 
+ * @param log_irqn : 
  */
 void mtbdl_data_init(
-    IRQn_Type rpm_irqn); 
+    IRQn_Type rpm_irqn, 
+    IRQn_Type log_irqn); 
 
 
 /**
@@ -391,14 +398,6 @@ void mtbdl_led_update(
 
 //=======================================================================================
 // Setters 
-
-/**
- * @brief Set sample flag 
- * 
- * @details 
- */
-void mtbdl_set_sample(void); 
-
 
 /**
  * @brief Set trail marker flag 

@@ -69,7 +69,19 @@ void mtbdl_init()
     tim_enable(TIM10); 
 
     // Enable the interrupt handlers 
-    nvic_config(TIM1_UP_TIM10_IRQn, EXTI_PRIORITY_1); 
+    nvic_config(TIM1_UP_TIM10_IRQn, EXTI_PRIORITY_2); 
+
+    // Periodic (counter update) interrupt timer for data log timing 
+    tim_9_to_11_counter_init(
+        TIM11, 
+        TIM_84MHZ_100US_PSC, 
+        0x0064,  // ARR=100, (100 counts)*(100us/count) = 10ms 
+        TIM_UP_INT_ENABLE); 
+    tim_enable(TIM11); 
+
+    // Set the interrupt priority and disable until data logging starts 
+    NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, EXTI_PRIORITY_1); 
+    NVIC_DisableIRQ(TIM1_TRG_COM_TIM11_IRQn); 
 
     //===================================================
 
@@ -225,7 +237,7 @@ void mtbdl_init()
         EXTI_RISE_TRIG_DISABLE, 
         EXTI_FALL_TRIG_ENABLE); 
 
-    // Set the interrupt priority and disable 
+    // Set the interrupt priority and disable until data logging starts 
     NVIC_SetPriority(EXTI4_IRQn, EXTI_PRIORITY_0); 
     NVIC_DisableIRQ(EXTI4_IRQn); 
 
@@ -257,7 +269,9 @@ void mtbdl_init()
         GPIOX_PIN_3); 
 
     // Data record init 
-    mtbdl_data_init(EXTI4_IRQn); 
+    mtbdl_data_init(
+        EXTI4_IRQn, 
+        TIM1_TRG_COM_TIM11_IRQn); 
 
     //===================================================
 }

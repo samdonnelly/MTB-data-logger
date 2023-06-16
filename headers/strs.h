@@ -50,9 +50,11 @@ extern const char mtbdl_param_fork_info[];     // Fork setup parameters
 extern const char mtbdl_param_shock_info[];    // Shock setup parameters 
 
 // System parameter information 
-extern const char mtbdl_param_log[];           // Logging information 
+extern const char mtbdl_param_index[];         // Log file index 
+extern const char mtbdl_param_time[];          // Time of file creation 
 extern const char mtbdl_param_accel_rest[];    // Resting accelerometer data 
 extern const char mtbdl_param_pot_rest[];      // Resting potentiometer data 
+extern const char mtbdl_param_data[];          // Data logging info 
 
 // Data log information 
 extern const char mtbdl_data_log_start[];      // Signifies the start of the logging info 

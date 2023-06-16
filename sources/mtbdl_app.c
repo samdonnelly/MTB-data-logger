@@ -218,7 +218,6 @@ void mtbdl_app(void)
     {
         handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
         debounce((uint8_t)gpio_port_read(mtbdl_trackers.user_btn_port)); 
-        mtbdl_set_sample(); 
     }
 
     // Free the button pressed status as soon as possible & turn the LEDs off 
@@ -862,8 +861,6 @@ void mtbdl_run_state(
     //==================================================
     // Check user button input 
 
-    // TODO consider incorporating LED writes into the data logging RTOS so it can be scheduled 
-
     // Button 1 - stops the run state --> triggers the post run state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
     {
@@ -877,7 +874,6 @@ void mtbdl_run_state(
     {
         mtbdl->user_btn_2_block = SET_BIT; 
         mtbdl_set_trailmark(); 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
     }
     
     //==================================================

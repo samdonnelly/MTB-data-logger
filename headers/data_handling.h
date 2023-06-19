@@ -97,9 +97,9 @@ typedef struct mtbdl_data_s
 
     // System parameters 
     uint8_t log_index;                          // Data log index 
-    uint8_t accel_x_rest;                       // Resting x-axis acceleration offset 
-    uint8_t accel_y_rest;                       // Resting y-axis acceleration offset 
-    uint8_t accel_z_rest;                       // Resting z-axis acceleration offset 
+    int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
+    int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
+    int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
     uint8_t pot_fork_rest;                      // Resting potentiometer reading for fork 
     uint8_t pot_shock_rest;                     // Resting potentiometer reading for shock 
 
@@ -115,9 +115,9 @@ typedef struct mtbdl_data_s
     uint8_t soc;                                // Battery SOC 
     uint8_t navstat;                            // Navigation status of GPS module 
     uint8_t gps;                                // TODO figure out GPS formatting 
-    uint8_t accel_x;                            // x-axis acceleration reading 
-    uint8_t accel_y;                            // y-axis acceleration reading 
-    uint8_t accel_z;                            // z-axis acceleration reading 
+    int16_t accel_x;                            // x-axis acceleration reading 
+    int16_t accel_y;                            // y-axis acceleration reading 
+    int16_t accel_z;                            // z-axis acceleration reading 
     uint8_t pot_fork;                           // Fork potentiometer reading 
     uint8_t pot_shock;                          // Shock potentiometer reading 
 

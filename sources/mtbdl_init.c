@@ -23,8 +23,6 @@
 // User init function 
 void mtbdl_init()
 {
-    // Local variables 
-
     //===================================================
     // General setup 
 
@@ -161,6 +159,9 @@ void mtbdl_init()
         DEVICE_ONE, 
         TIM9, 
         MPU6050_RATE); 
+    // Set the sample type to accelerometer and read method to read on request 
+    mpu6050_set_smpl_type(DEVICE_ONE, MPU6050_READ_A); 
+    mpu6050_set_read_state(DEVICE_ONE, MPU6050_READ_READY); 
 
     //===================================================
 

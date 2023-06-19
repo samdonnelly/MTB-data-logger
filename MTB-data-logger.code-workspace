@@ -28,7 +28,9 @@
 			"strings.h": "c",
 			"gpio_driver.h": "c",
 			"string.h": "c",
-			"strs.h": "c"
+			"strs.h": "c",
+			"hd44780u_controller.h": "c",
+			"hd44780u_driver.h": "c"
 		}
 	}
 }

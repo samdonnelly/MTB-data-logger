@@ -593,9 +593,6 @@ void mtbdl_init_state(
 
         // Display the startup message 
         hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
-
-        // MPU-6050 
-        // - Put into low power mode 
     }
     
     mtbdl->init = CLEAR_BIT; 
@@ -661,6 +658,9 @@ void mtbdl_idle_state(
 
         // Put the HC-05 into low power mode 
         hc05_off(); 
+
+        // Put the MPU-6050 into low power mode 
+        mpu6050_set_low_power(DEVICE_ONE); 
     }
 
     mtbdl->idle = CLEAR_BIT; 
@@ -814,6 +814,9 @@ void mtbdl_run_countdown_state(
 
         // SD card will be written to constantly so no need for the check state 
         hw125_clear_check_flag(); 
+
+        // Take the MPU-6050 out of low power mode 
+        mpu6050_clear_low_power(DEVICE_ONE); 
     }
 
     mtbdl->run = CLEAR_BIT; 

@@ -183,7 +183,7 @@ void mtbdl_data_init(
     mtbdl_data.log_index = CLEAR; 
     mtbdl_data.accel_x_rest = CLEAR; 
     mtbdl_data.accel_y_rest = CLEAR; 
-    mtbdl_data.accel_x_rest = CLEAR; 
+    mtbdl_data.accel_z_rest = CLEAR; 
     mtbdl_data.pot_fork_rest = CLEAR; 
     mtbdl_data.pot_shock_rest = CLEAR; 
 
@@ -698,6 +698,11 @@ void mtbdl_log_stream_accel(void)
         mtbdl_data.run_count = CLEAR_BIT; 
 
         // Record new accel data 
+        mpu6050_get_accel_raw(
+            DEVICE_ONE, 
+            &mtbdl_data.accel_x, 
+            &mtbdl_data.accel_y, 
+            &mtbdl_data.accel_z); 
 
         // Format accel data log string 
         snprintf(mtbdl_data.data_buff, 
@@ -715,6 +720,7 @@ void mtbdl_log_stream_accel(void)
         mtbdl_data.run_count = SET_BIT; 
 
         // Trigger a read from the accelerometer 
+        mpu6050_set_read_flag(DEVICE_ONE); 
 
         // Format standard log string 
         mtbdl_log_stream_standard(); 

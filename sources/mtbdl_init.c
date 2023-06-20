@@ -29,19 +29,6 @@ void mtbdl_init()
     // Initialize GPIO ports 
     gpio_port_init(); 
 
-#if MTBDL_DEBUG 
-
-    // Serial terminal output 
-    uart_init(
-        USART2, 
-        GPIOA, 
-        PIN_3, 
-        PIN_2, 
-        UART_BAUD_9600, 
-        UART_CLOCK_42); 
-
-#endif   // MTBDL_DEBUG 
-
     // Initialize interrupt handler flags 
     int_handler_init(); 
     
@@ -120,6 +107,19 @@ void mtbdl_init()
 
     //===================================================
     // UART setup 
+
+#if MTBDL_DEBUG 
+
+    // Serial terminal output 
+    uart_init(
+        USART2, 
+        GPIOA, 
+        PIN_3, 
+        PIN_2, 
+        UART_BAUD_9600, 
+        UART_CLOCK_42); 
+
+#endif   // MTBDL_DEBUG 
 
     // For HC-05 
     uart_init(

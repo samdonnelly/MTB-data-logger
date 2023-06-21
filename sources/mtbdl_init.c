@@ -141,6 +141,19 @@ void mtbdl_init()
     //===================================================
 
     //===================================================
+    // HD44780U LCD setup 
+
+    // Must come before setup of other devices on the same I2C bus 
+
+    // Driver 
+    hd44780u_init(I2C1, TIM9, PCF8574_ADDR_HHH);
+
+    // Contoller 
+    hd44780u_controller_init(TIM9); 
+
+    //===================================================
+
+    //===================================================
     // MPU-6050 IMU setup 
 
     // Driver 
@@ -162,17 +175,6 @@ void mtbdl_init()
     // Set the sample type to accelerometer and read method to read on request 
     mpu6050_set_smpl_type(DEVICE_ONE, MPU6050_READ_A); 
     mpu6050_set_read_state(DEVICE_ONE, MPU6050_READ_READY); 
-
-    //===================================================
-
-    //===================================================
-    // HD44780U LCD setup 
-
-    // Driver 
-    hd44780u_init(I2C1, TIM9, PCF8574_ADDR_HHH);
-
-    // Contoller 
-    hd44780u_controller_init(TIM9); 
 
     //===================================================
 

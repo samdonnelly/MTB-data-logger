@@ -572,6 +572,7 @@ void mtbdl_app(void)
     // Call device controllers 
     hd44780u_controller(); 
     hw125_controller(); 
+    mpu6050_controller(DEVICE_ONE); 
 }
 
 //=======================================================================================

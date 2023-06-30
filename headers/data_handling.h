@@ -36,7 +36,7 @@
 #define MTBDL_LOG_NUM_MIN 0              // Min data log files 
 #define MTBDL_LOG_PERIOD 10              // (ms) Period between data samples 
 #define MTBDL_NUM_LOG_STREAMS 6          // Number of data logging streams 
-#define MTBDL_NUM_LOG_SEQ 26             // Number of data logging sequence steps 
+#define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
 #define MTBDL_LOG_COUNT_CYCLE 99         // Log sample sequence max timer counter value 
 
 // Wheel RPM info 
@@ -114,7 +114,12 @@ typedef struct mtbdl_data_s
     // System data 
     uint8_t soc;                                // Battery SOC 
     uint8_t navstat;                            // Navigation status of GPS module 
-    uint8_t gps;                                // TODO figure out GPS formatting 
+    uint8_t deg_min_lat[M8Q_COO_LEN];           // 
+    uint8_t min_frac_lat[M8Q_COO_LEN];          // 
+    uint8_t NS;                                 // 
+    uint8_t deg_min_lon[M8Q_COO_LEN];           // 
+    uint8_t min_frac_lon[M8Q_COO_LEN];          // 
+    uint8_t EW;                                 // 
     int16_t accel_x;                            // x-axis acceleration reading 
     int16_t accel_y;                            // y-axis acceleration reading 
     int16_t accel_z;                            // z-axis acceleration reading 

@@ -136,24 +136,23 @@ static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] =
     {16,   MTBDL_LOG_STREAM_ACCEL},   // Step 5 
     {17,   MTBDL_LOG_STREAM_ACCEL},   // Step 6 
     {20,   MTBDL_LOG_STREAM_GPS},     // Step 7 
-    {21,   MTBDL_LOG_STREAM_GPS},     // Step 8 
-    {26,   MTBDL_LOG_STREAM_ACCEL},   // Step 9 
-    {27,   MTBDL_LOG_STREAM_ACCEL},   // Step 10 
-    {36,   MTBDL_LOG_STREAM_ACCEL},   // Step 11 
-    {37,   MTBDL_LOG_STREAM_ACCEL},   // Step 12 
-    {46,   MTBDL_LOG_STREAM_ACCEL},   // Step 13 
-    {47,   MTBDL_LOG_STREAM_ACCEL},   // Step 14 
-    {56,   MTBDL_LOG_STREAM_ACCEL},   // Step 15 
-    {57,   MTBDL_LOG_STREAM_ACCEL},   // Step 16 
-    {64,   MTBDL_LOG_STREAM_SPEED},   // Step 17 
-    {66,   MTBDL_LOG_STREAM_ACCEL},   // Step 18 
-    {67,   MTBDL_LOG_STREAM_ACCEL},   // Step 19 
-    {76,   MTBDL_LOG_STREAM_ACCEL},   // Step 20 
-    {77,   MTBDL_LOG_STREAM_ACCEL},   // Step 21 
-    {86,   MTBDL_LOG_STREAM_ACCEL},   // Step 22 
-    {87,   MTBDL_LOG_STREAM_ACCEL},   // Step 23 
-    {96,   MTBDL_LOG_STREAM_ACCEL},   // Step 24 
-    {97,   MTBDL_LOG_STREAM_ACCEL}    // Step 25 
+    {26,   MTBDL_LOG_STREAM_ACCEL},   // Step 8 
+    {27,   MTBDL_LOG_STREAM_ACCEL},   // Step 9 
+    {36,   MTBDL_LOG_STREAM_ACCEL},   // Step 10 
+    {37,   MTBDL_LOG_STREAM_ACCEL},   // Step 11 
+    {46,   MTBDL_LOG_STREAM_ACCEL},   // Step 12 
+    {47,   MTBDL_LOG_STREAM_ACCEL},   // Step 13 
+    {56,   MTBDL_LOG_STREAM_ACCEL},   // Step 14 
+    {57,   MTBDL_LOG_STREAM_ACCEL},   // Step 15 
+    {64,   MTBDL_LOG_STREAM_SPEED},   // Step 16 
+    {66,   MTBDL_LOG_STREAM_ACCEL},   // Step 17 
+    {67,   MTBDL_LOG_STREAM_ACCEL},   // Step 18 
+    {76,   MTBDL_LOG_STREAM_ACCEL},   // Step 29 
+    {77,   MTBDL_LOG_STREAM_ACCEL},   // Step 20 
+    {86,   MTBDL_LOG_STREAM_ACCEL},   // Step 21 
+    {87,   MTBDL_LOG_STREAM_ACCEL},   // Step 22 
+    {96,   MTBDL_LOG_STREAM_ACCEL},   // Step 23 
+    {97,   MTBDL_LOG_STREAM_ACCEL}    // Step 24 
 }; 
 
 //=======================================================================================
@@ -198,7 +197,12 @@ void mtbdl_data_init(
     // System data 
     mtbdl_data.soc = CLEAR; 
     mtbdl_data.navstat = CLEAR; 
-    mtbdl_data.gps = CLEAR; 
+    memset((void *)mtbdl_data.deg_min_lat, CLEAR, sizeof(mtbdl_data.deg_min_lat)); 
+    memset((void *)mtbdl_data.min_frac_lat, CLEAR, sizeof(mtbdl_data.min_frac_lat)); 
+    mtbdl_data.NS = CLEAR; 
+    memset((void *)mtbdl_data.deg_min_lon, CLEAR, sizeof(mtbdl_data.deg_min_lon)); 
+    memset((void *)mtbdl_data.min_frac_lon, CLEAR, sizeof(mtbdl_data.min_frac_lon)); 
+    mtbdl_data.EW = CLEAR; 
     mtbdl_data.accel_x = CLEAR; 
     mtbdl_data.accel_y = CLEAR; 
     mtbdl_data.accel_z = CLEAR; 
@@ -750,15 +754,24 @@ void mtbdl_log_stream_accel(void)
 void mtbdl_log_stream_gps(void)
 {
     // Record new GPS data 
+    m8q_get_lat_str(mtbdl_data.deg_min_lat, mtbdl_data.min_frac_lat); 
+    mtbdl_data.NS = m8q_get_NS(); 
+    m8q_get_long_str(mtbdl_data.deg_min_lon, mtbdl_data.min_frac_lon); 
+    mtbdl_data.EW = m8q_get_EW(); 
 
     // Format GPS data log string 
     snprintf(mtbdl_data.data_buff, 
-                MTBDL_MAX_DATA_STR_LEN, 
-                mtbdl_data_log_4, 
-                mtbdl_data.trailmark, 
-                mtbdl_data.pot_fork, 
-                mtbdl_data.pot_shock, 
-                mtbdl_data.gps); 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_data_log_4, 
+             mtbdl_data.trailmark, 
+             mtbdl_data.pot_fork, 
+             mtbdl_data.pot_shock, 
+             (char *)mtbdl_data.deg_min_lat, 
+             (char *)mtbdl_data.min_frac_lat, 
+             (char)mtbdl_data.NS, 
+             (char *)mtbdl_data.deg_min_lon, 
+             (char *)mtbdl_data.min_frac_lon, 
+             (char)mtbdl_data.EW); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.count_gps++; 

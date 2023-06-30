@@ -493,6 +493,10 @@ void mtbdl_log_data_prep(void)
     mtbdl_data.rev_buff_index = CLEAR; 
     memset((void *)mtbdl_data.rev_buff, CLEAR, sizeof(mtbdl_data.rev_buff)); 
 
+    // GPS - put into a controlled read state 
+    m8q_set_read_ready(); 
+    m8q_set_read_flag(); 
+
     // Log tracking 
     mtbdl_data.time_count = CLEAR; 
     mtbdl_data.stream_index = CLEAR; 
@@ -540,16 +544,25 @@ void mtbdl_logging(void)
             mtbdl_data.log_stream = stream_schedule[mtbdl_data.stream_index].stream; 
             mtbdl_data.stream_index = (mtbdl_data.stream_index < (MTBDL_NUM_LOG_SEQ-1)) ? 
                                       (mtbdl_data.stream_index + 1) : CLEAR; 
+
+            // Disable GPS reads 
+            m8q_clear_read_flag(); 
         }
         else if (mtbdl_data.user_input) 
         {
             // User input stream - run when there are no other non-standard streams to run 
             mtbdl_data.log_stream = MTBDL_LOG_STREAM_USER; 
             mtbdl_data.user_input = CLEAR_BIT; 
+
+            // Disable GPS reads 
+            m8q_clear_read_flag(); 
         }
         else 
         {
             mtbdl_data.log_stream = MTBDL_LOG_STREAM_STANDARD; 
+
+            // Enable GPS reads - no other critical tasks to be done 
+            m8q_set_read_flag(); 
         }
         
         //==================================================
@@ -736,35 +749,19 @@ void mtbdl_log_stream_accel(void)
 // GPS logging stream 
 void mtbdl_log_stream_gps(void)
 {
-    // Determine whether to trigger a GPS read or get the updated data 
-    if (mtbdl_data.run_count)
-    {
-        mtbdl_data.run_count = CLEAR_BIT; 
+    // Record new GPS data 
 
-        // Record new GPS data 
-
-        // Format GPS data log string 
-        snprintf(mtbdl_data.data_buff, 
-                 MTBDL_MAX_DATA_STR_LEN, 
-                 mtbdl_data_log_4, 
-                 mtbdl_data.trailmark, 
-                 mtbdl_data.pot_fork, 
-                 mtbdl_data.pot_shock, 
-                 mtbdl_data.gps); 
-    }
-    else 
-    {
-        mtbdl_data.run_count = SET_BIT; 
-
-        // Trigger a read from the GPS 
-
-        // Format standard log string 
-        mtbdl_log_stream_standard(); 
-    }
+    // Format GPS data log string 
+    snprintf(mtbdl_data.data_buff, 
+                MTBDL_MAX_DATA_STR_LEN, 
+                mtbdl_data_log_4, 
+                mtbdl_data.trailmark, 
+                mtbdl_data.pot_fork, 
+                mtbdl_data.pot_shock, 
+                mtbdl_data.gps); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.count_gps++; 
-    if (mtbdl_data.run_count) mtbdl_data.count_standard--; 
 #endif   // MTBDL_DEBUG 
 }
 
@@ -799,6 +796,10 @@ void mtbdl_log_end(void)
 
     // Update the log index 
     mtbdl_write_sys_params(HW125_MODE_OAWR); 
+
+    // GPS - put back into a continuous read state 
+    m8q_clear_read_ready(); 
+    m8q_clear_read_flag(); 
 }
 
 //=======================================================================================

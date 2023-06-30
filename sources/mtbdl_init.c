@@ -181,9 +181,11 @@ void mtbdl_init()
     //===================================================
     // M8Q GPS setup 
 
+    // Get the configuration messages to send to the device 
     char m8q_config_messages[M8Q_CONFIG_MSG_NUM][M8Q_CONFIG_MSG_MAX_LEN]; 
     m8q_config_copy(m8q_config_messages); 
 
+    // Driver 
     m8q_init(
         I2C1, 
         GPIOC, 
@@ -193,7 +195,7 @@ void mtbdl_init()
         M8Q_CONFIG_MSG_MAX_LEN, 
         (uint8_t *)m8q_config_messages[0]); 
 
-    // Initialize the device controller 
+    // Controller 
     m8q_controller_init(TIM9); 
     
     //===================================================

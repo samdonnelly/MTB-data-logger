@@ -196,7 +196,7 @@ void mtbdl_data_init(
 
     // System data 
     mtbdl_data.soc = CLEAR; 
-    mtbdl_data.navstat = CLEAR; 
+    mtbdl_data.navstat = M8Q_NAVSTAT_NF; 
     memset((void *)mtbdl_data.deg_min_lat, CLEAR, sizeof(mtbdl_data.deg_min_lat)); 
     memset((void *)mtbdl_data.min_frac_lat, CLEAR, sizeof(mtbdl_data.min_frac_lat)); 
     mtbdl_data.NS = CLEAR; 
@@ -511,6 +511,7 @@ void mtbdl_log_data_prep(void)
 
 #if MTBDL_DEBUG 
     mtbdl_data.time_stop = CLEAR; 
+    mtbdl_data.time_limit = 999; 
     mtbdl_data.count_standard = CLEAR; 
     mtbdl_data.count_wait = CLEAR; 
     mtbdl_data.time_overflow = CLEAR; 
@@ -532,7 +533,7 @@ void mtbdl_logging(void)
 {
     // Check for sampling trigger 
 #if MTBDL_DEBUG 
-    if (handler_flags.tim1_trg_tim11_glbl_flag && (mtbdl_data.time_stop < 299))
+    if (handler_flags.tim1_trg_tim11_glbl_flag && (mtbdl_data.time_stop < mtbdl_data.time_limit))
 #else   // MTBDL_DEBUG 
     if (handler_flags.tim1_trg_tim11_glbl_flag)
 #endif   // MTBDL_DEBUG 
@@ -997,7 +998,7 @@ void mtbdl_set_idle_msg(void)
     snprintf(msg[1].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[1].msg, 
              mtbdl_data.shock_psi, mtbdl_data.shock_lock, mtbdl_data.shock_reb); 
     snprintf(msg[2].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[2].msg, 
-             mtbdl_data.soc); 
+             mtbdl_data.soc, (char)(mtbdl_data.navstat >> SHIFT_8), (char)mtbdl_data.navstat); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
@@ -1017,7 +1018,7 @@ void mtbdl_set_run_prep_msg(void)
 
     // Format the message with data 
     snprintf(msg[0].msg, HD44780U_LINE_LEN, mtbdl_run_prep_msg[0].msg, 
-             mtbdl_data.navstat); 
+             (char)(mtbdl_data.navstat >> SHIFT_8), (char)mtbdl_data.navstat); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_3_LINE); 
@@ -1047,7 +1048,7 @@ void mtbdl_set_pretx_msg(void)
 
 
 //=======================================================================================
-// LEDs 
+// Data checks and updates 
 
 // Update LED colours 
 void mtbdl_led_update(
@@ -1058,17 +1059,31 @@ void mtbdl_led_update(
     ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
 }
 
-//=======================================================================================
-
-
-//=======================================================================================
-// Setters 
-
 // Set trail marker flag 
 void mtbdl_set_trailmark(void)
 {
     mtbdl_data.trailmark = SET_BIT; 
     mtbdl_data.user_input = SET_BIT; 
+}
+
+
+// Update the navigation status 
+uint8_t mtbdl_navstat_check(void)
+{
+    // Local variables 
+    static uint16_t navstat_check = M8Q_NAVSTAT_NF; 
+    uint8_t nav_stat_change = FALSE; 
+
+    // Update the data record with the navigation status and return the status 
+    mtbdl_data.navstat = m8q_get_navstat(); 
+
+    if (mtbdl_data.navstat != navstat_check)
+    {
+        nav_stat_change = TRUE; 
+        navstat_check = mtbdl_data.navstat; 
+    }
+    
+    return nav_stat_change; 
 }
 
 //=======================================================================================

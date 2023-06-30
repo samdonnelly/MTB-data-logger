@@ -709,7 +709,19 @@ void mtbdl_idle_state(
     //==================================================
     // Checks 
 
-    // If GPS position lock is found then put the module in LP mode - can hot start 
+    // Check for GPS lock status - update the display message with the status 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_WAIT, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        if (mtbdl_navstat_check())
+        {
+            mtbdl_set_idle_msg(); 
+        }
+    }
 
     //==================================================
 
@@ -725,6 +737,8 @@ void mtbdl_idle_state(
 
         // Take the screen out of power save mode 
         hd44780u_clear_pwr_save_flag(); 
+
+        mtbdl->delay_timer.time_start = SET_BIT; 
     }
 
     //==================================================
@@ -746,6 +760,9 @@ void mtbdl_run_prep_state(
             // New file name created - display the run prep state message 
             mtbdl_set_run_prep_msg(); 
             mtbdl->run = CLEAR_BIT; 
+
+            // Make sure the M8Q is out of low power mode 
+            m8q_clear_low_pwr_flag(); 
         }
         else 
         {
@@ -785,7 +802,19 @@ void mtbdl_run_prep_state(
     //==================================================
     // Checks 
 
-    // Check for GPS lock - update the display message as needed 
+    // Check for GPS lock status - update the display message with the status 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_WAIT, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        if (mtbdl_navstat_check())
+        {
+            mtbdl_set_run_prep_msg(); 
+        }
+    }
 
     //==================================================
 
@@ -796,6 +825,8 @@ void mtbdl_run_prep_state(
     {
         // Clear the run prep state message 
         hd44780u_set_clear_flag(); 
+
+        mtbdl->delay_timer.time_start = SET_BIT; 
     }
 
     //==================================================
@@ -1550,6 +1581,9 @@ void mtbdl_lowpwr_state(
         hd44780u_set_pwr_save_flag(); 
         hd44780u_set_sleep_time(MTBDL_LCD_LP_SLEEP); 
 
+        // Put the GPS into low power mode 
+        m8q_set_low_pwr_flag(); 
+
         // Put devices into low power mode 
     }
 
@@ -1596,6 +1630,9 @@ void mtbdl_lowpwr_state(
 
         // Take the screen out of power save mode 
         hd44780u_clear_pwr_save_flag(); 
+
+        // Take the GPS out of low power mode 
+        m8q_clear_low_pwr_flag(); 
 
         // Set the idle state flag 
         mtbdl->idle = SET_BIT; 

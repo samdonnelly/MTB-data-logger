@@ -113,13 +113,13 @@ typedef struct mtbdl_data_s
 
     // System data 
     uint8_t soc;                                // Battery SOC 
-    uint8_t navstat;                            // Navigation status of GPS module 
-    uint8_t deg_min_lat[M8Q_COO_LEN];           // 
-    uint8_t min_frac_lat[M8Q_COO_LEN];          // 
-    uint8_t NS;                                 // 
-    uint8_t deg_min_lon[M8Q_COO_LEN];           // 
-    uint8_t min_frac_lon[M8Q_COO_LEN];          // 
-    uint8_t EW;                                 // 
+    uint16_t navstat;                           // Navigation status of GPS module 
+    uint8_t deg_min_lat[M8Q_COO_LEN];           // Latitude: degrees and minutes integer part 
+    uint8_t min_frac_lat[M8Q_COO_LEN];          // Latitude: minuutes fractional part 
+    uint8_t NS;                                 // North/South indicator of latitude 
+    uint8_t deg_min_lon[M8Q_COO_LEN];           // Longitude: degrees and minutes integer part 
+    uint8_t min_frac_lon[M8Q_COO_LEN];          // Longitude: minuutes fractional part 
+    uint8_t EW;                                 // Eeast/West indicator of longitude 
     int16_t accel_x;                            // x-axis acceleration reading 
     int16_t accel_y;                            // y-axis acceleration reading 
     int16_t accel_z;                            // z-axis acceleration reading 
@@ -143,6 +143,7 @@ typedef struct mtbdl_data_s
 #if MTBDL_DEBUG 
     // Testing 
     uint16_t time_stop; 
+    uint16_t time_limit; 
     uint16_t count_standard; 
     uint16_t count_wait; 
     uint8_t time_overflow; 
@@ -393,16 +394,18 @@ void mtbdl_set_pretx_msg(void);
 //=======================================================================================
 // LEDs 
 
-// Update LED colours 
+/**
+ * @brief Update LED colours 
+ * 
+ * @details 
+ * 
+ * @param led_index 
+ * @param led_code 
+ */
 void mtbdl_led_update(
     ws2812_led_index_t led_index, 
     uint32_t led_code); 
 
-//=======================================================================================
-
-
-//=======================================================================================
-// Setters 
 
 /**
  * @brief Set trail marker flag 
@@ -410,6 +413,16 @@ void mtbdl_led_update(
  * @details 
  */
 void mtbdl_set_trailmark(void); 
+
+
+/**
+ * @brief Update the navigation status 
+ * 
+ * @details 
+ * 
+ * @return uint8_t 
+ */
+uint8_t mtbdl_navstat_check(void); 
 
 //=======================================================================================
 

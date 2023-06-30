@@ -35,7 +35,7 @@ hd44780u_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE] =
 {
     {HD44780U_L1, "F: PSI:%u C:%u R:%u", 0}, 
     {HD44780U_L2, "S: PSI:%u L:%u R:%u", 0}, 
-    {HD44780U_L3, "SOC: %u", 0}, 
+    {HD44780U_L3, "SOC:%u NAVSTAT:%c%c", 0}, 
     {HD44780U_L4, "1:RUN 2:TX/RX 3:CAL", 0} 
 }; 
 
@@ -43,7 +43,7 @@ hd44780u_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE] =
 // Pre run state message and number of data items for each line 
 hd44780u_msgs_t mtbdl_run_prep_msg[MTBDL_MSG_LEN_3_LINE] = 
 {
-    {HD44780U_L1, "NAVSTAT: %s", 0}, 
+    {HD44780U_L1, "NAVSTAT: %c%c", 0}, 
     {HD44780U_L2, "1: Proceed to run", 0}, 
     {HD44780U_L3, "2: Cancel", 0} 
 }; 

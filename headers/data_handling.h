@@ -38,6 +38,7 @@
 #define MTBDL_NUM_LOG_STREAMS 6          // Number of data logging streams 
 #define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
 #define MTBDL_LOG_COUNT_CYCLE 99         // Log sample sequence max timer counter value 
+#define MTBDL_ADC_BUFF_SIZE 3            // Size according to the number of ADCs used 
 
 // Wheel RPM info 
 #define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
@@ -86,6 +87,7 @@ typedef struct mtbdl_data_s
     // Peripherals 
     IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
     IRQn_Type log_irq;                          // Log sample period interrupt number 
+    ADC_TypeDef *adc;                            // ADC port battery soc and pots 
 
     // Bike parameters 
     uint8_t fork_psi;                           // Fork pressure (psi) 
@@ -112,7 +114,10 @@ typedef struct mtbdl_data_s
     uint32_t led_colour_data[WS2812_LED_NUM]; 
 
     // System data 
-    uint8_t soc;                                // Battery SOC 
+    uint8_t soc;                                // TODO delete 
+    uint8_t pot_fork;                           // 
+    uint8_t pot_shock;                          // 
+    uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
     uint16_t navstat;                           // Navigation status of GPS module 
     uint8_t deg_min_lat[M8Q_COO_LEN];           // Latitude: degrees and minutes integer part 
     uint8_t min_frac_lat[M8Q_COO_LEN];          // Latitude: minuutes fractional part 
@@ -123,8 +128,6 @@ typedef struct mtbdl_data_s
     int16_t accel_x;                            // x-axis acceleration reading 
     int16_t accel_y;                            // y-axis acceleration reading 
     int16_t accel_z;                            // z-axis acceleration reading 
-    uint8_t pot_fork;                           // Fork potentiometer reading 
-    uint8_t pot_shock;                          // Shock potentiometer reading 
 
     // Wheel RPM info 
     uint8_t rev_count;                          // Wheel revolution counter 
@@ -189,10 +192,12 @@ typedef void (*mtbdl_log_stream)(void);
  * 
  * @param rpm_irqn : 
  * @param log_irqn : 
+ * @param adc : 
  */
 void mtbdl_data_init(
     IRQn_Type rpm_irqn, 
-    IRQn_Type log_irqn); 
+    IRQn_Type log_irqn, 
+    ADC_TypeDef *adc); 
 
 
 /**

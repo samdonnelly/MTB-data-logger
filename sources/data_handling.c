@@ -164,11 +164,13 @@ static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] =
 // Initialize data record 
 void mtbdl_data_init(
     IRQn_Type rpm_irqn, 
-    IRQn_Type log_irqn)
+    IRQn_Type log_irqn, 
+    ADC_TypeDef *adc)
 {
     // Peripherals 
     mtbdl_data.rpm_irq = rpm_irqn; 
     mtbdl_data.log_irq = log_irqn; 
+    mtbdl_data.adc = adc; 
 
     // Bike parameters 
     mtbdl_data.fork_psi = CLEAR; 
@@ -241,6 +243,20 @@ void mtbdl_file_sys_setup(void)
         // File already exists - open the file for reading 
         mtbdl_read_sys_params(HW125_MODE_OEWR); 
     }
+}
+
+
+// ADC DMA setup 
+void mtbdl_adc_dma_init(
+    DMA_Stream_TypeDef *dma_strea, 
+    ADC_TypeDef *adc)
+{
+    // Configure the DMA stream 
+    dma_stream_config(
+        dma_strea, 
+        (uint32_t)(&adc->DR), 
+        (uint32_t)mtbdl_data.adc_buff, 
+        (uint16_t)MTBDL_ADC_BUFF_SIZE); 
 }
 
 //=======================================================================================

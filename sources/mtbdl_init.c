@@ -134,10 +134,61 @@ void mtbdl_init()
 
     //===================================================
     // ADC setup 
+
+    // Initialize the ADC port (called once) 
+    adc_port_init(
+        ADC1, 
+        ADC1_COMMON, 
+        ADC_PCLK2_4, 
+        ADC_RES_8, 
+        ADC_EOC_EACH, 
+        ADC_SCAN_ENABLE, 
+        ADC_CONT_DISABLE, 
+        ADC_DMA_ENABLE, 
+        ADC_DDS_ENABLE, 
+        ADC_EOC_INT_DISABLE, 
+        ADC_OVR_INT_DISABLE); 
+
+    // Initialize the ADC pins and channels 
+    adc_pin_init(ADC1, GPIOA, PIN_6, ADC_CHANNEL_6, ADC_SMP_15); 
+    adc_pin_init(ADC1, GPIOA, PIN_7, ADC_CHANNEL_7, ADC_SMP_15); 
+    adc_pin_init(ADC1, GPIOA, PIN_4, ADC_CHANNEL_4, ADC_SMP_15); 
+
+    // Set the ADC conversion sequence 
+    adc_seq(ADC1, ADC_CHANNEL_6, ADC_SEQ_1); 
+    adc_seq(ADC1, ADC_CHANNEL_7, ADC_SEQ_2); 
+    adc_seq(ADC1, ADC_CHANNEL_4, ADC_SEQ_3); 
+
+    // Set the sequence length (called once and only for more than one channel) 
+    adc_seq_len_set(ADC1, (adc_seq_num_t)MTBDL_ADC_BUFF_SIZE); 
+
+    // Turn the ADC on 
+    adc_on(ADC1); 
+
     //===================================================
 
     //===================================================
     // DMA setup 
+
+    // Initialize the DMA stream 
+    dma_stream_init(
+        DMA2, 
+        DMA2_Stream0, 
+        DMA_CHNL_0, 
+        DMA_DIR_PM, 
+        DMA_CM_ENABLE,
+        DMA_PRIOR_VHI, 
+        DMA_ADDR_INCREMENT, 
+        DMA_ADDR_FIXED, 
+        DMA_DATA_SIZE_HALF, 
+        DMA_DATA_SIZE_HALF); 
+
+    // Configure the DMA stream 
+    mtbdl_adc_dma_init(DMA2_Stream0, ADC1); 
+
+    // Enable the DMA stream 
+    dma_stream_enable(DMA2_Stream0); 
+
     //===================================================
 
     //===================================================
@@ -292,7 +343,8 @@ void mtbdl_init()
     // Data record init 
     mtbdl_data_init(
         EXTI4_IRQn, 
-        TIM1_TRG_COM_TIM11_IRQn); 
+        TIM1_TRG_COM_TIM11_IRQn, 
+        ADC1); 
 
     //===================================================
 }

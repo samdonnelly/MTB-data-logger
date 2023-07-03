@@ -75,6 +75,15 @@ typedef enum {
     MTBDL_LOG_STREAM_USER                // User input stream 
 } mtbdl_log_streams_t; 
 
+/**
+ * @brief ADC buffer index 
+ */
+typedef enum {
+    MTBDL_ADC_SOC, 
+    MTBDL_ADC_FORK, 
+    MTBDL_ADC_SHOCK 
+} mtbdl_adc_buff_index_t; 
+
 //=======================================================================================
 
 
@@ -102,8 +111,8 @@ typedef struct mtbdl_data_s
     int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
     int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
     int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
-    uint8_t pot_fork_rest;                      // Resting potentiometer reading for fork 
-    uint8_t pot_shock_rest;                     // Resting potentiometer reading for shock 
+    uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
+    uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
     // SD card 
     char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
@@ -114,9 +123,6 @@ typedef struct mtbdl_data_s
     uint32_t led_colour_data[WS2812_LED_NUM]; 
 
     // System data 
-    uint8_t soc;                                // TODO delete 
-    uint8_t pot_fork;                           // 
-    uint8_t pot_shock;                          // 
     uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
     uint16_t navstat;                           // Navigation status of GPS module 
     uint8_t deg_min_lat[M8Q_COO_LEN];           // Latitude: degrees and minutes integer part 
@@ -155,6 +161,7 @@ typedef struct mtbdl_data_s
     uint8_t count_accel; 
     uint8_t count_gps; 
     uint8_t count_user; 
+    uint16_t adc_count; 
 #endif   // MTBDL_DEBUG 
 }
 mtbdl_data_t; 
@@ -206,6 +213,19 @@ void mtbdl_data_init(
  * @details 
  */
 void mtbdl_file_sys_setup(void); 
+
+
+/**
+ * @brief ADC DMA setup 
+ * 
+ * @details 
+ * 
+ * @param dma_strea 
+ * @param adc 
+ */
+void mtbdl_adc_dma_init(
+    DMA_Stream_TypeDef *dma_strea, 
+    ADC_TypeDef *adc); 
 
 //=======================================================================================
 

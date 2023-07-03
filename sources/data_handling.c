@@ -197,7 +197,7 @@ void mtbdl_data_init(
     memset((void *)mtbdl_data.led_colour_data, CLEAR, sizeof(mtbdl_data.led_colour_data)); 
 
     // System data 
-    mtbdl_data.soc = CLEAR; 
+    memset((void *)mtbdl_data.adc_buff, CLEAR, sizeof(mtbdl_data.adc_buff)); 
     mtbdl_data.navstat = M8Q_NAVSTAT_NF; 
     memset((void *)mtbdl_data.deg_min_lat, CLEAR, sizeof(mtbdl_data.deg_min_lat)); 
     memset((void *)mtbdl_data.min_frac_lat, CLEAR, sizeof(mtbdl_data.min_frac_lat)); 
@@ -208,8 +208,6 @@ void mtbdl_data_init(
     mtbdl_data.accel_x = CLEAR; 
     mtbdl_data.accel_y = CLEAR; 
     mtbdl_data.accel_z = CLEAR; 
-    mtbdl_data.pot_fork = CLEAR; 
-    mtbdl_data.pot_shock = CLEAR; 
 }
 
 
@@ -536,6 +534,7 @@ void mtbdl_log_data_prep(void)
     mtbdl_data.count_accel = CLEAR; 
     mtbdl_data.count_gps = CLEAR; 
     mtbdl_data.count_user = CLEAR; 
+    mtbdl_data.adc_count = CLEAR; 
 #endif   // MTBDL_DEBUG 
 
     // Peripherals 
@@ -555,6 +554,21 @@ void mtbdl_logging(void)
 #endif   // MTBDL_DEBUG 
     {
         handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+
+        //==================================================
+        // Update data 
+        
+        // Start the ADC DMA read 
+        adc_start(mtbdl_data.adc); 
+
+        // Record wheel speed input if available 
+        if (handler_flags.exti4_flag)
+        {
+            handler_flags.exti4_flag = CLEAR; 
+            mtbdl_data.rev_count++; 
+        }
+        
+        //==================================================
 
         //==================================================
         // Update the next log stream 
@@ -584,20 +598,6 @@ void mtbdl_logging(void)
 
             // Enable GPS reads - no other critical tasks to be done 
             m8q_set_read_flag(); 
-        }
-        
-        //==================================================
-        
-        //==================================================
-        // Update data 
-        
-        // ADC read 
-
-        // Record wheel speed input if available 
-        if (handler_flags.exti4_flag)
-        {
-            handler_flags.exti4_flag = CLEAR; 
-            mtbdl_data.rev_count++; 
         }
         
         //==================================================
@@ -633,7 +633,7 @@ void mtbdl_logging(void)
 #if MTBDL_DEBUG 
     else 
     {
-        if (mtbdl_data.count_wait > 1)
+        if (mtbdl_data.count_wait > 2)
         {
             mtbdl_data.time_overflow++; 
         }
@@ -647,13 +647,14 @@ void mtbdl_logging(void)
 void mtbdl_log_stream_standard(void)
 {
     // Format standard log string 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_data_log_1, 
-             mtbdl_data.trailmark, 
-             mtbdl_data.pot_fork, 
-             mtbdl_data.pot_shock); 
-
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_data_log_1, 
+        mtbdl_data.trailmark, 
+        mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
+        mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]); 
+    
 #if MTBDL_DEBUG 
     mtbdl_data.count_standard++; 
 #endif   // MTBDL_DEBUG 
@@ -709,13 +710,14 @@ void mtbdl_log_stream_speed(void)
     }
 
     // Format wheel speed data log string 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_data_log_2, 
-             mtbdl_data.trailmark, 
-             mtbdl_data.pot_fork, 
-             mtbdl_data.pot_shock, 
-             revs); 
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_data_log_2, 
+        mtbdl_data.trailmark, 
+        mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
+        mtbdl_data.adc_buff[MTBDL_ADC_SHOCK], 
+        revs); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.count_speed++; 
@@ -739,15 +741,16 @@ void mtbdl_log_stream_accel(void)
             &mtbdl_data.accel_z); 
 
         // Format accel data log string 
-        snprintf(mtbdl_data.data_buff, 
-                 MTBDL_MAX_DATA_STR_LEN, 
-                 mtbdl_data_log_3, 
-                 mtbdl_data.trailmark, 
-                 mtbdl_data.pot_fork, 
-                 mtbdl_data.pot_shock, 
-                 mtbdl_data.accel_x, 
-                 mtbdl_data.accel_y, 
-                 mtbdl_data.accel_z); 
+        snprintf(
+            mtbdl_data.data_buff, 
+            MTBDL_MAX_DATA_STR_LEN, 
+            mtbdl_data_log_3, 
+            mtbdl_data.trailmark, 
+            mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
+            mtbdl_data.adc_buff[MTBDL_ADC_SHOCK], 
+            mtbdl_data.accel_x, 
+            mtbdl_data.accel_y, 
+            mtbdl_data.accel_z); 
     }
     else 
     {
@@ -777,18 +780,19 @@ void mtbdl_log_stream_gps(void)
     mtbdl_data.EW = m8q_get_EW(); 
 
     // Format GPS data log string 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_data_log_4, 
-             mtbdl_data.trailmark, 
-             mtbdl_data.pot_fork, 
-             mtbdl_data.pot_shock, 
-             (char *)mtbdl_data.deg_min_lat, 
-             (char *)mtbdl_data.min_frac_lat, 
-             (char)mtbdl_data.NS, 
-             (char *)mtbdl_data.deg_min_lon, 
-             (char *)mtbdl_data.min_frac_lon, 
-             (char)mtbdl_data.EW); 
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_data_log_4, 
+        mtbdl_data.trailmark, 
+        mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
+        mtbdl_data.adc_buff[MTBDL_ADC_SHOCK], 
+        (char *)mtbdl_data.deg_min_lat, 
+        (char *)mtbdl_data.min_frac_lat, 
+        (char)mtbdl_data.NS, 
+        (char *)mtbdl_data.deg_min_lon, 
+        (char *)mtbdl_data.min_frac_lon, 
+        (char)mtbdl_data.EW); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.count_gps++; 
@@ -1009,12 +1013,29 @@ void mtbdl_set_idle_msg(void)
     // Format the message with data 
     // snprintf will NULL terminate the string at the screen line length so in order to use 
     // the last spot on the screen line the message length must be indexed up by one 
-    snprintf(msg[0].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[0].msg, 
-             mtbdl_data.fork_psi, mtbdl_data.fork_comp, mtbdl_data.fork_reb); 
-    snprintf(msg[1].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[1].msg, 
-             mtbdl_data.shock_psi, mtbdl_data.shock_lock, mtbdl_data.shock_reb); 
-    snprintf(msg[2].msg, (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), mtbdl_idle_msg[2].msg, 
-             mtbdl_data.soc, (char)(mtbdl_data.navstat >> SHIFT_8), (char)mtbdl_data.navstat); 
+    snprintf(
+        msg[HD44780U_L1].msg, 
+        (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+        mtbdl_idle_msg[HD44780U_L1].msg, 
+        mtbdl_data.fork_psi, 
+        mtbdl_data.fork_comp, 
+        mtbdl_data.fork_reb); 
+    
+    snprintf(
+        msg[HD44780U_L2].msg, 
+        (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+        mtbdl_idle_msg[HD44780U_L2].msg, 
+        mtbdl_data.shock_psi, 
+        mtbdl_data.shock_lock, 
+        mtbdl_data.shock_reb); 
+    
+    snprintf(
+        msg[HD44780U_L3].msg, 
+        (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+        mtbdl_idle_msg[HD44780U_L3].msg, 
+        mtbdl_data.adc_buff[MTBDL_ADC_SOC], 
+        (char)(mtbdl_data.navstat >> SHIFT_8), 
+        (char)mtbdl_data.navstat); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
@@ -1033,8 +1054,12 @@ void mtbdl_set_run_prep_msg(void)
     // Convert the NAVSTAT code to an easily readable value 
 
     // Format the message with data 
-    snprintf(msg[0].msg, HD44780U_LINE_LEN, mtbdl_run_prep_msg[0].msg, 
-             (char)(mtbdl_data.navstat >> SHIFT_8), (char)mtbdl_data.navstat); 
+    snprintf(
+        msg[HD44780U_L1].msg, 
+        HD44780U_LINE_LEN, 
+        mtbdl_run_prep_msg[HD44780U_L1].msg, 
+        (char)(mtbdl_data.navstat >> SHIFT_8), 
+        (char)mtbdl_data.navstat); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_3_LINE); 
@@ -1053,8 +1078,11 @@ void mtbdl_set_pretx_msg(void)
     // Format the message with data 
     // The log index is adjusted because it will be one ahead of the most recent log 
     // file number after the most recent log has been created 
-    snprintf(msg[1].msg, HD44780U_LINE_LEN, mtbdl_pretx_msg[1].msg, 
-            (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+    snprintf(
+        msg[HD44780U_L2].msg, 
+        HD44780U_LINE_LEN, 
+        mtbdl_pretx_msg[HD44780U_L2].msg, 
+        (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 

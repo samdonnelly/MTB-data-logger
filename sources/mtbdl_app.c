@@ -591,25 +591,30 @@ void mtbdl_init_state(
 
     if (mtbdl->init)
     {
-        // Clear the line data 
-
         // Display the startup message 
         hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
+        
+        mtbdl->init = CLEAR_BIT; 
     }
-    
-    mtbdl->init = CLEAR_BIT; 
     
     //==================================================
 
     //==================================================
     // Checks 
 
-    // TODO if the screen doesn't init properly, add a button to trigger a re-try 
+    // Button 4 - Re-initialize the screen if it doesn't work 
+    if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
+    {
+        mtbdl->user_btn_4_block = SET_BIT; 
+        hd44780u_set_reset_flag(); 
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->init = SET_BIT; 
+    }
 
     // Wait for the SD card to be mounted then access the file system 
     if (hw125_get_state() == HW125_ACCESS_STATE)
     {
-        // Set the check flag 
+        // Set the SD card check flag 
         hw125_set_check_flag(); 
 
         // Set up the file structure and system info 
@@ -663,9 +668,9 @@ void mtbdl_idle_state(
 
         // Put the MPU-6050 into low power mode 
         mpu6050_set_low_power(DEVICE_ONE); 
+        
+        mtbdl->idle = CLEAR_BIT; 
     }
-
-    mtbdl->idle = CLEAR_BIT; 
 
     //==================================================
 
@@ -850,9 +855,9 @@ void mtbdl_run_countdown_state(
 
         // Take the MPU-6050 out of low power mode 
         mpu6050_clear_low_power(DEVICE_ONE); 
+        
+        mtbdl->run = CLEAR_BIT; 
     }
-
-    mtbdl->run = CLEAR_BIT; 
 
     //==================================================
 
@@ -998,9 +1003,9 @@ void mtbdl_data_select_state(
     {
         // Display the data select state message 
         hd44780u_set_msg(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
+        
+        mtbdl->data_select = CLEAR_BIT; 
     }
-
-    mtbdl->data_select = CLEAR_BIT; 
     
     //==================================================
 
@@ -1062,9 +1067,9 @@ void mtbdl_dev_search_state(
 
         // Take the HC-05 out of low power mode 
         hc05_on(); 
+        
+        mtbdl->data_select = CLEAR_BIT; 
     }
-
-    mtbdl->data_select = CLEAR_BIT; 
 
     //==================================================
 
@@ -1116,10 +1121,10 @@ void mtbdl_prerx_state(
     {
         // Display the pre rx state message 
         hd44780u_set_msg(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
+        
+        mtbdl->rx = CLEAR_BIT; 
+        mtbdl->data_select = CLEAR_BIT; 
     }
-    
-    mtbdl->rx = CLEAR_BIT; 
-    mtbdl->data_select = CLEAR_BIT; 
     
     //==================================================
 
@@ -1180,9 +1185,9 @@ void mtbdl_rx_state(
 
         // Begin the RX user interface 
         mtbdl_rx_prep(); 
+        
+        mtbdl->rx = CLEAR_BIT; 
     }
-    
-    mtbdl->rx = CLEAR_BIT; 
 
     //==================================================
 
@@ -1474,9 +1479,9 @@ void mtbdl_precalibrate_state(
     {
         // Display the pre calibration state message 
         hd44780u_set_msg(mtbdl_precal_msg, MTBDL_MSG_LEN_4_LINE); 
+        
+        mtbdl->calibrate = CLEAR_BIT; 
     }
-
-    mtbdl->calibrate = CLEAR_BIT; 
     
     //==================================================
 
@@ -1525,9 +1530,9 @@ void mtbdl_calibrate_state(
     {
         // Display the calibration state message 
         hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
+        
+        mtbdl->calibrate = CLEAR_BIT; 
     }
-
-    mtbdl->calibrate = CLEAR_BIT; 
     
     //==================================================
 
@@ -1585,9 +1590,9 @@ void mtbdl_lowpwr_state(
         m8q_set_low_pwr_flag(); 
 
         // Put devices into low power mode 
+        
+        mtbdl->low_pwr = CLEAR_BIT; 
     }
-
-    mtbdl->low_pwr = CLEAR_BIT; 
     
     //==================================================
 
@@ -1657,9 +1662,9 @@ void mtbdl_fault_state(
         // Record the fault code in a log 
 
         // Stop any existing processes - assess each state case 
+        
+        mtbdl->fault = SET_BIT; 
     }
-
-    mtbdl->fault = SET_BIT; 
 
     //==================================================
 

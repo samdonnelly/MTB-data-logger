@@ -30,29 +30,30 @@
 // LED off 
 extern uint32_t mtbdl_led_clear; 
 
-// LED 0 colours 
-extern uint32_t mtbdl_led0_1; 
+// LED 0 colours - Data loggng 
+extern uint32_t mtbdl_led0_1;   // Data logging in progress 
 
-// LED 1 colours 
-extern uint32_t mtbdl_led1_1; 
+// LED 1 colours - GPS position lock status 
+extern uint32_t mtbdl_led1_1;   // Position lock 
 
-// LED 2 colours 
-extern uint32_t mtbdl_led2_1; 
+// LED 2 colours - various states 
+extern uint32_t mtbdl_led2_1;   // Bluetooth connection in TX/RX states 
+extern uint32_t mtbdl_led2_2;   // Calibration state 
 
-// LED 3 colours 
-extern uint32_t mtbdl_led3_1; 
+// LED 3 colours - fault and low power states 
+extern uint32_t mtbdl_led3_1;   // Fault (solid) and low power (flashing) states 
 
-// LED 4 colours 
-extern uint32_t mtbdl_led4_1; 
+// LED 4 colours - user button 4 status 
+extern uint32_t mtbdl_led4_1;   // Button pressed 
 
-// LED 5 colours 
-extern uint32_t mtbdl_led5_1; 
+// LED 5 colours - user button 3 status 
+extern uint32_t mtbdl_led5_1;   // Button pressed 
 
-// LED 6 colours 
-extern uint32_t mtbdl_led6_1; 
+// LED 6 colours - user button 2 status 
+extern uint32_t mtbdl_led6_1;   // Button pressed 
 
-// LED 7 colours 
-extern uint32_t mtbdl_led7_1; 
+// LED 7 colours - user button 1 status 
+extern uint32_t mtbdl_led7_1;   // Button pressed 
 
 //=======================================================================================
 

@@ -32,10 +32,19 @@
 
 // System info 
 #define MTBDL_NUM_STATES 19              // Number of system states 
-#define MTBDL_LCD_SLEEP 10000000         // (us) inactive time before screen backlight off 
-#define MTBDL_STATE_WAIT 5000000         // (us) general state wait time 
-#define MTBDL_CAL_SAMPLE_TIME 5000000    // (us) calibration state sample time 
-#define MTBDL_LCD_LP_SLEEP 3000000       // (us) low power state message display time 
+#define MTBDL_LCD_SLEEP 10000000         // (us) Inactive time before screen backlight off 
+#define MTBDL_STATE_WAIT 5000000         // (us) General state wait time 
+
+// Calibration settings 
+#define MTBDL_CAL_SAMPLE_TIME 5000000    // (us) Calibration state sample time 
+#define MTBDL_LED_CAL_UPDATE 1000000     // (us) Low power state LED update interval 
+#define MTBDL_LED_CAL_COUNT 1            // Calibration state LED time counter 
+
+// Low power settings 
+#define MTBDL_LCD_LP_SLEEP 3000000       // (us) Low power state message display time 
+#define MTBDL_LED_LP_UPDATE 1000000      // (us) Low power state LED update interval 
+#define MTBDL_LED_LP_OFF_COUNT 2         // Low power state LED off time counter 
+#define MTBDL_LED_LP_ON_COUNT 1          // Low power state LED on time counter 
 
 //=======================================================================================
 

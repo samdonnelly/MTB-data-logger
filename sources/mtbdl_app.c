@@ -168,6 +168,7 @@ void mtbdl_app_init(
 {
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
+    mtbdl_trackers.fault_code = CLEAR; 
     mtbdl_trackers.user_btn_port = user_btn_gpio; 
 
     // Timing information 
@@ -208,7 +209,31 @@ void mtbdl_app(void)
     // Local variables 
     mtbdl_states_t next_state = mtbdl_trackers.state; 
 
-    // Check device statuses 
+    //===================================================
+    // Device status checks 
+
+    if (hd44780u_get_fault_code())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_0); 
+    }
+    if (mpu6050_get_fault_code(DEVICE_ONE))
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_1); 
+    }
+    if (m8q_get_fault_code())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_2); 
+    }
+    if (hw125_get_fault_code())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_3); 
+    }
+    if (hc05_get_status())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_4); 
+    }
+
+    //===================================================
 
     //===================================================
     // User buttons 
@@ -1089,7 +1114,7 @@ void mtbdl_dev_search_state(
     //==================================================
     // Checks 
 
-    // If the HC-05 if connected to a device then move to the next state 
+    // If the HC-05 is connected to a device then move to the next state 
     if (hc05_status())
     {
         mtbdl->data_select = SET_BIT; 
@@ -1472,6 +1497,9 @@ void mtbdl_posttx_state(
 void mtbdl_precalibrate_state(
     mtbdl_trackers_t *mtbdl)
 {
+    // Local variables 
+    static uint8_t led_state = CLEAR; 
+
     //==================================================
     // State entry 
 
@@ -1486,7 +1514,7 @@ void mtbdl_precalibrate_state(
     //==================================================
 
     //==================================================
-    // Check user button input 
+    // Checks 
 
     // Button 1 - triggers the calibration state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
@@ -1506,13 +1534,46 @@ void mtbdl_precalibrate_state(
     
     //==================================================
 
+    //===================================================
+    // LED update 
+
+    // Update the state of the LED 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_LED_CAL_UPDATE, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        led_state++; 
+
+        if (led_state == MTBDL_LED_CAL_COUNT)
+        {
+            mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+        }
+        else if (led_state >= (2*MTBDL_LED_CAL_COUNT))
+        {
+            mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+            led_state = CLEAR; 
+        }
+    }
+
+    //==================================================
+
     //==================================================
     // State exit 
 
     if (mtbdl->calibrate || mtbdl->idle)
     {
+        // Update the system tracking info 
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        led_state = CLEAR; 
+
         // Clear the pre calibration state message 
         hd44780u_set_clear_flag(); 
+
+        // Make sure the calibration LED is off 
+        mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
     }
 
     //==================================================
@@ -1530,6 +1591,9 @@ void mtbdl_calibrate_state(
     {
         // Display the calibration state message 
         hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
+
+        // Turn on the calibration LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
         
         mtbdl->calibrate = CLEAR_BIT; 
     }
@@ -1562,6 +1626,9 @@ void mtbdl_calibrate_state(
         // Clear the calibration state message 
         hd44780u_set_clear_flag(); 
 
+        // Turn off the calibration LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
     }
@@ -1574,6 +1641,9 @@ void mtbdl_calibrate_state(
 void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl)
 {
+    // Local variables 
+    static uint8_t led_state = CLEAR; 
+
     //==================================================
     // State entry 
 
@@ -1589,7 +1659,9 @@ void mtbdl_lowpwr_state(
         // Put the GPS into low power mode 
         m8q_set_low_pwr_flag(); 
 
-        // Put devices into low power mode 
+        // Make sure the MPU-6050 and HC-05 are in low power mode 
+        mpu6050_set_low_power(DEVICE_ONE); 
+        hc05_off(); 
         
         mtbdl->low_pwr = CLEAR_BIT; 
     }
@@ -1597,7 +1669,7 @@ void mtbdl_lowpwr_state(
     //==================================================
 
     //==================================================
-    // Check user button input 
+    // Checks 
     
     // Button 4 - Turns the screen backlight on 
     if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
@@ -1606,11 +1678,6 @@ void mtbdl_lowpwr_state(
         hd44780u_wake_up(); 
         mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
     }
-    
-    //==================================================
-
-    //==================================================
-    // Check SOC 
 
     // If SOC is above the minimum threshold then we can exit low power state 
     // TODO replace this with a check on the SOC 
@@ -1621,6 +1688,32 @@ void mtbdl_lowpwr_state(
         mtbdl->low_pwr = SET_BIT; 
     }
 
+    //===================================================
+    
+    //===================================================
+    // LED update 
+
+    // Update the state of the LED 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_LED_LP_UPDATE, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        led_state++; 
+
+        if (led_state == MTBDL_LED_LP_OFF_COUNT)
+        {
+            mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+        }
+        else if (led_state >= (MTBDL_LED_LP_OFF_COUNT + MTBDL_LED_LP_ON_COUNT))
+        {
+            mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+            led_state = CLEAR; 
+        }
+    }
+
     //==================================================
 
     //==================================================
@@ -1628,19 +1721,19 @@ void mtbdl_lowpwr_state(
 
     if (mtbdl->low_pwr)
     {
+        // Update system tracking info 
         mtbdl->low_pwr = CLEAR_BIT; 
+        mtbdl->idle = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        led_state = CLEAR; 
 
-        // Clear the idle state message 
+        // Clear the idle state message and take devices out of low power mode 
         hd44780u_set_clear_flag(); 
-
-        // Take the screen out of power save mode 
         hd44780u_clear_pwr_save_flag(); 
-
-        // Take the GPS out of low power mode 
         m8q_clear_low_pwr_flag(); 
 
-        // Set the idle state flag 
-        mtbdl->idle = SET_BIT; 
+        // Make sure the low power LED if off 
+        mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
     }
 
     //==================================================
@@ -1658,6 +1751,9 @@ void mtbdl_fault_state(
     {
         // Display the fault state message 
         hd44780u_set_msg(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
+
+        // Turn on the fault status LED 
+        mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
 
         // Record the fault code in a log 
 
@@ -1689,6 +1785,9 @@ void mtbdl_fault_state(
     {
         mtbdl->fault_code = CLEAR; 
         mtbdl->fault = CLEAR_BIT; 
+
+        // Turn off the fault status LED 
+        mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
 
         // Clear the fault state message 
         hd44780u_set_clear_flag(); 

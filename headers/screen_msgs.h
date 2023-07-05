@@ -84,6 +84,9 @@ extern hd44780u_msgs_t mtbdl_precal_msg[MTBDL_MSG_LEN_4_LINE];
 // Calibration state message 
 extern hd44780u_msgs_t mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE]; 
 
+// Post calibration state message 
+extern hd44780u_msgs_t mtbdl_postcal_msg[MTBDL_MSG_LEN_1_LINE]; 
+
 // Low power state state message 
 extern hd44780u_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE]; 
 

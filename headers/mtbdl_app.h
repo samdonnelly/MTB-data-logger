@@ -31,7 +31,7 @@
 #define MTBDL_DEBUG 1                    // Conditional compilation for debugging 
 
 // System info 
-#define MTBDL_NUM_STATES 19              // Number of system states 
+#define MTBDL_NUM_STATES 20              // Number of system states 
 #define MTBDL_LCD_SLEEP 10000000         // (us) Inactive time before screen backlight off 
 #define MTBDL_STATE_WAIT 5000000         // (us) General state wait time 
 
@@ -72,8 +72,8 @@ typedef enum {
     MTBDL_POSTTX_STATE,          // State 13 : Post data send 
     MTBDL_PRECALIBRATE_STATE,    // State 14 : Pre calibration 
     MTBDL_CALIBRATE_STATE,       // State 15 : Calibration 
-    MTBDL_LOWPWR_STATE,          // State 16 : Low power mode 
-    MTBDL_NONCRIT_FAULT_STATE,   // State 17 : Non-critical fault 
+    MTBDL_POSTCALIBRATE_STATE,   // State 16 : Post calibration 
+    MTBDL_LOWPWR_STATE,          // State 17 : Low power mode 
     MTBDL_FAULT_STATE,           // State 18 : Fault 
     MTBDL_RESET_STATE            // State 19 : Reset 
 } mtbdl_states_t; 

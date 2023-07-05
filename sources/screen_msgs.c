@@ -147,6 +147,13 @@ hd44780u_msgs_t mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE] =
 }; 
 
 
+// Post calibration state message 
+hd44780u_msgs_t mtbdl_postcal_msg[MTBDL_MSG_LEN_1_LINE] = 
+{
+    {HD44780U_L2, "Calibration complete", 0} 
+}; 
+
+
 // Low power state state message 
 hd44780u_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE] = 
 {

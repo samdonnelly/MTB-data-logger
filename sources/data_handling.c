@@ -1043,6 +1043,80 @@ void mtbdl_tx_end(void)
 
 
 //=======================================================================================
+// Calibration functions 
+
+// Calibration data prep 
+void mtbdl_cal_prep(void)
+{
+    // Reset the calibration data 
+    memset((void *)mtbdl_data.cal_buff, CLEAR, sizeof(mtbdl_data.cal_buff)); 
+    mtbdl_data.cal_index = CLEAR; 
+
+    // Trigger an ADC and accelerometer read so the data is available for the first 
+    // time data is recorded 
+    adc_start(mtbdl_data.adc); 
+    mpu6050_set_read_flag(DEVICE_ONE); 
+
+    // Enable log sample period interrupts 
+    NVIC_EnableIRQ(mtbdl_data.log_irq); 
+}
+
+
+// Calibration 
+void mtbdl_calibrate(void)
+{
+    // Record new data periodically 
+    if (handler_flags.tim1_trg_tim11_glbl_flag)
+    {
+        handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+
+        // Record new accel data 
+        mpu6050_get_accel_raw(
+            DEVICE_ONE, 
+            &mtbdl_data.accel_x_rest, 
+            &mtbdl_data.accel_y_rest, 
+            &mtbdl_data.accel_z_rest); 
+
+        // Sum all the data into the calibration buffer. This data will be averaged once the 
+        // calibration state is left. 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] += mtbdl_data.accel_x_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] += mtbdl_data.accel_y_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] += mtbdl_data.accel_z_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] += mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
+        mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] += mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
+
+        // Trigger an ADC and accelerometer read so the data is available for the next 
+        // time data is recorded 
+        adc_start(mtbdl_data.adc); 
+        mpu6050_set_read_flag(DEVICE_ONE); 
+    }
+}
+
+
+// Calibration calculation 
+void mtbdl_cal_calc(void)
+{
+    // Disable log sample period interrupts 
+    NVIC_DisableIRQ(mtbdl_data.log_irq); 
+
+    // Calculate and record calibration data 
+    // This data is an average of all the samples taken during calibration 
+    mtbdl_data.accel_x_rest = 
+        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] / mtbdl_data.cal_index); 
+    mtbdl_data.accel_y_rest = 
+        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] / mtbdl_data.cal_index); 
+    mtbdl_data.accel_z_rest = 
+        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] / mtbdl_data.cal_index); 
+    mtbdl_data.pot_fork_rest = 
+        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] / mtbdl_data.cal_index); 
+    mtbdl_data.pot_shock_rest = 
+        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] / mtbdl_data.cal_index); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Screen message formatting 
 
 // Format the idle state message 

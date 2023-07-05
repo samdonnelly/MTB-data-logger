@@ -31,6 +31,9 @@
 #define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
 #define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
 
+// Calibration 
+#define MTBDL_NUM_CAL_DATA 5             // Number of parameters that require calibration 
+
 // Data logging 
 #define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
 #define MTBDL_LOG_NUM_MIN 0              // Min data log files 
@@ -78,6 +81,7 @@ typedef enum {
     MTBDL_LOG_STREAM_USER                // User input stream 
 } mtbdl_log_streams_t; 
 
+
 /**
  * @brief ADC buffer index 
  */
@@ -86,6 +90,18 @@ typedef enum {
     MTBDL_ADC_FORK, 
     MTBDL_ADC_SHOCK 
 } mtbdl_adc_buff_index_t; 
+
+
+/**
+ * @brief Calibration data index 
+ */
+typedef enum {
+    MTBDL_CAL_ACCEL_X, 
+    MTBDL_CAL_ACCEL_Y, 
+    MTBDL_CAL_ACCEL_Z, 
+    MTBDL_CAL_POT_FORK, 
+    MTBDL_CAL_POT_SHOCK 
+} mtbdl_cal_index_t; 
 
 //=======================================================================================
 
@@ -132,6 +148,10 @@ typedef struct mtbdl_data_s
     int16_t accel_x;                            // x-axis acceleration reading 
     int16_t accel_y;                            // y-axis acceleration reading 
     int16_t accel_z;                            // z-axis acceleration reading 
+
+    // Calibration data 
+    int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
+    int32_t cal_index;                          // Calibration sample index 
 
     // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
     uint32_t led_colour_data[WS2812_LED_NUM]; 
@@ -392,6 +412,35 @@ uint8_t mtbdl_tx(void);
  * @details 
  */
 void mtbdl_tx_end(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Calibration functions 
+
+/**
+ * @brief Calibration data prep 
+ * 
+ * @details 
+ */
+void mtbdl_cal_prep(void); 
+
+
+/**
+ * @brief Calibration 
+ * 
+ * @details 
+ */
+void mtbdl_calibrate(void); 
+
+
+/**
+ * @brief Calibration calculation 
+ * 
+ * @details 
+ */
+void mtbdl_cal_calc(void); 
 
 //=======================================================================================
 

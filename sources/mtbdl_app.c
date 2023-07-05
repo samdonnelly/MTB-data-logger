@@ -103,6 +103,11 @@ void mtbdl_calibrate_state(
     mtbdl_trackers_t *mtbdl); 
 
 
+// Post calibration state 
+void mtbdl_postcalibrate_state(
+    mtbdl_trackers_t *mtbdl); 
+
+
 // Low power state 
 void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl); 
@@ -146,9 +151,10 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
     &mtbdl_posttx_state,                // State 13 : Post data send 
     &mtbdl_precalibrate_state,          // State 14 : Pre calibration 
     &mtbdl_calibrate_state,             // State 15 : Calibration 
-    &mtbdl_lowpwr_state,                // State 16 : Low power mode 
-    &mtbdl_fault_state,                 // State 17 : Fault 
-    &mtbdl_reset_state                  // State 18 : Reset 
+    &mtbdl_postcalibrate_state,         // State 16 : Post calibration 
+    &mtbdl_lowpwr_state,                // State 17 : Low power mode 
+    &mtbdl_fault_state,                 // State 18 : Fault 
+    &mtbdl_reset_state                  // State 19 : Reset 
 }; 
 
 //=======================================================================================
@@ -553,6 +559,15 @@ void mtbdl_app(void)
             break; 
         
         case MTBDL_CALIBRATE_STATE: 
+            // Calibration state flag set 
+            if (mtbdl_trackers.calibrate)
+            {
+                next_state = MTBDL_POSTCALIBRATE_STATE;  
+            }
+
+            break; 
+
+        case MTBDL_POSTCALIBRATE_STATE: 
             // Idle state flag set 
             if (mtbdl_trackers.idle)
             {
@@ -1605,6 +1620,9 @@ void mtbdl_calibrate_state(
         // Display the calibration state message 
         hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
 
+        // Prepare to record data for calibration 
+        mtbdl_cal_prep(); 
+
         // Turn on the calibration LED 
         mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
         
@@ -1616,7 +1634,8 @@ void mtbdl_calibrate_state(
     //==================================================
     // Sample data 
 
-    // Record the data as needed in the data handling code 
+    // This function records data that gets used to calculate the calibration values 
+    mtbdl_calibrate(); 
 
     //==================================================
 
@@ -1631,22 +1650,59 @@ void mtbdl_calibrate_state(
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
+        // Update the tracking information 
         mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->calibrate = SET_BIT; 
 
-        // Record the calibration data 
-        mtbdl_write_sys_params(HW125_MODE_OEW); 
+        // Calculate the calibration values 
+        mtbdl_cal_calc(); 
 
-        // Clear the calibration state message 
+        // Clear the calibration state message and turn off the calibration LED 
         hd44780u_set_clear_flag(); 
-
-        // Turn off the calibration LED 
         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-
-        // Set the idle state flag when ready 
-        mtbdl->idle = SET_BIT; 
     }
     
     //==================================================
+}
+
+
+// Post calibration state 
+void mtbdl_postcalibrate_state(
+    mtbdl_trackers_t *mtbdl)
+{
+    //===================================================
+    // State entry 
+
+    if (mtbdl->calibrate)
+    {
+        // Display the post calibration message and record the calibration data
+        hd44780u_set_msg(mtbdl_postcal_msg, MTBDL_MSG_LEN_1_LINE); 
+        mtbdl_write_sys_params(HW125_MODE_OEW); 
+        mtbdl->calibrate = CLEAR_BIT; 
+    }
+
+    //===================================================
+
+    //===================================================
+    // State exit 
+
+    // Wait for a period of time before returning to the idle state 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_WAIT, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        // Update the tracking information 
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->idle = SET_BIT; 
+
+        // Clear the post calibration message 
+        hd44780u_set_clear_flag(); 
+    }
+
+    //===================================================
 }
 
 

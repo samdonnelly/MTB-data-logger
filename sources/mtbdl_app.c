@@ -388,6 +388,12 @@ void mtbdl_app(void)
                 next_state = MTBDL_DEV_SEARCH_STATE; 
             }
 
+            // TX flag set (but not data select flag - no files to send) 
+            else if (mtbdl_trackers.tx)
+            {
+                next_state = MTBDL_PRETX_STATE; 
+            }
+
             break; 
 
         case MTBDL_DEV_SEARCH_STATE: 
@@ -1049,8 +1055,16 @@ void mtbdl_data_select_state(
     // Button 2 - triggers the pre send (TX) state 
     else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
     {
+        // Before going to the device search state the code first check if there are any log 
+        // files saved in the system. If there are none then the data select bit is not set 
+        // which will ultimately aborts the TX state and tells the user there are no files 
+        // available for sending. 
+        if (mtbdl_tx_check())
+        {
+            // Files exist - go to the device search state 
+            mtbdl->data_select = SET_BIT; 
+        }
         mtbdl->tx = SET_BIT; 
-        mtbdl->data_select = SET_BIT; 
         mtbdl->user_btn_2_block = SET_BIT; 
         mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
     }
@@ -1068,7 +1082,7 @@ void mtbdl_data_select_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->data_select || mtbdl->idle)
+    if (mtbdl->data_select || mtbdl->tx || mtbdl->idle)
     {
         // Clear the data select state message 
         hd44780u_set_clear_flag(); 
@@ -1335,7 +1349,7 @@ void mtbdl_pretx_state(
     //==================================================
 
     //==================================================
-    // Check user button input 
+    // Checks 
 
     // Button 1 - triggers the tx state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
@@ -1355,14 +1369,13 @@ void mtbdl_pretx_state(
         // End the data transfer 
         mtbdl_tx_end(); 
     }
-    
-    //==================================================
-
-    //==================================================
-    // Checks 
 
     // If the HC-05 gets disconnected then abort the potential transfer 
-    if (!hc05_status())
+    // This check uses the tx bit to reflect the existance of log files saved in the system. 
+    // In the state entry (above), if there are no log files to send then the tx bit will 
+    // not be set which then prevents this Bluetooth device connection check from 
+    // overwriting the non-critical fault message. 
+    if (!hc05_status() && !mtbdl->tx)
     {
         mtbdl->tx = SET_BIT; 
         mtbdl->noncrit_fault = SET_BIT; 
@@ -1549,11 +1562,11 @@ void mtbdl_precalibrate_state(
 
         if (led_state == MTBDL_LED_CAL_COUNT)
         {
-            mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
         }
         else if (led_state >= (2*MTBDL_LED_CAL_COUNT))
         {
-            mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
             led_state = CLEAR; 
         }
     }
@@ -1573,7 +1586,7 @@ void mtbdl_precalibrate_state(
         hd44780u_set_clear_flag(); 
 
         // Make sure the calibration LED is off 
-        mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
     }
 
     //==================================================
@@ -1768,7 +1781,6 @@ void mtbdl_fault_state(
     // Check user button input 
 
     // Button 4 - triggers a system reset (reset state) 
-    // Add another condition to prevent premature reset 
     if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
     {
         mtbdl->reset = SET_BIT; 

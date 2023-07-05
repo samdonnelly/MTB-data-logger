@@ -351,6 +351,16 @@ void mtbdl_rx(void);
 // TX state functions 
 
 /**
+ * @brief Check if there are no log files 
+ * 
+ * @details 
+ * 
+ * @return uint8_t 
+ */
+uint8_t mtbdl_tx_check(void); 
+
+
+/**
  * @brief Prepare to send a data log file 
  * 
  * @details 

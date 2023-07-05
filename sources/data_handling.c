@@ -927,11 +927,23 @@ void mtbdl_rx(void)
 //=======================================================================================
 // TX state functions 
 
+// Check if there are no log files 
+uint8_t mtbdl_tx_check(void)
+{
+    if (mtbdl_data.log_index != MTBDL_LOG_NUM_MIN)
+    {
+        return TRUE; 
+    }
+
+    return FALSE; 
+}
+
+
 // Prepare to send a data log file 
 uint8_t mtbdl_tx_prep(void)
 {
     // Check if there are no log files 
-    if (mtbdl_data.log_index == MTBDL_LOG_NUM_MIN)
+    if (!mtbdl_tx_check())
     {
         return FALSE; 
     }

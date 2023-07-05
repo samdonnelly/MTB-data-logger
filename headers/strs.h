@@ -51,9 +51,9 @@ extern const char mtbdl_param_shock_info[];    // Shock setup parameters
 
 // System parameter information 
 extern const char mtbdl_param_index[];         // Log file index 
-extern const char mtbdl_param_time[];          // Time of file creation 
 extern const char mtbdl_param_accel_rest[];    // Resting accelerometer data 
 extern const char mtbdl_param_pot_rest[];      // Resting potentiometer data 
+extern const char mtbdl_param_time[];          // Time of file creation 
 extern const char mtbdl_param_data[];          // Data logging info 
 
 // Data log information 

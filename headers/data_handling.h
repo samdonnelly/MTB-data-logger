@@ -44,6 +44,9 @@
 #define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
 #define MTBDL_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
 
+// Debugging 
+#define MTBDL_DEBUG_SAMPLE_COUNT 999     // Number of data samples to take in debug mode 
+
 //=======================================================================================
 
 
@@ -114,17 +117,12 @@ typedef struct mtbdl_data_s
     uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
     uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
-    // SD card 
-    char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
-    char filename[MTBDL_MAX_DATA_STR_LEN];      // Buffer for storing a file name 
-    uint8_t tx_status : 1;                      // TX transaction status 
-
-    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
-    uint32_t led_colour_data[WS2812_LED_NUM]; 
-
     // System data 
+    uint8_t soc;                                // Battery SOC 
     uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
     uint16_t navstat;                           // Navigation status of GPS module 
+    uint8_t utc_time[M8Q_TIME_CHAR_LEN];        // UTC time recorded by the GPS module 
+    uint8_t utc_date[M8Q_DATE_CHAR_LEN];        // UTC date recorded by the GPS module 
     uint8_t deg_min_lat[M8Q_COO_LEN];           // Latitude: degrees and minutes integer part 
     uint8_t min_frac_lat[M8Q_COO_LEN];          // Latitude: minuutes fractional part 
     uint8_t NS;                                 // North/South indicator of latitude 
@@ -135,10 +133,18 @@ typedef struct mtbdl_data_s
     int16_t accel_y;                            // y-axis acceleration reading 
     int16_t accel_z;                            // z-axis acceleration reading 
 
+    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+    uint32_t led_colour_data[WS2812_LED_NUM]; 
+
     // Wheel RPM info 
     uint8_t rev_count;                          // Wheel revolution counter 
     uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
     uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
+
+    // SD card 
+    char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
+    char filename[MTBDL_MAX_DATA_STR_LEN];      // Buffer for storing a file name 
+    uint8_t tx_status : 1;                      // TX transaction status 
 
     // Log tracking 
     uint32_t time_count;                        // Time tracking counter for logging 

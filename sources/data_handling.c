@@ -188,17 +188,12 @@ void mtbdl_data_init(
     mtbdl_data.pot_fork_rest = CLEAR; 
     mtbdl_data.pot_shock_rest = CLEAR; 
 
-    // SD card 
-    memset((void *)mtbdl_data.data_buff, CLEAR, sizeof(mtbdl_data.data_buff)); 
-    memset((void *)mtbdl_data.filename, CLEAR, sizeof(mtbdl_data.filename)); 
-    mtbdl_data.tx_status = CLEAR_BIT; 
-
-    // LEDs 
-    memset((void *)mtbdl_data.led_colour_data, CLEAR, sizeof(mtbdl_data.led_colour_data)); 
-
     // System data 
+    mtbdl_data.soc = CLEAR; 
     memset((void *)mtbdl_data.adc_buff, CLEAR, sizeof(mtbdl_data.adc_buff)); 
     mtbdl_data.navstat = M8Q_NAVSTAT_NF; 
+    memset((void *)mtbdl_data.utc_time, CLEAR, sizeof(mtbdl_data.utc_time)); 
+    memset((void *)mtbdl_data.utc_date, CLEAR, sizeof(mtbdl_data.utc_date)); 
     memset((void *)mtbdl_data.deg_min_lat, CLEAR, sizeof(mtbdl_data.deg_min_lat)); 
     memset((void *)mtbdl_data.min_frac_lat, CLEAR, sizeof(mtbdl_data.min_frac_lat)); 
     mtbdl_data.NS = CLEAR; 
@@ -208,6 +203,14 @@ void mtbdl_data_init(
     mtbdl_data.accel_x = CLEAR; 
     mtbdl_data.accel_y = CLEAR; 
     mtbdl_data.accel_z = CLEAR; 
+
+    // LEDs 
+    memset((void *)mtbdl_data.led_colour_data, CLEAR, sizeof(mtbdl_data.led_colour_data)); 
+
+    // SD card 
+    memset((void *)mtbdl_data.data_buff, CLEAR, sizeof(mtbdl_data.data_buff)); 
+    memset((void *)mtbdl_data.filename, CLEAR, sizeof(mtbdl_data.filename)); 
+    mtbdl_data.tx_status = CLEAR_BIT; 
 }
 
 
@@ -339,22 +342,24 @@ void mtbdl_read_sys_params(
 void mtbdl_format_write_bike_params(void)
 {
     // Write fork parameters 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_param_fork_info, 
-             mtbdl_data.fork_psi, 
-             mtbdl_data.fork_comp, 
-             mtbdl_data.fork_reb); 
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_param_fork_info, 
+        mtbdl_data.fork_psi, 
+        mtbdl_data.fork_comp, 
+        mtbdl_data.fork_reb); 
     
     hw125_puts(mtbdl_data.data_buff); 
 
     // Write shock parameters 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_param_shock_info, 
-             mtbdl_data.shock_psi, 
-             mtbdl_data.shock_lock, 
-             mtbdl_data.shock_reb); 
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_param_shock_info, 
+        mtbdl_data.shock_psi, 
+        mtbdl_data.shock_lock, 
+        mtbdl_data.shock_reb); 
     
     hw125_puts(mtbdl_data.data_buff); 
 }
@@ -366,20 +371,22 @@ void mtbdl_format_read_bike_params(void)
     // Read fork parameters 
     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_fork_info, 
-           &mtbdl_data.fork_psi, 
-           &mtbdl_data.fork_comp, 
-           &mtbdl_data.fork_reb); 
+    sscanf(
+        mtbdl_data.data_buff, 
+        mtbdl_param_fork_info, 
+        &mtbdl_data.fork_psi, 
+        &mtbdl_data.fork_comp, 
+        &mtbdl_data.fork_reb); 
 
     // Read shock parameters 
     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_shock_info, 
-           &mtbdl_data.shock_psi, 
-           &mtbdl_data.shock_lock, 
-           &mtbdl_data.shock_reb); 
+    sscanf(
+        mtbdl_data.data_buff, 
+        mtbdl_param_shock_info, 
+        &mtbdl_data.shock_psi, 
+        &mtbdl_data.shock_lock, 
+        &mtbdl_data.shock_reb); 
 }
 
 
@@ -387,29 +394,32 @@ void mtbdl_format_read_bike_params(void)
 void mtbdl_format_write_sys_params(void)
 {
     // Write logging parameters 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_param_index, 
-             mtbdl_data.log_index); 
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_param_index, 
+        mtbdl_data.log_index); 
 
     hw125_puts(mtbdl_data.data_buff); 
     
     // Write accelerometer calibration data 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_param_accel_rest, 
-             mtbdl_data.accel_x_rest, 
-             mtbdl_data.accel_y_rest, 
-             mtbdl_data.accel_z_rest); 
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_param_accel_rest, 
+        mtbdl_data.accel_x_rest, 
+        mtbdl_data.accel_y_rest, 
+        mtbdl_data.accel_z_rest); 
     
     hw125_puts(mtbdl_data.data_buff); 
 
     // Write potentiometer calibrated starting points 
-    snprintf(mtbdl_data.data_buff, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_param_pot_rest, 
-             mtbdl_data.pot_fork_rest, 
-             mtbdl_data.pot_shock_rest); 
+    snprintf(
+        mtbdl_data.data_buff, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_param_pot_rest, 
+        mtbdl_data.pot_fork_rest, 
+        mtbdl_data.pot_shock_rest); 
     
     hw125_puts(mtbdl_data.data_buff); 
 }
@@ -421,26 +431,29 @@ void mtbdl_format_read_sys_params(void)
     // Read logging parameters 
     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_index, 
-           &mtbdl_data.log_index); 
+    sscanf(
+        mtbdl_data.data_buff, 
+        mtbdl_param_index, 
+        &mtbdl_data.log_index); 
 
     // Read accelerometer calibration data 
     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_accel_rest, 
-           &mtbdl_data.accel_x_rest, 
-           &mtbdl_data.accel_y_rest, 
-           &mtbdl_data.accel_z_rest); 
+    sscanf(
+        mtbdl_data.data_buff, 
+        mtbdl_param_accel_rest, 
+        &mtbdl_data.accel_x_rest, 
+        &mtbdl_data.accel_y_rest, 
+        &mtbdl_data.accel_z_rest); 
 
     // Read potentiometer starting points 
     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(mtbdl_data.data_buff, 
-           mtbdl_param_pot_rest, 
-           &mtbdl_data.pot_fork_rest, 
-           &mtbdl_data.pot_shock_rest); 
+    sscanf(
+        mtbdl_data.data_buff, 
+        mtbdl_param_pot_rest, 
+        &mtbdl_data.pot_fork_rest, 
+        &mtbdl_data.pot_shock_rest); 
 }
 
 //=======================================================================================
@@ -460,10 +473,11 @@ uint8_t mtbdl_log_name_prep(void)
     }
 
     // Number of log files is within the limit - generate a new log file name 
-    snprintf(mtbdl_data.filename, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_log_file, 
-             mtbdl_data.log_index); 
+    snprintf(
+        mtbdl_data.filename, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_log_file, 
+        mtbdl_data.log_index); 
 
     return TRUE; 
 }
@@ -472,29 +486,46 @@ uint8_t mtbdl_log_name_prep(void)
 // Log file prep 
 void mtbdl_log_file_prep(void)
 {
-    // Move to the data directory 
+    // The code moves to the directory that stores the data log files and attempts to create 
+    // and open the next indexed log file. If this is successful then information and data 
+    // will be written to the file. If unsuccessful then the hw125 controller will record a 
+    // fault and the system will enter the fault state instead of proceeding to the data 
+    // logging state. 
+    
     hw125_set_dir(mtbdl_data_dir); 
 
     if (hw125_open(mtbdl_data.filename, HW125_MODE_WWX) == FR_OK)
     {
-        // File successfully created - write parameters and log info, update file index 
+        // File successfully created 
+        // Write the bike and system parameters, file creation time stamp (UTC format) and 
+        // logging info (sample period and RPM calculation info) to the head of the log file 
+        // so the user can associate the information to the logged data. 
+        // For readability and easier post processing of the collected data (not done within 
+        // this system), a line is written to indicate the start of the data logging 
+        // information. The data log index is then incremented which allows the code to keep 
+        // track of the number of log files that have been created. 
+        
+        // Bike and system parameters 
         mtbdl_format_write_bike_params(); 
         mtbdl_format_write_sys_params(); 
 
-        // // Write file creation timestamp 
-        // snprintf(mtbdl_data.data_buff, 
-        //          MTBDL_MAX_DATA_STR_LEN, 
-        //          mtbdl_param_time, 
-        //          mtbdl_data); 
-        // hw125_puts(mtbdl_data.data_buff); 
+        // UTC time stamp 
+        snprintf(
+            mtbdl_data.data_buff, 
+            MTBDL_MAX_DATA_STR_LEN, 
+            mtbdl_param_time, 
+            (char *)mtbdl_data.utc_time, 
+            (char *)mtbdl_data.utc_date); 
+        hw125_puts(mtbdl_data.data_buff); 
 
-        // Write data logging info 
-        snprintf(mtbdl_data.data_buff, 
-                 MTBDL_MAX_DATA_STR_LEN, 
-                 mtbdl_param_data, 
-                 MTBDL_LOG_PERIOD, 
-                 MTBDL_REV_LOG_FREQ, 
-                 MTBDL_REV_SAMPLE_SIZE); 
+        // Logging info 
+        snprintf(
+            mtbdl_data.data_buff, 
+            MTBDL_MAX_DATA_STR_LEN, 
+            mtbdl_param_data, 
+            MTBDL_LOG_PERIOD, 
+            MTBDL_REV_LOG_FREQ, 
+            MTBDL_REV_SAMPLE_SIZE); 
         hw125_puts(mtbdl_data.data_buff); 
         
         hw125_puts(mtbdl_data_log_start); 
@@ -511,10 +542,6 @@ void mtbdl_log_data_prep(void)
     mtbdl_data.rev_buff_index = CLEAR; 
     memset((void *)mtbdl_data.rev_buff, CLEAR, sizeof(mtbdl_data.rev_buff)); 
 
-    // GPS - put into a controlled read state 
-    m8q_set_read_ready(); 
-    m8q_set_read_flag(); 
-
     // Log tracking 
     mtbdl_data.time_count = CLEAR; 
     mtbdl_data.stream_index = CLEAR; 
@@ -522,10 +549,15 @@ void mtbdl_log_data_prep(void)
     mtbdl_data.run_count = CLEAR_BIT; 
     mtbdl_data.trailmark = CLEAR_BIT; 
     mtbdl_data.user_input = CLEAR_BIT; 
+    mtbdl_data.log_stream = MTBDL_LOG_STREAM_STANDARD; 
+
+    // GPS - put into a controlled read state 
+    m8q_set_read_ready(); 
+    m8q_set_read_flag(); 
 
 #if MTBDL_DEBUG 
     mtbdl_data.time_stop = CLEAR; 
-    mtbdl_data.time_limit = 999; 
+    mtbdl_data.time_limit = MTBDL_DEBUG_SAMPLE_COUNT; 
     mtbdl_data.count_standard = CLEAR; 
     mtbdl_data.count_wait = CLEAR; 
     mtbdl_data.time_overflow = CLEAR; 

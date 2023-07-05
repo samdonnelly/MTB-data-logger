@@ -47,9 +47,9 @@ const char mtbdl_param_shock_info[] = "Shock: PSI:%u L:%u R:%u\r\n";
 
 // System parameter information 
 const char mtbdl_param_index[] = "File Index: %u\r\n"; 
-const char mtbdl_param_time[] = "Timestamp: %s\r\n"; 
 const char mtbdl_param_accel_rest[] = "IMU Offset: X:%u Y:%u Z:%u\r\n"; 
 const char mtbdl_param_pot_rest[] = "Pot Offset: F:%u S:%u\r\n"; 
+const char mtbdl_param_time[] = "UTC: %s %s\r\n"; 
 const char mtbdl_param_data[] = "Data: T:%ums RPM_f:%uHz RPM_size:%u\r\n"; 
 
 // Data log information 

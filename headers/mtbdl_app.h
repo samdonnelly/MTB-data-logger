@@ -32,8 +32,13 @@
 
 // System info 
 #define MTBDL_NUM_STATES 20              // Number of system states 
+
+// Timing info 
 #define MTBDL_LCD_SLEEP 10000000         // (us) Inactive time before screen backlight off 
 #define MTBDL_STATE_WAIT 5000000         // (us) General state wait time 
+#define MTBDL_STATE_CHECK_SLOW 5000000   // (us) Long period time for non-blocking timer 
+#define MTBDL_STATE_CHECK_NORM 1000000   // (us) Normal period time for non-blocking timer 
+#define MTBDL_STATE_CHECK_FAST 100000    // (us) Short period time for non-blocking timer 
 
 // Calibration settings 
 #define MTBDL_CAL_SAMPLE_TIME 5000000    // (us) Calibration state sample time 

@@ -639,6 +639,9 @@ void mtbdl_init_state(
     {
         // Display the startup message 
         hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
+
+        // Turn on the init state LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led2_3); 
         
         mtbdl->init = CLEAR_BIT; 
     }
@@ -685,6 +688,9 @@ void mtbdl_init_state(
         // Clear the screen startup message 
         hd44780u_set_clear_flag(); 
 
+        // Turn off the init state LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
     }
@@ -697,6 +703,9 @@ void mtbdl_init_state(
 void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl)
 {
+    // Local variables 
+    static uint32_t time_count = CLEAR; 
+
     //==================================================
     // State entry 
 
@@ -721,7 +730,7 @@ void mtbdl_idle_state(
     //==================================================
 
     //==================================================
-    // Check user button input 
+    // Checks 
 
     // Button 1 - triggers the pre run state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
@@ -754,23 +763,32 @@ void mtbdl_idle_state(
         hd44780u_wake_up(); 
         mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
     }
-    
-    //==================================================
 
-    //==================================================
-    // Checks 
-
-    // Check for GPS lock status - update the display message with the status 
+    // Check for GPS position lock - update the screen message and LED with the status 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_FAST, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        if (mtbdl_navstat_check())
+        time_count += MTBDL_STATE_CHECK_FAST; 
+
+        if (time_count == MTBDL_STATE_CHECK_FAST)
         {
+            // Turn off the GPS LED 
+            mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+        }
+        else if (time_count >= MTBDL_STATE_CHECK_SLOW)
+        {
+            if (mtbdl_navstat_check())
+            {
+                // Turn on the GPS LED if there is a position lock 
+                mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+            }
+
             mtbdl_set_idle_msg(); 
+            time_count = CLEAR; 
         }
     }
 
@@ -779,17 +797,17 @@ void mtbdl_idle_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->run || 
-        mtbdl->data_select || 
-        mtbdl->calibrate)
+    if (mtbdl->run || mtbdl->data_select || mtbdl->calibrate || mtbdl->fault_code)
     {
-        // Clear the idle state message 
+        // Clear the idle state message and take the screen out of power save mode 
         hd44780u_set_clear_flag(); 
-
-        // Take the screen out of power save mode 
         hd44780u_clear_pwr_save_flag(); 
 
+        // Turn off the GPS LED 
+        mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+
         mtbdl->delay_timer.time_start = SET_BIT; 
+        time_count = CLEAR; 
     }
 
     //==================================================
@@ -800,6 +818,9 @@ void mtbdl_idle_state(
 void mtbdl_run_prep_state(
     mtbdl_trackers_t *mtbdl)
 {
+    // Local variables 
+    static uint32_t time_count = CLEAR; 
+
     //==================================================
     // State entry 
 
@@ -827,7 +848,7 @@ void mtbdl_run_prep_state(
     //==================================================
 
     //==================================================
-    // Check user button input 
+    // Checks 
 
     // Button 1 - triggers the run state 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
@@ -847,23 +868,43 @@ void mtbdl_run_prep_state(
         mtbdl->user_btn_2_block = SET_BIT; 
         mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
     }
-    
-    //==================================================
 
-    //==================================================
-    // Checks 
-
-    // Check for GPS lock status - update the display message with the status 
+    // Check the GPS position lock status and update the status LEDs 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_FAST, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        if (mtbdl_navstat_check())
+        time_count += MTBDL_STATE_CHECK_FAST; 
+
+        // GPS status and LED update 
+        if (time_count == MTBDL_STATE_CHECK_FAST)
         {
+            // Turn off the GPS LED 
+            mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+        }
+        else if (time_count == MTBDL_STATE_CHECK_NORM)
+        {
+            // Turn on the data logging LED 
+            mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+        }
+        else if (time_count == (MTBDL_STATE_CHECK_NORM + MTBDL_STATE_CHECK_FAST))
+        {
+            // Turn off the data logging LED 
+            mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+        }
+        else if (time_count >= MTBDL_STATE_CHECK_SLOW)
+        {
+            if (mtbdl_navstat_check())
+            {
+                // Turn on the GPS LED if there is a GPS position lock 
+                mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+            }
+
             mtbdl_set_run_prep_msg(); 
+            time_count = CLEAR; 
         }
     }
 
@@ -872,12 +913,17 @@ void mtbdl_run_prep_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->run || mtbdl->idle)
+    if (mtbdl->run || mtbdl->idle || mtbdl->fault_code)
     {
         // Clear the run prep state message 
         hd44780u_set_clear_flag(); 
 
+        // Make sure the data logging and GPS LEDs are off 
+        mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+        mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+
         mtbdl->delay_timer.time_start = SET_BIT; 
+        time_count = CLEAR; 
     }
 
     //==================================================
@@ -895,6 +941,9 @@ void mtbdl_run_countdown_state(
     {
         // Display the run countdown state message 
         hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
+
+        // Turn on the data logging LED 
+        mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
 
         // SD card will be written to constantly so no need for the check state 
         hw125_clear_check_flag(); 
@@ -922,6 +971,9 @@ void mtbdl_run_countdown_state(
 
         // Put the screen in low power mode 
         hd44780u_set_low_pwr_flag(); 
+
+        // Turn off the data logging LED 
+        mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
 
         // Prep the logging data 
         mtbdl_log_data_prep(); 
@@ -976,7 +1028,7 @@ void mtbdl_run_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->run)
+    if (mtbdl->run || mtbdl->fault_code)
     {
         // Take the screen out of low power mode 
         hd44780u_clear_low_pwr_flag(); 
@@ -1097,7 +1149,7 @@ void mtbdl_data_select_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->data_select || mtbdl->tx || mtbdl->idle)
+    if (mtbdl->data_select || mtbdl->tx || mtbdl->idle || mtbdl->fault_code)
     {
         // Clear the data select state message 
         hd44780u_set_clear_flag(); 
@@ -1154,7 +1206,7 @@ void mtbdl_dev_search_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->idle || mtbdl->data_select)
+    if (mtbdl->idle || mtbdl->data_select || mtbdl->fault_code)
     {
         // Clear the device connection search state message 
         hd44780u_set_clear_flag(); 
@@ -1215,7 +1267,7 @@ void mtbdl_prerx_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->rx || mtbdl->idle)
+    if (mtbdl->rx || mtbdl->idle || mtbdl->fault_code)
     {
         // Clear the pre rx state message 
         hd44780u_set_clear_flag(); 
@@ -1282,7 +1334,7 @@ void mtbdl_rx_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->rx)
+    if (mtbdl->rx || mtbdl->fault_code)
     {
         // Clear the rx state message 
         hd44780u_set_clear_flag(); 
@@ -1403,7 +1455,7 @@ void mtbdl_pretx_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->tx || mtbdl->idle)
+    if (mtbdl->tx || mtbdl->idle || mtbdl->fault_code)
     {
         // Clear the pre rx state message 
         hd44780u_set_clear_flag(); 
@@ -1462,7 +1514,7 @@ void mtbdl_tx_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->tx)
+    if (mtbdl->tx || mtbdl->fault_code)
     {
         // Clear the tx state message 
         hd44780u_set_clear_flag(); 
@@ -1550,6 +1602,9 @@ void mtbdl_precalibrate_state(
         mtbdl->calibrate = SET_BIT; 
         mtbdl->user_btn_1_block = SET_BIT; 
         mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+
+        // Take the MPU-6050 out of low power mode 
+        mpu6050_clear_low_power(DEVICE_ONE); 
     }
     
     // Button 2 - cancels the calibration state --> triggers idle state 
@@ -1591,7 +1646,7 @@ void mtbdl_precalibrate_state(
     //==================================================
     // State exit 
 
-    if (mtbdl->calibrate || mtbdl->idle)
+    if (mtbdl->calibrate || mtbdl->idle || mtbdl->fault_code)
     {
         // Update the system tracking info 
         mtbdl->delay_timer.time_start = SET_BIT; 
@@ -1818,9 +1873,9 @@ void mtbdl_fault_state(
 
     if (!mtbdl->fault)
     {
-        // Clear the screen and display the fault state message 
-        hd44780u_set_clear_flag(); 
+        // Display the fault state message and take screen out of power save mode 
         hd44780u_set_msg(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
+        hd44780u_clear_pwr_save_flag(); 
 
         // Turn on the fault status LED 
         mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
@@ -1882,6 +1937,9 @@ void mtbdl_reset_state(
 
     // Set the init state flag once ready 
     mtbdl->init = SET_BIT; 
+
+    // TODO Reset devices 
+    hw125_set_reset_flag(); 
     
     //==================================================
 }

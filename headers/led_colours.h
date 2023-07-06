@@ -39,6 +39,7 @@ extern uint32_t mtbdl_led1_1;   // Position lock
 // LED 2 colours - various states 
 extern uint32_t mtbdl_led2_1;   // Bluetooth connection in TX/RX states 
 extern uint32_t mtbdl_led2_2;   // Calibration state 
+extern uint32_t mtbdl_led2_3;   // Initialization state 
 
 // LED 3 colours - fault and low power states 
 extern uint32_t mtbdl_led3_1;   // Fault (solid) and low power (flashing) states 

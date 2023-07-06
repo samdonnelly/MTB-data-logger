@@ -27,7 +27,7 @@
 uint32_t mtbdl_led_clear = 0x00000000; 
 
 // LED 0 colours - Data loggng 
-uint32_t mtbdl_led0_1 = 0x001E0000;   // Data logging in progress 
+uint32_t mtbdl_led0_1 = 0x001E0000;   // Run prep, run countdown and run (data logging) 
 
 // LED 1 colours - GPS position lock status 
 uint32_t mtbdl_led1_1 = 0x001E1E1E;   // Position lock 
@@ -35,6 +35,7 @@ uint32_t mtbdl_led1_1 = 0x001E1E1E;   // Position lock
 // LED 2 colours - various states 
 uint32_t mtbdl_led2_1 = 0x0000001E;   // Bluetooth connection in TX/RX states 
 uint32_t mtbdl_led2_2 = 0x00001E1E;   // Calibration state 
+uint32_t mtbdl_led2_3 = 0x004A0D22;   // Initialization state 
 
 // LED 3 colours - fault and low power states 
 uint32_t mtbdl_led3_1 = 0x00001E00;   // Fault (solid) and low power (flashing) states 

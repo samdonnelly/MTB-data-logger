@@ -1236,16 +1236,43 @@ void mtbdl_set_trailmark(void)
 uint8_t mtbdl_navstat_check(void)
 {
     // Local variables 
-    static uint16_t navstat_check = M8Q_NAVSTAT_NF; 
     uint8_t nav_stat_change = FALSE; 
 
     // Update the data record with the navigation status and return the status 
     mtbdl_data.navstat = m8q_get_navstat(); 
 
-    if (mtbdl_data.navstat != navstat_check)
+    switch (mtbdl_data.navstat)
     {
-        nav_stat_change = TRUE; 
-        navstat_check = mtbdl_data.navstat; 
+        case M8Q_NAVSTAT_NF: 
+            break; 
+
+        case M8Q_NAVSTAT_DR: 
+            break; 
+
+        case M8Q_NAVSTAT_G2: 
+            nav_stat_change = TRUE; 
+            break; 
+
+        case M8Q_NAVSTAT_G3: 
+            nav_stat_change = TRUE; 
+            break; 
+
+        case M8Q_NAVSTAT_D2: 
+            nav_stat_change = TRUE; 
+            break; 
+
+        case M8Q_NAVSTAT_D3: 
+            nav_stat_change = TRUE; 
+            break; 
+
+        case M8Q_NAVSTAT_RK: 
+            break; 
+
+        case M8Q_NAVSTAT_TT: 
+            break; 
+
+        default: 
+            break; 
     }
     
     return nav_stat_change; 

@@ -1818,7 +1818,8 @@ void mtbdl_fault_state(
 
     if (!mtbdl->fault)
     {
-        // Display the fault state message 
+        // Clear the screen and display the fault state message 
+        hd44780u_set_clear_flag(); 
         hd44780u_set_msg(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
 
         // Turn on the fault status LED 

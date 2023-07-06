@@ -510,6 +510,8 @@ void mtbdl_log_file_prep(void)
         mtbdl_format_write_sys_params(); 
 
         // UTC time stamp 
+        m8q_get_time(mtbdl_data.utc_time); 
+        m8q_get_date(mtbdl_data.utc_date); 
         snprintf(
             mtbdl_data.data_buff, 
             MTBDL_MAX_DATA_STR_LEN, 
@@ -1069,6 +1071,7 @@ void mtbdl_calibrate(void)
     if (handler_flags.tim1_trg_tim11_glbl_flag)
     {
         handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+        mtbdl_data.cal_index++; 
 
         // Record new accel data 
         mpu6050_get_accel_raw(
@@ -1079,11 +1082,11 @@ void mtbdl_calibrate(void)
 
         // Sum all the data into the calibration buffer. This data will be averaged once the 
         // calibration state is left. 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] += mtbdl_data.accel_x_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] += mtbdl_data.accel_y_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] += mtbdl_data.accel_z_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] += mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
-        mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] += mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] += (int32_t)mtbdl_data.accel_x_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] += (int32_t)mtbdl_data.accel_y_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] += (int32_t)mtbdl_data.accel_z_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
+        mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
 
         // Trigger an ADC and accelerometer read so the data is available for the next 
         // time data is recorded 

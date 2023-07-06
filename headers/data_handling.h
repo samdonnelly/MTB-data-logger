@@ -137,8 +137,8 @@ typedef struct mtbdl_data_s
     uint8_t soc;                                // Battery SOC 
     uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
     uint16_t navstat;                           // Navigation status of GPS module 
-    uint8_t utc_time[M8Q_TIME_CHAR_LEN];        // UTC time recorded by the GPS module 
-    uint8_t utc_date[M8Q_DATE_CHAR_LEN];        // UTC date recorded by the GPS module 
+    uint8_t utc_time[M8Q_TIME_CHAR_LEN+1];      // UTC time recorded by the GPS module 
+    uint8_t utc_date[M8Q_DATE_CHAR_LEN+1];      // UTC date recorded by the GPS module 
     uint8_t deg_min_lat[M8Q_COO_LEN];           // Latitude: degrees and minutes integer part 
     uint8_t min_frac_lat[M8Q_COO_LEN];          // Latitude: minuutes fractional part 
     uint8_t NS;                                 // North/South indicator of latitude 

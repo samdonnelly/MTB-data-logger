@@ -183,6 +183,7 @@ void mtbdl_app_init(
     mtbdl_trackers.delay_timer.time_cnt_total = CLEAR; 
     mtbdl_trackers.delay_timer.time_cnt = CLEAR; 
     mtbdl_trackers.delay_timer.time_start = SET_BIT; 
+    mtbdl_trackers.led_state = CLEAR; 
 
     // User buttons 
     mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
@@ -678,7 +679,7 @@ void mtbdl_init_state(
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_SLOW, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
@@ -962,7 +963,7 @@ void mtbdl_run_countdown_state(
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_SLOW, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
@@ -1056,6 +1057,9 @@ void mtbdl_postrun_state(
             mtbdl_log_end(); 
         }
 
+        // Turn on the data logging LED 
+        mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+
         hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
         mtbdl->noncrit_fault = CLEAR_BIT; 
         mtbdl->run = CLEAR_BIT; 
@@ -1069,7 +1073,7 @@ void mtbdl_postrun_state(
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_SLOW, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
@@ -1078,6 +1082,9 @@ void mtbdl_postrun_state(
 
         // Clear the post run state message 
         hd44780u_set_clear_flag(); 
+
+        // Turn off the data logging LED 
+        mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
 
         // Set the SD card controller check flag 
         hw125_set_check_flag(); 
@@ -1180,7 +1187,7 @@ void mtbdl_dev_search_state(
     //==================================================
 
     //==================================================
-    // Check user button input 
+    // Checks 
 
     // Button 1 - triggers the idle state - cancels device search 
     if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
@@ -1189,16 +1196,37 @@ void mtbdl_dev_search_state(
         mtbdl->user_btn_1_block = SET_BIT; 
         mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
     }
-    
-    //==================================================
-    
-    //==================================================
-    // Checks 
 
     // If the HC-05 is connected to a device then move to the next state 
     if (hc05_status())
     {
         mtbdl->data_select = SET_BIT; 
+    }
+
+    //==================================================
+
+    //===================================================
+    // LED update 
+
+    // Update the state of the LED 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_CHECK_FAST, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        mtbdl->led_state = 1 - mtbdl->led_state; 
+
+        // Toggle Bluetooth LED quickly while not connected 
+        if (mtbdl->led_state)
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+        }
+        else 
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+        }
     }
 
     //==================================================
@@ -1210,6 +1238,12 @@ void mtbdl_dev_search_state(
     {
         // Clear the device connection search state message 
         hd44780u_set_clear_flag(); 
+
+        // Make sure Bluetooth LED is off 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->led_state = CLEAR; 
     }
 
     //==================================================
@@ -1264,6 +1298,32 @@ void mtbdl_prerx_state(
     
     //==================================================
 
+    //===================================================
+    // LED update 
+
+    // Update the state of the LED 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_CHECK_NORM, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        mtbdl->led_state = 1 - mtbdl->led_state; 
+
+        // Toggle Bluetooth LED slowly while connected 
+        if (mtbdl->led_state)
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+        }
+        else 
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+        }
+    }
+
+    //==================================================
+
     //==================================================
     // State exit 
 
@@ -1271,6 +1331,9 @@ void mtbdl_prerx_state(
     {
         // Clear the pre rx state message 
         hd44780u_set_clear_flag(); 
+
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->led_state = CLEAR; 
     }
 
     //==================================================
@@ -1323,6 +1386,32 @@ void mtbdl_rx_state(
     
     //==================================================
 
+    //===================================================
+    // LED update 
+
+    // Update the state of the LED 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_CHECK_NORM, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        mtbdl->led_state = 1 - mtbdl->led_state; 
+
+        // Toggle Bluetooth LED slowly while connected 
+        if (mtbdl->led_state)
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+        }
+        else 
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+        }
+    }
+
+    //==================================================
+
     //==================================================
     // Data transfer 
 
@@ -1338,6 +1427,9 @@ void mtbdl_rx_state(
     {
         // Clear the rx state message 
         hd44780u_set_clear_flag(); 
+
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->led_state = CLEAR; 
     }
 
     //==================================================
@@ -1353,8 +1445,13 @@ void mtbdl_postrx_state(
 
     if (mtbdl->rx)
     {
-        // Update the screen message and save the parameters to file 
+        // Update the screen message 
         hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
+
+        // Turn on the Bluetooth LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+
+        // Save the parameters to file and update tracking info 
         mtbdl_write_bike_params(HW125_MODE_OEW); 
         mtbdl->noncrit_fault = CLEAR_BIT; 
         mtbdl->rx = CLEAR_BIT; 
@@ -1368,17 +1465,19 @@ void mtbdl_postrx_state(
     // Wait for a short period of time before leaving the post rx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_SLOW, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-
         // Clear the post rx state message 
         hd44780u_set_clear_flag(); 
 
-        // Set the idle state flag when ready 
+        // Turn off the Bluetooth LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+
+        // Update tracking info 
+        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->idle = SET_BIT; 
     }
     
@@ -1452,6 +1551,32 @@ void mtbdl_pretx_state(
 
     //==================================================
 
+    //===================================================
+    // LED update 
+
+    // Update the state of the LED 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_CHECK_NORM, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        mtbdl->led_state = 1 - mtbdl->led_state; 
+
+        // Toggle Bluetooth LED slowly while connected 
+        if (mtbdl->led_state)
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+        }
+        else 
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+        }
+    }
+
+    //==================================================
+
     //==================================================
     // State exit 
 
@@ -1459,6 +1584,9 @@ void mtbdl_pretx_state(
     {
         // Clear the pre rx state message 
         hd44780u_set_clear_flag(); 
+
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->led_state = CLEAR; 
     }
 
     //==================================================
@@ -1511,6 +1639,32 @@ void mtbdl_tx_state(
     
     //==================================================
 
+    //===================================================
+    // LED update 
+
+    // Update the state of the LED 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    MTBDL_STATE_CHECK_NORM, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        mtbdl->led_state = 1 - mtbdl->led_state; 
+
+        // Toggle Bluetooth LED slowly while connected 
+        if (mtbdl->led_state)
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+        }
+        else 
+        {
+            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+        }
+    }
+
+    //==================================================
+
     //==================================================
     // State exit 
 
@@ -1518,6 +1672,9 @@ void mtbdl_tx_state(
     {
         // Clear the tx state message 
         hd44780u_set_clear_flag(); 
+
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->led_state = CLEAR; 
     }
 
     //==================================================
@@ -1533,7 +1690,13 @@ void mtbdl_posttx_state(
     
     if (mtbdl->tx)
     {
+        // Set the post TX state message 
         hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
+
+        // Turn on the Bluetooth LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+
+        // End the transaction 
         mtbdl_tx_end(); 
         mtbdl->tx = CLEAR_BIT; 
     }
@@ -1546,7 +1709,7 @@ void mtbdl_posttx_state(
     // Wait for a short period of time before leaving the post tx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_SLOW, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
@@ -1555,6 +1718,9 @@ void mtbdl_posttx_state(
 
         // Clear the post tx state message 
         hd44780u_set_clear_flag(); 
+
+        // Turn off the Bluetooth LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
 
         // Go back to the pre-tx state if the connection was not lost 
         if (mtbdl->noncrit_fault)
@@ -1577,9 +1743,6 @@ void mtbdl_posttx_state(
 void mtbdl_precalibrate_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // Local variables 
-    static uint8_t led_state = CLEAR; 
-
     //==================================================
     // State entry 
 
@@ -1623,21 +1786,21 @@ void mtbdl_precalibrate_state(
     // Update the state of the LED 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_LED_CAL_UPDATE, 
+                    MTBDL_STATE_CHECK_NORM, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        led_state++; 
+        mtbdl->led_state++; 
 
-        if (led_state == MTBDL_LED_CAL_COUNT)
+        if (mtbdl->led_state == MTBDL_STATE_CHECK_CNT_1)
         {
             mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
         }
-        else if (led_state >= (2*MTBDL_LED_CAL_COUNT))
+        else if (mtbdl->led_state >= MTBDL_STATE_CHECK_CNT_2)
         {
             mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-            led_state = CLEAR; 
+            mtbdl->led_state = CLEAR; 
         }
     }
 
@@ -1648,15 +1811,15 @@ void mtbdl_precalibrate_state(
 
     if (mtbdl->calibrate || mtbdl->idle || mtbdl->fault_code)
     {
-        // Update the system tracking info 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        led_state = CLEAR; 
-
         // Clear the pre calibration state message 
         hd44780u_set_clear_flag(); 
 
         // Make sure the calibration LED is off 
         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+
+        // Update the system tracking info 
+        mtbdl->delay_timer.time_start = SET_BIT; 
+        mtbdl->led_state = CLEAR; 
     }
 
     //==================================================
@@ -1700,7 +1863,7 @@ void mtbdl_calibrate_state(
     // Wait until calibration is done before leaving the state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_CAL_SAMPLE_TIME, 
+                    MTBDL_STATE_CHECK_SLOW, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
@@ -1744,7 +1907,7 @@ void mtbdl_postcalibrate_state(
     // Wait for a period of time before returning to the idle state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_WAIT, 
+                    MTBDL_STATE_CHECK_SLOW, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
@@ -1765,9 +1928,6 @@ void mtbdl_postcalibrate_state(
 void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl)
 {
-    // Local variables 
-    static uint8_t led_state = CLEAR; 
-
     //==================================================
     // State entry 
 
@@ -1820,21 +1980,21 @@ void mtbdl_lowpwr_state(
     // Update the state of the LED 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
-                    MTBDL_LED_LP_UPDATE, 
+                    MTBDL_STATE_CHECK_NORM, 
                     &mtbdl->delay_timer.time_cnt_total, 
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        led_state++; 
+        mtbdl->led_state++; 
 
-        if (led_state == MTBDL_LED_LP_OFF_COUNT)
+        if (mtbdl->led_state == MTBDL_STATE_CHECK_CNT_2)
         {
             mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
         }
-        else if (led_state >= (MTBDL_LED_LP_OFF_COUNT + MTBDL_LED_LP_ON_COUNT))
+        else if (mtbdl->led_state >= MTBDL_STATE_CHECK_CNT_3)
         {
             mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
-            led_state = CLEAR; 
+            mtbdl->led_state = CLEAR; 
         }
     }
 
@@ -1849,7 +2009,7 @@ void mtbdl_lowpwr_state(
         mtbdl->low_pwr = CLEAR_BIT; 
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
-        led_state = CLEAR; 
+        mtbdl->led_state = CLEAR; 
 
         // Clear the idle state message and take devices out of low power mode 
         hd44780u_set_clear_flag(); 

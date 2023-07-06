@@ -35,21 +35,10 @@
 
 // Timing info 
 #define MTBDL_LCD_SLEEP 10000000         // (us) Inactive time before screen backlight off 
-#define MTBDL_STATE_WAIT 5000000         // (us) General state wait time 
+#define MTBDL_LCD_LP_SLEEP 3000000       // (us) Low power state message display time 
 #define MTBDL_STATE_CHECK_SLOW 5000000   // (us) Long period time for non-blocking timer 
 #define MTBDL_STATE_CHECK_NORM 1000000   // (us) Normal period time for non-blocking timer 
 #define MTBDL_STATE_CHECK_FAST 100000    // (us) Short period time for non-blocking timer 
-
-// Calibration settings 
-#define MTBDL_CAL_SAMPLE_TIME 5000000    // (us) Calibration state sample time 
-#define MTBDL_LED_CAL_UPDATE 1000000     // (us) Low power state LED update interval 
-#define MTBDL_LED_CAL_COUNT 1            // Calibration state LED time counter 
-
-// Low power settings 
-#define MTBDL_LCD_LP_SLEEP 3000000       // (us) Low power state message display time 
-#define MTBDL_LED_LP_UPDATE 1000000      // (us) Low power state LED update interval 
-#define MTBDL_LED_LP_OFF_COUNT 2         // Low power state LED off time counter 
-#define MTBDL_LED_LP_ON_COUNT 1          // Low power state LED on time counter 
 
 //=======================================================================================
 
@@ -83,6 +72,18 @@ typedef enum {
     MTBDL_RESET_STATE            // State 19 : Reset 
 } mtbdl_states_t; 
 
+
+/**
+ * @brief State check counter values 
+ * 
+ * @details 
+ */
+typedef enum {
+    MTBDL_STATE_CHECK_CNT_1 = 1, 
+    MTBDL_STATE_CHECK_CNT_2, 
+    MTBDL_STATE_CHECK_CNT_3 
+} mtbdl_state_check_count_t; 
+
 //=======================================================================================
 
 
@@ -100,6 +101,7 @@ typedef struct mtbdl_trackers_s
     // Timing information 
     TIM_TypeDef *timer_nonblocking;             // Timer used for non-blocking delays 
     tim_compare_t delay_timer;                  // Delay timing info 
+    uint8_t led_state;                          // LED counter used with non-blocking timer 
 
     // Screen message 
     hd44780u_msgs_t *msg;                       // Message content 

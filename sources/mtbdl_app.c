@@ -1089,6 +1089,9 @@ void mtbdl_postrun_state(
         // Set the SD card controller check flag 
         hw125_set_check_flag(); 
 
+        // Turn off the data logging LED 
+        mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+
         // Set the idle state flag when ready 
         mtbdl->idle = SET_BIT; 
     }
@@ -1584,6 +1587,9 @@ void mtbdl_pretx_state(
     {
         // Clear the pre rx state message 
         hd44780u_set_clear_flag(); 
+
+        // Clear the Bluetooth LED 
+        mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
 
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->led_state = CLEAR; 

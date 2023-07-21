@@ -766,6 +766,7 @@ void mtbdl_idle_state(
     }
 
     // Check for GPS position lock - update the screen message and LED with the status 
+    // Calculate the battery SOC - update the screen message with the status 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
                     MTBDL_STATE_CHECK_FAST, 
@@ -787,6 +788,8 @@ void mtbdl_idle_state(
                 // Turn on the GPS LED if there is a position lock 
                 mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
             }
+
+            // Read the battery ADC and calculate the SOC 
 
             mtbdl_set_idle_msg(); 
             time_count = CLEAR; 

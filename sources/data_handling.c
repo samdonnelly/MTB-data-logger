@@ -249,12 +249,12 @@ void mtbdl_file_sys_setup(void)
 
 // ADC DMA setup 
 void mtbdl_adc_dma_init(
-    DMA_Stream_TypeDef *dma_strea, 
+    DMA_Stream_TypeDef *dma_stream, 
     ADC_TypeDef *adc)
 {
     // Configure the DMA stream 
     dma_stream_config(
-        dma_strea, 
+        dma_stream, 
         (uint32_t)(&adc->DR), 
         (uint32_t)mtbdl_data.adc_buff, 
         (uint16_t)MTBDL_ADC_BUFF_SIZE); 

@@ -244,13 +244,16 @@ void mtbdl_file_sys_setup(void);
 /**
  * @brief ADC DMA setup 
  * 
- * @details 
+ * @details Called during system setup to configure the DMA stream. This function is 
+ *          called instead of doing the initialization directly in the setup so that 
+ *          the ADC buffer, used to store ADC values and exists in the scope of the 
+ *          data handling file, can be associated with the setup. 
  * 
- * @param dma_strea 
- * @param adc 
+ * @param dma_stream : pointer to DMA stream being used 
+ * @param adc : pointer to ADC port used 
  */
 void mtbdl_adc_dma_init(
-    DMA_Stream_TypeDef *dma_strea, 
+    DMA_Stream_TypeDef *dma_stream, 
     ADC_TypeDef *adc); 
 
 //=======================================================================================

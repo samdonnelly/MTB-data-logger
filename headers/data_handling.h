@@ -221,11 +221,13 @@ typedef void (*mtbdl_log_stream)(void);
 /**
  * @brief Initialize data record 
  * 
- * @details 
+ * @details Sets all the data handling info to its default value. This should be called 
+ *          during the setup code. The arguments are saved into the data handling record 
+ *          so they can be used where needed. 
  * 
- * @param rpm_irqn : 
- * @param log_irqn : 
- * @param adc : 
+ * @param rpm_irqn : wheel speed periodic interrupt index 
+ * @param log_irqn : data sample periodic interrupt index 
+ * @param adc : pointer to ADC port used 
  */
 void mtbdl_data_init(
     IRQn_Type rpm_irqn, 
@@ -236,7 +238,13 @@ void mtbdl_data_init(
 /**
  * @brief Bike parameter setup 
  * 
- * @details 
+ * @details Creates directories on the SD card for storing system and bike parameters 
+ *          as well data logs if the directories do not already exist. After establishing 
+ *          directories, checks for existance of system and bike parameter files. If they 
+ *          exist then they will be read and stored into the data handling record. If not 
+ *          then they will be created and intialized to default values. 
+ *          
+ *          This function should be called during the setup code. 
  */
 void mtbdl_file_sys_setup(void); 
 

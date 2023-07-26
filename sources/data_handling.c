@@ -56,7 +56,7 @@ void mtbdl_format_read_sys_params(void);
 
 
 /**
- * @brief 
+ * @brief Data logging stream that records standard data only 
  * 
  * @details 
  */
@@ -64,7 +64,7 @@ void mtbdl_log_stream_standard(void);
 
 
 /**
- * @brief 
+ * @brief Data logging stream that updates user LED feedback 
  * 
  * @details 
  */
@@ -72,7 +72,7 @@ void mtbdl_log_stream_blink(void);
 
 
 /**
- * @brief 
+ * @brief Data logging stream that updates wheel speed 
  * 
  * @details 
  */
@@ -80,7 +80,7 @@ void mtbdl_log_stream_speed(void);
 
 
 /**
- * @brief 
+ * @brief Data logging stream that updates and records acceleration 
  * 
  * @details 
  */
@@ -88,7 +88,7 @@ void mtbdl_log_stream_accel(void);
 
 
 /**
- * @brief 
+ * @brief Data logging stream that updates and records GPS location 
  * 
  * @details 
  */
@@ -96,7 +96,7 @@ void mtbdl_log_stream_gps(void);
 
 
 /**
- * @brief 
+ * @brief Data logging stream that updates user input feedback LEDs 
  * 
  * @details 
  */

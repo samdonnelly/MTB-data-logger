@@ -175,8 +175,8 @@ void mtbdl_app_init(
 /**
  * @brief MTB DL application 
  * 
- * @details Contains the applications main state machine that controls the flow of the 
- *          system. 
+ * @details Checks for system faults, updates the status of user buttons, executes the 
+ *          systems state machine and calls devices controllers. 
  */
 void mtbdl_app(void);
 

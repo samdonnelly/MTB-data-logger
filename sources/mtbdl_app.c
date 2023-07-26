@@ -23,102 +23,222 @@
 //=======================================================================================
 // Function prototypes 
 
-// Initialization state 
+/**
+ * @brief Initialization state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_init_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Idle state 
+/**
+ * @brief Idle state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Run prep state 
+/**
+ * @brief Run prep state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_run_prep_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Run countdown state 
+/**
+ * @brief Run countdown state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_run_countdown_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Run state 
+/**
+ * @brief Run state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_run_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Post run state 
+/**
+ * @brief Post run state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_postrun_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Data transfer selection state 
+/**
+ * @brief Data transfer selection state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_data_select_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Search for Bluetooth connection state 
+/**
+ * @brief Search for Bluetooth connection state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_dev_search_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Pre RX state 
+/**
+ * @brief Pre RX state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_prerx_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// RX state 
+/**
+ * @brief RX state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_rx_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Post RX state 
+/**
+ * @brief Post RX state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_postrx_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// PRE TX state 
+/**
+ * @brief PRE TX state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_pretx_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// TX state 
+/**
+ * @brief TX state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_tx_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Post TX state 
+/**
+ * @brief Post TX state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_posttx_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Pre calibration state 
+/**
+ * @brief Pre calibration state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_precalibrate_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Calibrate state 
+/**
+ * @brief Calibrate state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_calibrate_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Post calibration state 
+/**
+ * @brief Post calibration state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_postcalibrate_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Low power state 
+/**
+ * @brief Low power state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Fault state 
+/**
+ * @brief Fault state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_fault_state(
     mtbdl_trackers_t *mtbdl); 
 
 
-// Reset state 
+/**
+ * @brief Reset state 
+ * 
+ * @details 
+ * 
+ * @param mtbdl : pointer to system tracking info data record 
+ */
 void mtbdl_reset_state(
     mtbdl_trackers_t *mtbdl); 
 

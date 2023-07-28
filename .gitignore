@@ -5,3 +5,13 @@
 
 # Build files 
 build/
+
+# Scripts 
+analysis/file_locations.py
+
+# Data 
+analysis/logs/
+
+# Hidden files 
+.DS_Store 
+__pycache__/

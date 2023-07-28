@@ -48,6 +48,7 @@
 #define MTBDL_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
 
 // Debugging 
+#define MTBDL_DEBUG 0                    // Conditional compilation for debugging 
 #define MTBDL_DEBUG_SAMPLE_COUNT 999     // Number of data samples to take in debug mode 
 
 //=======================================================================================

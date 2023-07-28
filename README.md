@@ -12,9 +12,9 @@ The base code for this project, such as register definitions, interrupt and faul
 
 ## Data Analysis
 
-Data recorded from the system gets interpreted from scripts in the 'analysis' folder. The <a href="">mtbdl_data_analysis.py</a> script can be run to perform the analysis. All other scripts in the folder are supporting scripts and should not be run directly. 
+Data recorded from the system gets interpreted from scripts in the 'analysis' folder. The <a href="https://github.com/samdonnelly/MTB-data-logger/blob/main/analysis/mtbdl_data_analysis.py">mtbdl_data_analysis.py</a> script can be run to perform the analysis. All other scripts in the folder are supporting scripts and should not be run directly. 
 
-A file_locations.py script needs to be created in the 'analysis' folder for each local copy of this repository. It is not included in the remote repository because directories will change between each machine. This script specifies the location of where raw data logs are stored, where formatted data is stored and where script analysis outputs can be saved to. Read the comments in the <a href="">mtbdl_data_analysis.py</a> script to see how these directories should be named. 
+A file_locations.py script needs to be created in the 'analysis' folder for each local copy of this repository. It is not included in the remote repository because directories will change between each machine. This script specifies the location of where raw data logs are stored, where formatted data is stored and where script analysis outputs can be saved to. Read the comments in the <a href="https://github.com/samdonnelly/MTB-data-logger/blob/main/analysis/mtbdl_data_analysis.py">mtbdl_data_analysis.py</a> script to see how these directories should be named. 
 
 
 ## Further Information

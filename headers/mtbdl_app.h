@@ -27,9 +27,6 @@
 //=======================================================================================
 // Macros 
 
-// Testing 
-#define MTBDL_DEBUG 0                    // Conditional compilation for debugging 
-
 // System info 
 #define MTBDL_NUM_STATES 20              // Number of system states 
 

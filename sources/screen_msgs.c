@@ -109,7 +109,7 @@ hd44780u_msgs_t mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE] =
 hd44780u_msgs_t mtbdl_pretx_msg[MTBDL_MSG_LEN_4_LINE] = 
 {
     {HD44780U_L1, "Connected", 0}, 
-    {HD44780U_L2, "Next file: %u"}, 
+    {HD44780U_L2, "Next file: %u", 0}, 
     {HD44780U_L3, "1: Send Data", 0}, 
     {HD44780U_L4, "2: Cancel", 0} 
 }; 

@@ -37,7 +37,8 @@
 # - Coordinate plot 
 #   - Formatting will have to be done first. 
 #   - Take GPS coordinates and plot on a map. 
-#   - 
+
+# Change 
 
 #================================================================================
 
@@ -45,11 +46,12 @@
 # Includes 
 
 # Files and functions 
-import file_locations 
+from file_locations import mtbdl_logs_raw 
 
 # Libraries 
-import openpyxl 
+from openpyxl import Workbook, load_workbook 
 import atexit 
+import os 
 
 #================================================================================
 
@@ -57,38 +59,23 @@ import atexit
 #================================================================================
 # Global variables 
 
-# User interface 
-user_input = "" 
+# String data 
+mode_index = ("1", "2", "3") 
+modes = ("Format", "Analysis", "Coordinate plot") 
+mode_str = "\r\n" + mode_index[0] + ". " + modes[0] + "\r\n" + \
+                    mode_index[1] + ". " + modes[1] + "\r\n" + \
+                    mode_index[2] + ". " + modes[2] + "\r\n" 
+
+# User prompts 
+mode_prompt = "Mode: "
+date_prompt = "\nDate (YYYY-MM-DD): "
+low_log_prompt = "Lower log index: " 
+high_log_prompt = "Upper log index: " 
+terminate_prompt = "exit"
 
 # Excel 
-workbook            # Workbook for an Excel file 
-sheet               # Sheet of workbook 
-
-#================================================================================
-
-
-#================================================================================
-# Main 
-
-#==================================================
-# Setup 
-
-# Configure the exit handler 
-atexit.register(exit_handler) 
-
-#==================================================
-
-#==================================================
-# Main loop 
-
-while True: 
-    # Get user input 
-
-    # Choose a task 
-    
-    break 
-
-#==================================================
+# workbook            # Workbook for an Excel file 
+# sheet               # Sheet of workbook 
 
 #================================================================================
 
@@ -96,14 +83,203 @@ while True:
 #================================================================================
 # Functions 
 
-#
+##
 # brief: Code called upon termination of the script 
 # 
 # description: Code that should be run before the script terminates should be put here. 
 #              This code will only be run once the program has begun the termination 
 #              process. 
-#
+##
 def exit_handler(): 
     print("\nProgram terminated.\n") 
+
+
+##
+# brief: Checks user input for a valid entry 
+# 
+# description: The function prints a prompt (specified in the arguments) to the 
+#              console and takes the user input. This input is first checked 
+#              against the 'check' argument, which if matched, will then 
+#              terminate the script. If there is no match then the 'data_type' 
+#              argument is used to determine how to interpret the user input. 
+#              If the user input aligns with the data types specified then 
+#              'True' is returned along with the user input formatted 
+#              according to the data type. If the input doesn't match the 
+#              data types then 'False' is returned and the user input returned 
+#              is irrelevant.  
+# 
+# @param prompt : string printed to console to prompt the user as needed 
+# @param check : string to check user input against for terminating the program 
+# @param data_type : expected data type input from the user 
+# @return 1 : True if user input matches expected format, False otherwise 
+# @return 2 : contents of the user input formatted as needed if it's a valid input 
+##
+def user_input(
+    prompt, 
+    check, 
+    data_type): 
+
+    # Get the user input 
+    command = input(prompt) 
+        
+    # Check for exit 
+    # String comparision 
+    for i in range(len(check)): 
+        try: 
+            if (command[i].lower() != check[i]):
+                break 
+        except IndexError: 
+            break 
+    
+    if (i == (len(check)-1)): 
+        exit() 
+    
+    # Try converting the number and check for errors 
+    if (data_type is float): 
+        # Try converting to float and check for errors 
+        try: 
+            value = float(command) 
+            return True, value
+        except ValueError: 
+            print("\nFloat conversion failed.\n") 
+    
+    elif (data_type is int): 
+        # Try converting to int and check for errors 
+        try: 
+            value = int(float(command)) 
+            return True, value
+        except ValueError: 
+            print("\nInteger conversion failed.\n") 
+            
+    else: 
+        # Interpreted as a string 
+        return True, command
+            
+    return False, 0
+
+
+##
+# brief: 
+# 
+# description: 
+##
+def mode_select(): 
+    while (True): 
+        print(mode_str) 
+        valid, user_str = user_input(mode_prompt, terminate_prompt, str) 
+        if (valid): 
+            # Interpret the input 
+            user_str = user_str.lower()
+            if (user_str == mode_index[0] or user_str == modes[0].lower()): 
+                format_data() 
+            elif (user_str == mode_index[1] or user_str == modes[1].lower()): 
+                analyze_data() 
+            elif (user_str == mode_index[2] or user_str == modes[2].lower()): 
+                coord_plot() 
+
+
+##
+# brief: 
+# 
+# description: 
+##
+def format_data(): 
+    # Get the log data from the user 
+    while (True): 
+        valid, user_in = user_input(date_prompt, terminate_prompt, str) 
+        if (valid): 
+            log_folder = mtbdl_logs_raw + "/" + user_in 
+            if (os.path.isdir(log_folder) is not True): 
+                print("No logs for that date.") 
+                return 
+            log_date = user_in
+            break 
+    
+    # Get the log index range from the user 
+    while (True): 
+        valid, user_in = user_input(low_log_prompt, terminate_prompt, int) 
+        if (valid): 
+            log_low_index = user_in 
+            break 
+    while (True): 
+        valid, user_in = user_input(high_log_prompt, terminate_prompt, int) 
+        if (valid): 
+            log_high_index = user_in 
+            break 
+
+    # Check that all the logs exist 
+    for i in range(log_low_index, log_high_index+1):
+        log_file_raw = log_folder + "/" + log_date + "-log" + str(i) + ".txt"
+        if (os.path.exists(log_file_raw) is not True): 
+            print("Some log files in the specified range don't exist.") 
+            return 
+
+    # All files exist 
+
+    # Check for the existance of an Excel file 
+    log_file = log_folder + "/" + log_date + "-log-data.xlsx" 
+    if (os.path.exists(log_file) is not True): 
+        # If it does not exist then create it and name it 
+        wb = Workbook()
+        ws = wb.active 
+        ws.title = "log1" 
+    else: 
+        # If it exists then open it 
+        wb = load_workbook(log_file) 
+        ws = wb.active 
+        ws_new = wb.create_sheet("some_log", 0) 
+    
+    # Check for the existance of log sheets - create then if they don't exist 
+    sheet_names = wb.sheetnames 
+    for name in sheet_names: 
+        print(name) 
+    
+    wb.save(log_file) 
+
+
+##
+# brief: 
+# 
+# description: 
+##
+def analyze_data(): 
+    print("\nAnalyze") 
+    return 
+
+
+##
+# brief: 
+# 
+# description: 
+##
+def coord_plot(): 
+    print("\nPlot") 
+    return 
+
+#================================================================================
+
+
+#================================================================================
+# Run 
+
+#==================================================
+# Setup 
+
+# Configure the exit handler 
+atexit.register(exit_handler) 
+
+# Exit statement 
+print("\n-----------------------------------------------------")
+print("Type 'exit' into any prompt to terminate the program.")
+
+#==================================================
+
+#==================================================
+# Main loop 
+
+while (True): 
+    mode_select() 
+
+#==================================================
 
 #================================================================================

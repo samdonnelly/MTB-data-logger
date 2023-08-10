@@ -18,26 +18,92 @@
 #   is not tracked by git as directories will change between machines. For file 
 #   location names, see the comments and code below. 
 
+# UI 
+# - Choose mode --> format log files, analyze data or coordinate plot 
+# - Format log files; 
+#   - Select a date - check for folder matching date 
+#   - Select a log file range - check that those files exist (could also be 1 file) 
+#   - Format all valid files sequentially: 
+#     - Need to format GPS coordinates, IMU readings (correct for resting state), 
+#       calculate wheel speed, create time data (?), suspension travel calculation 
+#       (ADC voltage to position), UTC time to local time. 
+#     - Suspension parameters recorded and pasted per log. 
+#     - ALl logs from a folder saved to one spreadsheet. 
+#     - One data log data set per one spreadsheet sheet. Sheet tab names are the 
+# - Analyze data 
+#   - Data must be formatted first. 
+#   - Trailmarker points plotted on every plot. 
+#   - Plot Latitude and longitude on separate plots against time. 
+# - Coordinate plot 
+#   - Formatting will have to be done first. 
+#   - Take GPS coordinates and plot on a map. 
+#   - 
+
 #================================================================================
 
 #================================================================================
 # Includes 
 
+# Files and functions 
 import file_locations 
+
+# Libraries 
+import openpyxl 
+import atexit 
 
 #================================================================================
 
 
 #================================================================================
 # Global variables 
+
+# User interface 
+user_input = "" 
+
+# Excel 
+workbook            # Workbook for an Excel file 
+sheet               # Sheet of workbook 
+
 #================================================================================
 
 
 #================================================================================
 # Main 
+
+#==================================================
+# Setup 
+
+# Configure the exit handler 
+atexit.register(exit_handler) 
+
+#==================================================
+
+#==================================================
+# Main loop 
+
+while True: 
+    # Get user input 
+
+    # Choose a task 
+    
+    break 
+
+#==================================================
+
 #================================================================================
 
 
 #================================================================================
 # Functions 
+
+#
+# brief: Code called upon termination of the script 
+# 
+# description: Code that should be run before the script terminates should be put here. 
+#              This code will only be run once the program has begun the termination 
+#              process. 
+#
+def exit_handler(): 
+    print("\nProgram terminated.\n") 
+
 #================================================================================

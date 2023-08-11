@@ -38,8 +38,6 @@
 #   - Formatting will have to be done first. 
 #   - Take GPS coordinates and plot on a map. 
 
-# Change 
-
 #================================================================================
 
 #================================================================================
@@ -72,10 +70,6 @@ date_prompt = "\nDate (YYYY-MM-DD): "
 low_log_prompt = "Lower log index: " 
 high_log_prompt = "Upper log index: " 
 terminate_prompt = "exit"
-
-# Excel 
-# workbook            # Workbook for an Excel file 
-# sheet               # Sheet of workbook 
 
 #================================================================================
 

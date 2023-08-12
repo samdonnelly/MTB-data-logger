@@ -213,20 +213,30 @@ def format_data():
     # Check for the existance of an Excel file 
     log_file = log_folder + "/" + log_date + "-log-data.xlsx" 
     if (os.path.exists(log_file) is not True): 
-        # If it does not exist then create it and name it 
+        # If it does not exist then create it and name the first sheet 
         wb = Workbook()
         ws = wb.active 
-        ws.title = "log1" 
+        ws.title = "log-" + str(log_low_index) 
     else: 
         # If it exists then open it 
         wb = load_workbook(log_file) 
         ws = wb.active 
-        ws_new = wb.create_sheet("some_log", 0) 
     
     # Check for the existance of log sheets - create then if they don't exist 
     sheet_names = wb.sheetnames 
-    for name in sheet_names: 
-        print(name) 
+    for i in range(log_low_index, log_high_index+1): 
+        sheet_check = 0 
+        sheet = "log-" + str(i) 
+
+        for name in sheet_names: 
+            if (name == sheet): 
+                sheet_check += 1 
+                break 
+        
+        if (not sheet_check): 
+            # sheet does not exist - create it 
+            wb.create_sheet(sheet) 
+
     
     wb.save(log_file) 
 

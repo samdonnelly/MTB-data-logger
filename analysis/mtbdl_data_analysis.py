@@ -202,7 +202,7 @@ def format_data():
             break 
 
     # Check that all the logs exist 
-    for i in range(log_low_index, log_high_index+1):
+    for i in range(log_low_index, log_high_index+1): 
         log_file_raw = log_folder + "/" + log_date + "-log" + str(i) + ".txt"
         if (os.path.exists(log_file_raw) is not True): 
             print("Some log files in the specified range don't exist.") 
@@ -222,7 +222,7 @@ def format_data():
         wb = load_workbook(log_file) 
         ws = wb.active 
     
-    # Check for the existance of log sheets - create then if they don't exist 
+    # Check for the existance of log sheets - create them if they don't exist 
     sheet_names = wb.sheetnames 
     for i in range(log_low_index, log_high_index+1): 
         sheet_check = 0 
@@ -237,7 +237,54 @@ def format_data():
             # sheet does not exist - create it 
             wb.create_sheet(sheet) 
 
+    # Write data to each log sheet 
+    for i in range(log_low_index, log_high_index+1): 
+        # Set the log file and sheet name to access 
+        log_file_raw = log_folder + "/" + log_date + "-log" + str(i) + ".txt" 
+        sheet = "log-" + str(i) 
+
+        # Open the requested log file and sheet 
+        file_obj = open(log_file_raw, "r") 
+        ws = wb[sheet] 
+
+        # Data tracking 
+        time = 0.0 
+        time_step = 0.0 
+        trailmarker = [[], []] 
+        fork = [] 
+        shock = [] 
+        wheel_speed = [] 
+        imu = [] 
+        gps = [] 
+
+        # Read, set and write calculation/formatting data 
+        line_data = file_obj.readline() 
+        while(line_data != "Data log:"): 
+            # If fork parameters 
+            # If shock parameters 
+            # If IMU offsets 
+            # If potentiometer offsets 
+            # If UTC time 
+            # If logging params 
+            time_step = 0.0 
+            # Read next line 
+            line_data = file_obj.readline() 
+
+        # Read, format and write log data 
+        line_data = file_obj.readline() 
+        while(line_data != "End"): 
+            # Check trail marker 
+            # Update fork and shock arrays 
+            # Check for wheel speed - if available then update time + data 
+            # Check for IMU - if available then update time + data 
+            # Check for GPS - if available then update time + data 
+            # Update universal time tracker and read next line 
+            time += time_step 
+            line_data = file_obj.readline() 
+
+        ws["B" + str(i)] = i 
     
+    # Save the log file to a specified name 
     wb.save(log_file) 
 
 

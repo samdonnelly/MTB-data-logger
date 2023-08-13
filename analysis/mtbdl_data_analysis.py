@@ -173,9 +173,10 @@ def mode_select():
 
 
 ##
-# brief: 
+# brief: Format data log data 
 # 
-# description: 
+# description: Takes raw data log files and formats the data into an Excel file 
+#              so it can be analyzed. 
 ##
 def format_data(): 
     # Get the log data from the user 

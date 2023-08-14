@@ -175,8 +175,9 @@ def mode_select():
 ##
 # brief: Format data log data 
 # 
-# description: Takes raw data log files and formats the data into an Excel file 
-#              so it can be analyzed. 
+# description: Prompts the user to specify a set of raw data log files, checks if the 
+#              files exist, then formats the data into an Excel sheet so it can be 
+#              used for data analysis. 
 ##
 def format_data(): 
     # Get the log data from the user 

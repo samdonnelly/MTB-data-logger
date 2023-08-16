@@ -177,7 +177,11 @@ def mode_select():
 # 
 # description: Prompts the user to specify a set of raw data log files, checks if the 
 #              files exist, then formats the data into an Excel sheet so it can be 
-#              used for data analysis. 
+#              used for data analysis. If any of the specified data log files don't 
+#              exist then the request will be aborted. If the Excel file does not 
+#              already exist then it will be created first. Only one sheet per log 
+#              file number will be created so logs that have already been formatted 
+#              will be overwritten if requested again. 
 ##
 def format_data(): 
     # Get the log data from the user 

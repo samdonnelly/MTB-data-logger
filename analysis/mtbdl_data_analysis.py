@@ -181,7 +181,10 @@ def mode_select():
 #              exist then the request will be aborted. If the Excel file does not 
 #              already exist then it will be created first. Only one sheet per log 
 #              file number will be created so logs that have already been formatted 
-#              will be overwritten if requested again. 
+#              will be overwritten if requested again. Data is intended to be 
+#              formatted in the most useful or human readable way possible. For 
+#              example, IMU data is not formatted into xyz compoents but rather 
+#              bike pitch and roll as well as total acceleration. 
 ##
 def format_data(): 
     # Get the log data from the user 

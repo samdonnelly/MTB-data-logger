@@ -155,7 +155,9 @@ def user_input(
 ##
 # brief: Select the data operation to perform 
 # 
-# description: 
+# description: Allows the user to choose between formatting raw data log files, 
+#              running the analysis on a set of formatted data logs or plotting the 
+#              GPS coodinates on a map. 
 ##
 def mode_select(): 
     while (True): 

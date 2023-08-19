@@ -157,7 +157,8 @@ def user_input(
 # 
 # description: Allows the user to choose between formatting raw data log files, 
 #              running the analysis on a set of formatted data logs or plotting the 
-#              GPS coodinates on a map. 
+#              GPS coodinates on a map. This is the default user prompt for the 
+#              script whenno other action is being used. 
 ##
 def mode_select(): 
     while (True): 

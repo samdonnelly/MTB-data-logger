@@ -301,7 +301,7 @@ def format_data():
 
 
 ##
-# brief: 
+# brief: Perform analysis on formatted data logs 
 # 
 # description: 
 ##

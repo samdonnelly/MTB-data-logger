@@ -303,7 +303,9 @@ def format_data():
 ##
 # brief: Perform analysis on formatted data logs 
 # 
-# description: 
+# description: Takes formatted data log data and present it to the user in a readable
+#              and visual format so they can understand their riding style and bike 
+#              setup. 
 ##
 def analyze_data(): 
     print("\nAnalyze") 

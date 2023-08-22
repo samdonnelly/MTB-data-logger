@@ -313,7 +313,7 @@ def analyze_data():
 
 
 ##
-# brief: 
+# brief: Plot recorded GPS coordinates on a map 
 # 
 # description: 
 ##

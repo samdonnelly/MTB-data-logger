@@ -32,7 +32,8 @@
 			"hd44780u_controller.h": "c",
 			"hd44780u_driver.h": "c",
 			"led_colours.h": "c",
-			"ws2812_driver.h": "c"
+			"ws2812_driver.h": "c",
+			"mtbdl_init.h": "c"
 		}
 	}
 }

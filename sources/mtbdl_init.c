@@ -219,7 +219,7 @@ void mtbdl_init()
         MPU6050_ADDR_1,
         MPU6050_STBY_MASK, 
         MPU6050_DLPF_CFG_1,
-        MPU6050_SMPLRT_DIV,
+        MPU6050_SMPLRT_DIVIDER,
         MPU6050_AFS_SEL_4,
         MPU6050_FS_SEL_500); 
 

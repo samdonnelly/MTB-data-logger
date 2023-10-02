@@ -116,7 +116,7 @@ typedef struct mtbdl_data_s
     // Peripherals 
     IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
     IRQn_Type log_irq;                          // Log sample period interrupt number 
-    ADC_TypeDef *adc;                            // ADC port battery soc and pots 
+    ADC_TypeDef *adc;                           // ADC port battery soc and pots 
 
     // Bike parameters 
     uint8_t fork_psi;                           // Fork pressure (psi) 

@@ -29,7 +29,7 @@
 
 // MPU-6050 config 
 #define MPU6050_STBY_MASK 0x00           // Axis standby status mask 
-#define MPU6050_SMPLRT_DIV 0             // Sample Rate Divider 
+#define MPU6050_SMPLRT_DIVIDER 0         // Sample Rate Divider 
 #define MPU6050_RATE 250000              // Time between reading new data (us) 
 
 //=======================================================================================

@@ -42,6 +42,9 @@
 #define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
 #define MTBDL_LOG_COUNT_CYCLE 99         // Log sample sequence max timer counter value 
 #define MTBDL_ADC_BUFF_SIZE 3            // Size according to the number of ADCs used 
+#define MTBDL_COO_BUFF_LEN 6             // Coordinate buffer size - data from M8Q driver 
+#define MTBDL_TIME_BUFF_LEN 10           // UTC time buffer size - data from M8Q driver 
+#define MTBDL_DATE_BUFF_LEN 7            // UTC date buffer size - data from M8Q driver 
 
 // Wheel RPM info 
 #define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
@@ -138,13 +141,13 @@ typedef struct mtbdl_data_s
     uint8_t soc;                                // Battery SOC 
     uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
     uint16_t navstat;                           // Navigation status of GPS module 
-    uint8_t utc_time[M8Q_TIME_CHAR_LEN+1];      // UTC time recorded by the GPS module 
-    uint8_t utc_date[M8Q_DATE_CHAR_LEN+1];      // UTC date recorded by the GPS module 
-    uint8_t deg_min_lat[M8Q_COO_LEN];           // Latitude: degrees and minutes integer part 
-    uint8_t min_frac_lat[M8Q_COO_LEN];          // Latitude: minuutes fractional part 
+    uint8_t utc_time[MTBDL_TIME_BUFF_LEN];      // UTC time recorded by the GPS module 
+    uint8_t utc_date[MTBDL_DATE_BUFF_LEN];      // UTC date recorded by the GPS module 
+    uint8_t deg_min_lat[MTBDL_COO_BUFF_LEN];    // Latitude: degrees and minutes integer part 
+    uint8_t min_frac_lat[MTBDL_COO_BUFF_LEN];   // Latitude: minuutes fractional part 
     uint8_t NS;                                 // North/South indicator of latitude 
-    uint8_t deg_min_lon[M8Q_COO_LEN];           // Longitude: degrees and minutes integer part 
-    uint8_t min_frac_lon[M8Q_COO_LEN];          // Longitude: minuutes fractional part 
+    uint8_t deg_min_lon[MTBDL_COO_BUFF_LEN];    // Longitude: degrees and minutes integer part 
+    uint8_t min_frac_lon[MTBDL_COO_BUFF_LEN];   // Longitude: minuutes fractional part 
     uint8_t EW;                                 // Eeast/West indicator of longitude 
     int16_t accel_x;                            // x-axis acceleration reading 
     int16_t accel_y;                            // y-axis acceleration reading 

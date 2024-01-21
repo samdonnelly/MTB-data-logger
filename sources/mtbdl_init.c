@@ -16,6 +16,7 @@
 // Includes 
 
 #include "mtbdl_init.h"
+#include "m8q_config.h"
 
 //=======================================================================================
 
@@ -238,19 +239,17 @@ void mtbdl_init()
     //===================================================
     // M8Q GPS setup 
 
-    // Get the configuration messages to send to the device 
-    char m8q_config_messages[M8Q_CONFIG_MSG_NUM][M8Q_CONFIG_MSG_MAX_LEN]; 
-    m8q_config_copy(m8q_config_messages); 
-
-    // Driver 
+    // M8Q device setup 
     m8q_init(
         I2C1, 
-        GPIOC, 
-        PIN_10, 
-        PIN_11, 
+        &m8q_config_msgs[0][0], 
         M8Q_CONFIG_MSG_NUM, 
         M8Q_CONFIG_MSG_MAX_LEN, 
-        (uint8_t *)m8q_config_messages[0]); 
+        CLEAR); 
+
+    // Set up low power and TX ready pins 
+    m8q_pwr_pin_init(GPIOC, PIN_10); 
+    m8q_txr_pin_init(GPIOC, PIN_11); 
 
     // Controller 
     m8q_controller_init(TIM9); 

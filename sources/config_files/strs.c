@@ -59,7 +59,7 @@ const char mtbdl_data_log_end[] = "End\r\n\n";
 const char mtbdl_data_log_1[] = "%u, %u, %u, -, -, -, -, -, -\r\n"; 
 const char mtbdl_data_log_2[] = "%u, %u, %u, %u, -, -, -, -, -\r\n"; 
 const char mtbdl_data_log_3[] = "%u, %u, %u, -, %d, %d, %d, -, -\r\n"; 
-const char mtbdl_data_log_4[] = "%u, %u, %u, -, -, -, -, %s.%s%c, %s.%s%c\r\n"; 
+const char mtbdl_data_log_4[] = "%u, %u, %u, -, -, -, -, %s%c, %s%c\r\n"; 
 
 //=======================================================================================
 

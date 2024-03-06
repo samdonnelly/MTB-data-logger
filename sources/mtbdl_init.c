@@ -1,5 +1,5 @@
 /**
- * @file user_init.c
+ * @file mtbdl_init.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
@@ -15,11 +15,24 @@
 //=======================================================================================
 // Includes 
 
-#include "mtbdl_init.h"
-#include "m8q_config.h"
+#include "mtbdl_interface.h" 
 
 //=======================================================================================
 
+
+//=======================================================================================
+// Macros 
+
+// MPU-6050 config 
+#define MPU6050_STBY_MASK 0x00           // Axis standby status mask 
+#define MPU6050_SMPLRT_DIVIDER 0         // Sample Rate Divider 
+#define MPU6050_RATE 250000              // Time between reading new data (us) 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Initialization 
 
 // User init function 
 void mtbdl_init()
@@ -110,8 +123,6 @@ void mtbdl_init()
     //===================================================
     // UART setup 
 
-#if MTBDL_DEBUG 
-
     // Serial terminal output 
     uart_init(
         USART2, 
@@ -122,8 +133,6 @@ void mtbdl_init()
         UART_MANT_42_9600, 
         UART_DMA_DISABLE, 
         UART_DMA_ENABLE); 
-
-#endif   // MTBDL_DEBUG 
 
     // For HC-05 
     uart_init(
@@ -327,7 +336,7 @@ void mtbdl_init()
     ws2812_init(
         DEVICE_ONE, 
         TIM3, 
-        TIM_CHANNEL_1, 
+        TIMER_CH1, 
         GPIOC, 
         PIN_6); 
     
@@ -353,3 +362,5 @@ void mtbdl_init()
 
     //===================================================
 }
+
+//=======================================================================================

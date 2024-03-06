@@ -49,6 +49,7 @@ set(STM32CUBEMX_INCLUDE_DIRECTORIES
 set(PROJECT_INCLUDE_DIRECTORIES 
     ${CMAKE_CURRENT_SOURCE_DIR}/headers
     ${CMAKE_CURRENT_SOURCE_DIR}/headers/config_files
+    ${CMAKE_CURRENT_SOURCE_DIR}/headers/includes
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/headers/devices
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/headers/peripherals
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/headers/tools)

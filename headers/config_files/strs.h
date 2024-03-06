@@ -16,16 +16,7 @@
 #define _STRS_H_ 
 
 //=======================================================================================
-// Includes 
-
-#include "includes_app.h"
-#include "includes_drivers.h"
-
-//=======================================================================================
-
-
-//=======================================================================================
-// Directory declarations 
+// Directories 
 
 // Project root directory on SD card 
 extern const char mtbdl_dir[]; 

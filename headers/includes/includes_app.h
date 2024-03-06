@@ -12,21 +12,22 @@
  * 
  */
 
-#ifndef _INCLUDES_H_
-#define _INCLUDES_H_
+#ifndef _INCLUDES_APP_H_
+#define _INCLUDES_APP_H_
 
 //=======================================================================================
 // Includes 
 
-// Application code 
-#include "int_handlers.h"
-#include "mtbdl_init.h"
-#include "mtbdl_app.h"
-#include "data_handling.h"
-#include "led_colours.h"
-#include "strs.h"
+// Application 
+#include "data_handling.h" 
+#include "int_handlers.h" 
+
+// Config files 
+#include "strs.h" 
+#include "led_colours.h" 
 #include "screen_msgs.h" 
+#include "m8q_config.h" 
 
 //=======================================================================================
 
-#endif  // _INCLUDES_H_
+#endif  // _INCLUDES_APP_H_

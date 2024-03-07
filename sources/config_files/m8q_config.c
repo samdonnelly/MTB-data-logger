@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief SAM-M8Q GPS configuration file 
+ * @brief SAM-M8Q GPS configuration file implementation 
  * 
  * @version 0.1
  * @date 2022-10-02
@@ -21,9 +21,8 @@
 
 
 //=======================================================================================
-// Variables 
+// Config messages 
 
-// M8Q configuration messages 
 const char m8q_config_msgs[M8Q_CONFIG_MSG_NUM][M8Q_CONFIG_MSG_MAX_LEN] = 
 {
     // Disable default NMEA messages 
@@ -34,20 +33,20 @@ const char m8q_config_msgs[M8Q_CONFIG_MSG_NUM][M8Q_CONFIG_MSG_MAX_LEN] =
     "$PUBX,40,RMC,0,0,0,0,0,0*",    // RMC disable
     "$PUBX,40,VTG,0,0,0,0,0,0*",    // VTG disable 
 
-    // UBX config messages  
-    "B5,62,06,01,0800,F1,00,01,00,00,00,00,00*",      // POSITION enable 
-    "B5,62,06,01,0800,F1,04,0A,00,00,00,00,00*",      // TIME enable 
+    // UBX config messages 
+    "B562,06,01,0800,F1,00,01,00,00,00,00,00*",      // POSITION enable 
+    "B562,06,01,0800,F1,04,0A,00,00,00,00,00*",      // TIME enable 
 
     // Power configuration 
-    "B5,62,06,3B,3000,02,00,00,00,60104201,E8030000,10270000,00000000,"
+    "B562,06,3B,3000,02,00,00,00,60104201,E8030000,10270000,00000000,"
     "0000,0000,0000000000000000000000000000000000000000,00000000*",
 
     // Port configuration 
-    "B5,62,06,00,1400,01,00,0000,C0080000,80250000,0000,0000,0000,0000*",
-    "B5,62,06,00,1400,00,00,9902,84000000,00000000,0700,0300,0200,0000*", 
+    "B562,06,00,1400,01,00,0000,C0080000,80250000,0000,0000,0000,0000*",
+    "B562,06,00,1400,00,00,9902,84000000,00000000,0700,0300,0200,0000*", 
 
     // Save the settings (save mask) 
-    "B5,62,06,09,0C00,00000000,FFFFFFFF,00000000*" 
+    "B562,06,09,0C00,00000000,FFFFFFFF,00000000*" 
 };
 
 //=======================================================================================

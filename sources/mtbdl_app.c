@@ -43,16 +43,16 @@
  * @brief MTB data logger controller states 
  */
 typedef enum {
-    MTBDL_INIT_STATE,            // State 0 : Startup 
-    MTBDL_IDLE_STATE,            // State 1 : Idle 
-    MTBDL_RUN_PREP_STATE,        // State 2 : Run prep 
-    MTBDL_RUN_COUNTDOWN_STATE,   // State 3 : Run countdown 
-    MTBDL_RUN_STATE,             // State 4 : Run 
-    MTBDL_POSTRUN_STATE,         // State 5 : Post-run 
-    MTBDL_DATA_SELECT_STATE,     // State 6 : Data transfer selection 
-    MTBDL_DEV_SEARCH_STATE,      // State 7 : Search for Bluetooth connection 
-    MTBDL_PRERX_STATE,           // State 8 : Pre data receive 
-    MTBDL_RX_STATE,              // State 9 : Data receive 
+    MTBDL_INIT_STATE,            // State 0  : Startup 
+    MTBDL_IDLE_STATE,            // State 1  : Idle 
+    MTBDL_RUN_PREP_STATE,        // State 2  : Run prep 
+    MTBDL_RUN_COUNTDOWN_STATE,   // State 3  : Run countdown 
+    MTBDL_RUN_STATE,             // State 4  : Run 
+    MTBDL_POSTRUN_STATE,         // State 5  : Post-run 
+    MTBDL_DATA_SELECT_STATE,     // State 6  : Data transfer selection 
+    MTBDL_DEV_SEARCH_STATE,      // State 7  : Search for Bluetooth connection 
+    MTBDL_PRERX_STATE,           // State 8  : Pre data receive 
+    MTBDL_RX_STATE,              // State 9  : Data receive 
     MTBDL_POSTRX_STATE,          // State 10 : Post data receive 
     MTBDL_PRETX_STATE,           // State 11 : Pre data send 
     MTBDL_TX_STATE,              // State 12 : Data send 
@@ -125,6 +125,10 @@ typedef struct mtbdl_trackers_s
 }
 mtbdl_trackers_t; 
 
+
+// Instance of the system data trackers 
+static mtbdl_trackers_t mtbdl_trackers; 
+
 //=======================================================================================
 
 
@@ -146,9 +150,11 @@ typedef void (*mtbdl_func_ptr_t)(
 /**
  * @brief Initialization state 
  * 
- * @details 
+ * @details First state to run on system startup and after the main controller resets. 
+ *          Used to set up or reset any devices or data. Defaults to the idle state when 
+ *          done. 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_init_state(
     mtbdl_trackers_t *mtbdl); 
@@ -159,7 +165,7 @@ void mtbdl_init_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_idle_state(
     mtbdl_trackers_t *mtbdl); 
@@ -170,7 +176,7 @@ void mtbdl_idle_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_run_prep_state(
     mtbdl_trackers_t *mtbdl); 
@@ -181,7 +187,7 @@ void mtbdl_run_prep_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_run_countdown_state(
     mtbdl_trackers_t *mtbdl); 
@@ -192,7 +198,7 @@ void mtbdl_run_countdown_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_run_state(
     mtbdl_trackers_t *mtbdl); 
@@ -203,7 +209,7 @@ void mtbdl_run_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_postrun_state(
     mtbdl_trackers_t *mtbdl); 
@@ -214,7 +220,7 @@ void mtbdl_postrun_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_data_select_state(
     mtbdl_trackers_t *mtbdl); 
@@ -225,7 +231,7 @@ void mtbdl_data_select_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_dev_search_state(
     mtbdl_trackers_t *mtbdl); 
@@ -236,7 +242,7 @@ void mtbdl_dev_search_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_prerx_state(
     mtbdl_trackers_t *mtbdl); 
@@ -247,7 +253,7 @@ void mtbdl_prerx_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_rx_state(
     mtbdl_trackers_t *mtbdl); 
@@ -258,7 +264,7 @@ void mtbdl_rx_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_postrx_state(
     mtbdl_trackers_t *mtbdl); 
@@ -269,7 +275,7 @@ void mtbdl_postrx_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_pretx_state(
     mtbdl_trackers_t *mtbdl); 
@@ -280,7 +286,7 @@ void mtbdl_pretx_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_tx_state(
     mtbdl_trackers_t *mtbdl); 
@@ -291,7 +297,7 @@ void mtbdl_tx_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_posttx_state(
     mtbdl_trackers_t *mtbdl); 
@@ -302,7 +308,7 @@ void mtbdl_posttx_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_precalibrate_state(
     mtbdl_trackers_t *mtbdl); 
@@ -313,7 +319,7 @@ void mtbdl_precalibrate_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_calibrate_state(
     mtbdl_trackers_t *mtbdl); 
@@ -324,7 +330,7 @@ void mtbdl_calibrate_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_postcalibrate_state(
     mtbdl_trackers_t *mtbdl); 
@@ -335,7 +341,7 @@ void mtbdl_postcalibrate_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_lowpwr_state(
     mtbdl_trackers_t *mtbdl); 
@@ -346,7 +352,7 @@ void mtbdl_lowpwr_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_fault_state(
     mtbdl_trackers_t *mtbdl); 
@@ -357,7 +363,7 @@ void mtbdl_fault_state(
  * 
  * @details 
  * 
- * @param mtbdl : pointer to system tracking info data record 
+ * @param mtbdl : main controller tracking info 
  */
 void mtbdl_reset_state(
     mtbdl_trackers_t *mtbdl); 
@@ -368,23 +374,19 @@ void mtbdl_reset_state(
 //=======================================================================================
 // Global variables 
 
-// Instance of the system data trackers 
-static mtbdl_trackers_t mtbdl_trackers; 
-
-
 // Function pointers to system controller states 
 static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] = 
 {
-    &mtbdl_init_state,                  // State 0 : Startup 
-    &mtbdl_idle_state,                  // State 1 : Idle 
-    &mtbdl_run_prep_state,              // State 2 : Run prep 
-    &mtbdl_run_countdown_state,         // State 3 : Run countdown 
-    &mtbdl_run_state,                   // State 4 : Run 
-    &mtbdl_postrun_state,               // State 5 : Post run 
-    &mtbdl_data_select_state,           // State 6 : Data transfer selection 
-    &mtbdl_dev_search_state,            // State 7 : Search for Bluetooth connection 
-    &mtbdl_prerx_state,                 // State 8 : Pre data receive 
-    &mtbdl_rx_state,                    // State 9 : Data receive 
+    &mtbdl_init_state,                  // State 0  : Startup 
+    &mtbdl_idle_state,                  // State 1  : Idle 
+    &mtbdl_run_prep_state,              // State 2  : Run prep 
+    &mtbdl_run_countdown_state,         // State 3  : Run countdown 
+    &mtbdl_run_state,                   // State 4  : Run 
+    &mtbdl_postrun_state,               // State 5  : Post run 
+    &mtbdl_data_select_state,           // State 6  : Data transfer selection 
+    &mtbdl_dev_search_state,            // State 7  : Search for Bluetooth connection 
+    &mtbdl_prerx_state,                 // State 8  : Pre data receive 
+    &mtbdl_rx_state,                    // State 9  : Data receive 
     &mtbdl_postrx_state,                // State 10 : Post data receive 
     &mtbdl_pretx_state,                 // State 11 : Pre data send 
     &mtbdl_tx_state,                    // State 12 : Data send 
@@ -522,7 +524,6 @@ void mtbdl_app(void)
     switch (next_state)
     {
         case MTBDL_INIT_STATE: 
-            // Idle state flag set 
             if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
@@ -531,25 +532,18 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_IDLE_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Run state flag set 
             else if (mtbdl_trackers.run)
             {
                 next_state = MTBDL_RUN_PREP_STATE; 
             }
-
-            // Data transfer select state flag set 
             else if (mtbdl_trackers.data_select)
             {
                 next_state = MTBDL_DATA_SELECT_STATE; 
             }
-
-            // Calibration state flag set 
             else if (mtbdl_trackers.calibrate)
             {
                 next_state = MTBDL_PRECALIBRATE_STATE;  
@@ -558,25 +552,18 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_PREP_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
-            // Non-critical fault state flag set 
             else if (mtbdl_trackers.noncrit_fault)
             {
                 next_state = MTBDL_POSTRUN_STATE; 
             }
-
-            // Run state flag set 
             else if (mtbdl_trackers.run)
             {
                 next_state = MTBDL_RUN_COUNTDOWN_STATE; 
@@ -593,13 +580,10 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Run state flag set 
             else if (mtbdl_trackers.run)
             {
                 next_state = MTBDL_POSTRUN_STATE; 
@@ -608,7 +592,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTRUN_STATE: 
-            // Idle state flag set 
             if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
@@ -617,25 +600,18 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_DATA_SELECT_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
-            // Data select state flag set 
             else if (mtbdl_trackers.data_select)
             {
                 next_state = MTBDL_DEV_SEARCH_STATE; 
             }
-
-            // TX flag set (but not data select flag - no files to send) 
             else if (mtbdl_trackers.tx)
             {
                 next_state = MTBDL_PRETX_STATE; 
@@ -644,25 +620,18 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_DEV_SEARCH_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
-            // Data select and RX state flags set 
             else if (mtbdl_trackers.data_select && mtbdl_trackers.rx)
             {
                 next_state = MTBDL_PRERX_STATE; 
             }
-
-            // Data select and TX state flags set 
             else if (mtbdl_trackers.data_select && mtbdl_trackers.tx)
             {
                 next_state = MTBDL_PRETX_STATE; 
@@ -671,25 +640,18 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRERX_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
-            // Non-critical fault state flag set 
             else if (mtbdl_trackers.noncrit_fault)
             {
                 next_state = MTBDL_POSTRX_STATE; 
             }
-
-            // RX state flag set 
             else if (mtbdl_trackers.rx)
             {
                 next_state = MTBDL_RX_STATE; 
@@ -698,13 +660,10 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RX_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // RX flag or non-critical fault flag set 
             else if (mtbdl_trackers.rx || mtbdl_trackers.noncrit_fault)
             {
                 next_state = MTBDL_POSTRX_STATE; 
@@ -713,7 +672,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTRX_STATE: 
-            // Idle state flag set 
             if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
@@ -722,25 +680,18 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRETX_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
-            // Non-critical fault state flag set 
             else if (mtbdl_trackers.noncrit_fault)
             {
                 next_state = MTBDL_POSTTX_STATE; 
             }
-
-            // TX state flag set 
             else if (mtbdl_trackers.tx)
             {
                 next_state = MTBDL_TX_STATE; 
@@ -749,13 +700,10 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_TX_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // TX state flag or non-critical fault flag set 
             else if (mtbdl_trackers.tx || mtbdl_trackers.noncrit_fault)
             {
                 next_state = MTBDL_POSTTX_STATE; 
@@ -764,13 +712,10 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTTX_STATE: 
-            // TX flag set 
             if (mtbdl_trackers.tx)
             {
                 next_state = MTBDL_PRETX_STATE; 
             }
-
-            // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
@@ -779,19 +724,14 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRECALIBRATE_STATE: 
-            // Fault code set 
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-
-            // Idle state flag set 
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
-            // Calibration state flag set 
             else if (mtbdl_trackers.calibrate)
             {
                 next_state = MTBDL_CALIBRATE_STATE;  
@@ -800,7 +740,6 @@ void mtbdl_app(void)
             break; 
         
         case MTBDL_CALIBRATE_STATE: 
-            // Calibration state flag set 
             if (mtbdl_trackers.calibrate)
             {
                 next_state = MTBDL_POSTCALIBRATE_STATE;  
@@ -809,7 +748,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_POSTCALIBRATE_STATE: 
-            // Idle state flag set 
             if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
@@ -818,7 +756,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_LOWPWR_STATE: 
-            // Idle state flag set 
             if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
@@ -827,7 +764,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_FAULT_STATE: 
-            // Reset flag set 
             if (mtbdl_trackers.reset)
             {
                 next_state = MTBDL_RESET_STATE; 
@@ -836,7 +772,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RESET_STATE: 
-            // Init state flag set 
             if (mtbdl_trackers.init)
             {
                 next_state = MTBDL_INIT_STATE; 

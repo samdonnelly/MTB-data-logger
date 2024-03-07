@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief SAM-M8Q GPS configuration file 
+ * @brief SAM-M8Q GPS configuration file interface 
  * 
  * @version 0.1
  * @date 2022-10-02
@@ -14,15 +14,6 @@
 
 #ifndef _M8Q_CONFIG_H_ 
 #define _M8Q_CONFIG_H_ 
-
-//=======================================================================================
-// Includes 
-
-#include "stm32f411xe.h"
-#include "tools.h"
-
-//=======================================================================================
-
 
 //=======================================================================================
 // Macros 

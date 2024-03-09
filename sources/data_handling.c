@@ -59,12 +59,12 @@
  * @brief User parameter index --> for RX state 
  */
 typedef enum {
-    MTBDL_PARM_FPSI,                     // Fork PSI 
-    MTBDL_PARM_FC,                       // Fork compression setting 
-    MTBDL_PARM_FR,                       // Fork rebound setting 
-    MTBDL_PARM_SPSI,                     // Shock SPI 
-    MTBDL_PARM_SL,                       // Shock lockout setting 
-    MTBDL_PARM_SR                        // Shock rebound setting 
+    MTBDL_PARM_FPSI,   // Fork PSI 
+    MTBDL_PARM_FC,     // Fork compression setting 
+    MTBDL_PARM_FR,     // Fork rebound setting 
+    MTBDL_PARM_SPSI,   // Shock SPI 
+    MTBDL_PARM_SL,     // Shock lockout setting 
+    MTBDL_PARM_SR      // Shock rebound setting 
 } mtbdl_rx_param_index_t; 
 
 
@@ -72,12 +72,12 @@ typedef enum {
  * @brief Logging streams 
  */
 typedef enum {
-    MTBDL_LOG_STREAM_STANDARD,           // Standard stream 
-    MTBDL_LOG_STREAM_BLINK,              // LED blink stream 
-    MTBDL_LOG_STREAM_SPEED,              // Wheel speed stream 
-    MTBDL_LOG_STREAM_ACCEL,              // Accelerometer stream 
-    MTBDL_LOG_STREAM_GPS,                // GPS stream 
-    MTBDL_LOG_STREAM_USER                // User input stream 
+    MTBDL_LOG_STREAM_STANDARD,   // Standard stream 
+    MTBDL_LOG_STREAM_BLINK,      // LED blink stream 
+    MTBDL_LOG_STREAM_SPEED,      // Wheel speed stream 
+    MTBDL_LOG_STREAM_ACCEL,      // Accelerometer stream 
+    MTBDL_LOG_STREAM_GPS,        // GPS stream 
+    MTBDL_LOG_STREAM_USER        // User input stream 
 } mtbdl_log_streams_t; 
 
 
@@ -85,9 +85,9 @@ typedef enum {
  * @brief ADC buffer index 
  */
 typedef enum {
-    MTBDL_ADC_SOC, 
-    MTBDL_ADC_FORK, 
-    MTBDL_ADC_SHOCK 
+    MTBDL_ADC_SOC,    // Battery State of Charge (SOC) 
+    MTBDL_ADC_FORK,   // Fork potentiometer 
+    MTBDL_ADC_SHOCK   // Shock potentiometer 
 } mtbdl_adc_buff_index_t; 
 
 
@@ -108,7 +108,7 @@ typedef enum {
 //=======================================================================================
 // Structures 
 
-// Data record for the system 
+// System data record 
 typedef struct mtbdl_data_s 
 {
     // Peripherals 
@@ -194,7 +194,7 @@ typedef struct mtbdl_data_s
 mtbdl_data_t; 
 
 
-// 
+// Logging schedule data 
 typedef struct mtbdl_log_stream_state_s 
 {
     uint8_t counter; 
@@ -220,17 +220,23 @@ typedef void (*mtbdl_log_stream)(void);
 // Function prototypes 
 
 /**
- * @brief Format and write the bike parameters 
+ * @brief Format and write the bike suspension parameters 
  * 
- * @details 
+ * @details Formats fork and shock settings from the data record into strings and writes 
+ *          the strings to the SD card. This function is used to write the settings to 
+ *          the top of log files when they're created. It's also called when writing to 
+ *          the parameters file to update and save settings or when creating a new 
+ *          parameters file on startup because it does not already exist. 
  */
 void mtbdl_format_write_bike_params(void); 
 
 
 /**
- * @brief Read and format the bike parameters 
+ * @brief Read and format the bike suspension parameters 
  * 
- * @details 
+ * @details Reads the fork and shock settings from the SD card and saves the data into 
+ *          the data record. These settings are stored in the parameters file and this 
+ *          function is only called during startup if the parameters file already exists. 
  */
 void mtbdl_format_read_bike_params(void); 
 
@@ -492,7 +498,7 @@ void mtbdl_read_bike_params(
     // Open the file for reading 
     hw125_open(mtbdl_bike_param_file, mode); 
 
-    // Read and format the bikr parameters 
+    // Read and format the bike parameters 
     mtbdl_format_read_bike_params(); 
 
     // Close the file 
@@ -536,7 +542,7 @@ void mtbdl_read_sys_params(
 }
 
 
-// Format and write the bike parameters 
+// Format and write the bike suspension parameters 
 void mtbdl_format_write_bike_params(void)
 {
     // Write fork parameters 

@@ -220,23 +220,23 @@ typedef void (*mtbdl_log_stream)(void);
 // Function prototypes 
 
 /**
- * @brief Format and write the bike suspension parameters 
+ * @brief Format and write the bike parameters 
  * 
- * @details Formats fork and shock settings from the data record into strings and writes 
- *          the strings to the SD card. This function is used to write the settings to 
- *          the top of log files when they're created. It's also called when writing to 
- *          the parameters file to update and save settings or when creating a new 
- *          parameters file on startup because it does not already exist. 
+ * @details Formats bike parameters (such as fork and shock settings) from the data 
+ *          record into strings and writes the strings to the SD card. This function is 
+ *          used when writing settings to both the bike parameters file and to newly 
+ *          created log files. The bike parameters file is written upon creation and 
+ *          when saving new settings. 
  */
 void mtbdl_format_write_bike_params(void); 
 
 
 /**
- * @brief Read and format the bike suspension parameters 
+ * @brief Read and format the bike parameters 
  * 
- * @details Reads the fork and shock settings from the SD card and saves the data into 
- *          the data record. These settings are stored in the parameters file and this 
- *          function is only called during startup if the parameters file already exists. 
+ * @details Reads the bike settings/configuration from the SD card and saves the data 
+ *          into the data record. These settings are stored in the bike parameters file 
+ *          and this function is only called during startup if the file already exists. 
  */
 void mtbdl_format_read_bike_params(void); 
 
@@ -244,7 +244,12 @@ void mtbdl_format_read_bike_params(void);
 /**
  * @brief Format and write the system parameters 
  * 
- * @details 
+ * @details Formats system parameters (such as IMU and potentiometer calibration data) 
+ *          from the data record into strings and writes the strings to the SD card. 
+ *          This function is used when writing settings to both the system parameters 
+ *          file and to newly created log files. The system parameters file is written 
+ *          upon creation, when saving new settings and keeping track of the log file 
+ *          number/index. 
  */
 void mtbdl_format_write_sys_params(void); 
 
@@ -252,21 +257,27 @@ void mtbdl_format_write_sys_params(void);
 /**
  * @brief Read and format the system parameters 
  * 
- * @details 
+ * @details Reads the system settings from the SD card and saves the data into the data 
+ *          record. These settings are stored in the system parameters file and this 
+ *          function is only called during startup if the file already exists. 
  */
 void mtbdl_format_read_sys_params(void); 
 
 
 /**
- * @brief Data logging stream that records standard data only 
+ * @brief Data logging stream: standard data only 
  * 
- * @details 
+ * @details While in data logging mode, only record standard data during the current 
+ *          logging interval. Standard data is data that gets recorded every logging 
+ *          intervl and it includes trail markers and suspension position measurements. 
+ *          This is the default logging stream when no other stream is scheduled. See 
+ *          the 'stream_schedule' table for the data stream sequence. 
  */
 void mtbdl_log_stream_standard(void); 
 
 
 /**
- * @brief Data logging stream that updates user LED feedback 
+ * @brief Data logging stream: user LED feedback 
  * 
  * @details 
  */
@@ -274,7 +285,7 @@ void mtbdl_log_stream_blink(void);
 
 
 /**
- * @brief Data logging stream that updates wheel speed 
+ * @brief Data logging stream: wheel speed 
  * 
  * @details 
  */
@@ -282,7 +293,7 @@ void mtbdl_log_stream_speed(void);
 
 
 /**
- * @brief Data logging stream that updates and records acceleration 
+ * @brief Data logging stream: acceleration 
  * 
  * @details 
  */
@@ -290,7 +301,7 @@ void mtbdl_log_stream_accel(void);
 
 
 /**
- * @brief Data logging stream that updates and records GPS location 
+ * @brief Data logging stream: GPS location 
  * 
  * @details 
  */
@@ -298,7 +309,7 @@ void mtbdl_log_stream_gps(void);
 
 
 /**
- * @brief Data logging stream that updates user input feedback LEDs 
+ * @brief Data logging stream: user input feedback LEDs 
  * 
  * @details 
  */
@@ -396,12 +407,8 @@ void mtbdl_data_init(
     mtbdl_data.navstat = M8Q_NAVSTAT_NF; 
     memset((void *)mtbdl_data.utc_time, CLEAR, sizeof(mtbdl_data.utc_time)); 
     memset((void *)mtbdl_data.utc_date, CLEAR, sizeof(mtbdl_data.utc_date)); 
-    // memset((void *)mtbdl_data.deg_min_lat, CLEAR, sizeof(mtbdl_data.deg_min_lat)); 
-    // memset((void *)mtbdl_data.min_frac_lat, CLEAR, sizeof(mtbdl_data.min_frac_lat)); 
     memset((void *)mtbdl_data.lat_str, CLEAR, sizeof(mtbdl_data.lat_str)); 
     mtbdl_data.NS = CLEAR; 
-    // memset((void *)mtbdl_data.deg_min_lon, CLEAR, sizeof(mtbdl_data.deg_min_lon)); 
-    // memset((void *)mtbdl_data.min_frac_lon, CLEAR, sizeof(mtbdl_data.min_frac_lon)); 
     memset((void *)mtbdl_data.lon_str, CLEAR, sizeof(mtbdl_data.lon_str)); 
     mtbdl_data.EW = CLEAR; 
     mtbdl_data.accel_x = CLEAR; 
@@ -542,7 +549,7 @@ void mtbdl_read_sys_params(
 }
 
 
-// Format and write the bike suspension parameters 
+// Format and write the bike parameters 
 void mtbdl_format_write_bike_params(void)
 {
     // Write fork parameters 
@@ -972,7 +979,7 @@ void mtbdl_log_stream_accel(void)
     {
         mtbdl_data.run_count = CLEAR_BIT; 
 
-        // Record new accel data 
+        // Record new accelerometer data 
         mpu6050_get_accel_raw(
             DEVICE_ONE, 
             &mtbdl_data.accel_x, 

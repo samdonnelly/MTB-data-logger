@@ -267,11 +267,11 @@ void mtbdl_format_read_sys_params(void);
 /**
  * @brief Data logging stream: standard data only 
  * 
- * @details While in data logging mode, only record standard data during the current 
- *          logging interval. Standard data is data that gets recorded every logging 
- *          intervl and it includes trail markers and suspension position measurements. 
- *          This is the default logging stream when no other stream is scheduled. See 
- *          the 'stream_schedule' table for the data stream sequence. 
+ * @details This function is used during data logging only to record standard data for 
+ *          the current logging interval. Standard data is data that gets recorded every 
+ *          logging interval and it includes trail markers and suspension position 
+ *          measurements. This is the default logging stream for when no other stream is 
+ *          scheduled. See the 'stream_schedule' table for the data stream sequence. 
  */
 void mtbdl_log_stream_standard(void); 
 
@@ -279,7 +279,13 @@ void mtbdl_log_stream_standard(void);
 /**
  * @brief Data logging stream: user LED feedback 
  * 
- * @details 
+ * @details This function is used during data logging to record standard data for the 
+ *          current logging interval and toggle the data logging mode LED. The LED is 
+ *          used as visual feedback for the user to help identify the systems state. 
+ *          This stream is used periodically to create a blinking effect for the LED. 
+ *          See the 'stream_schedule' table for the data stream sequence. 
+ * 
+ * @see mtbdl_log_stream_standard 
  */
 void mtbdl_log_stream_blink(void); 
 
@@ -287,7 +293,11 @@ void mtbdl_log_stream_blink(void);
 /**
  * @brief Data logging stream: wheel speed 
  * 
- * @details 
+ * @details This function is used during data logging to record standard data for the 
+ *          current logging interval and estimated wheel speed. Wheel speed is determined 
+ *          by recording the number of hall effect sensor interrupts over a period of time 
+ *          which means this stream has to look at previous sensor data. See the 
+ *          'stream_schedule' table for the data stream sequence. 
  */
 void mtbdl_log_stream_speed(void); 
 
@@ -295,7 +305,12 @@ void mtbdl_log_stream_speed(void);
 /**
  * @brief Data logging stream: acceleration 
  * 
- * @details 
+ * @details This function is used during data logging to record standard data and IMU 
+ *          data for the current logging interval. This stream is executed across two 
+ *          intervals, twice in a row. The first pass will trigger a read from the device 
+ *          and the second pass will take the data and write it to the log file. This is 
+ *          done to help prevent the interval time from being exceeded. See the 
+ *          'stream_schedule' table for the data stream sequence. 
  */
 void mtbdl_log_stream_accel(void); 
 
@@ -303,7 +318,12 @@ void mtbdl_log_stream_accel(void);
 /**
  * @brief Data logging stream: GPS location 
  * 
- * @details 
+ * @details This function is used during data logging to record standard data and GPS 
+ *          position for the current logging interval. The GPS device is only read from 
+ *          during intervals where no other data besides standard data is being read 
+ *          and recorded. That way an interval will not exceed its max time and this 
+ *          stream can be only for recording the most recent GPS position. See the 
+ *          'stream_schedule' table for the data stream sequence. 
  */
 void mtbdl_log_stream_gps(void); 
 
@@ -311,7 +331,12 @@ void mtbdl_log_stream_gps(void);
 /**
  * @brief Data logging stream: user input feedback LEDs 
  * 
- * @details 
+ * @details This function is used during data logging to record standard data for the 
+ *          current logging interval and light up the trail marker LED. The trail marker 
+ *          LED lights up when the user presses the trail marker button so the user can 
+ *          see that the input was recorded. When this happens, a 1 will be recorded for 
+ *          the trail marker so points of interest in the data log can be marked/noted 
+ *          See the 'stream_schedule' table for the data stream sequence. 
  */
 void mtbdl_log_stream_user(void); 
 
@@ -764,7 +789,7 @@ void mtbdl_log_data_prep(void)
     mtbdl_data.user_input = CLEAR_BIT; 
     mtbdl_data.log_stream = MTBDL_LOG_STREAM_STANDARD; 
 
-    // GPS - put into a controlled read state 
+    // GPS - put into a continuous read state 
     m8q_set_read_flag(); 
 
 #if MTBDL_DEBUG 
@@ -826,7 +851,6 @@ void mtbdl_logging(void)
 
             // Disable GPS reads 
             m8q_set_idle_flag(); 
-            // m8q_clear_read_flag(); 
         }
         else if (mtbdl_data.user_input) 
         {
@@ -836,7 +860,6 @@ void mtbdl_logging(void)
 
             // Disable GPS reads 
             m8q_set_idle_flag(); 
-            // m8q_clear_read_flag(); 
         }
         else 
         {
@@ -1076,9 +1099,7 @@ void mtbdl_log_end(void)
     mtbdl_write_sys_params(HW125_MODE_OAWR); 
 
     // GPS - put back into a continuous read state 
-    // m8q_clear_read_ready(); 
-    // m8q_clear_read_flag(); 
-    m8q_set_idle_flag(); 
+    m8q_set_read_flag(); 
 }
 
 //=======================================================================================

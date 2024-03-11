@@ -183,6 +183,10 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl);
  *          connection status will be indicated on the screen and through the LEDs but 
  *          will not prevent the user from starting a data log. The run prep state LED 
  *          will also flash. 
+ *          
+ *          This state can only be entered from the idle state. From here, the state can 
+ *          enter the run countdown, post run or idle state. Post run state is entered if 
+ *          there was an issue creating a new log file. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -192,7 +196,12 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Run countdown state 
  * 
- * @details 
+ * @details Waits a short period of time before proceeding to the run state to log data. 
+ *          This state is meant to provide the user with a chance to start riding before 
+ *          data logging begins. The screen and LEDs will indicate that data logging 
+ *          is about to begin. 
+ *          
+ *          Entered from the run prep state only. Exits to the run state only. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -202,7 +211,19 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Run state 
  * 
- * @details 
+ * @details Continuously logs data from the bike and system including the suspension 
+ *          potentiometers, GPS, IMU, wheel speed hall effect sensor and user trail 
+ *          markers. The buttons give the user to option to stop a data log or set a 
+ *          trail marker which gets recorded in the log file. Data is logged at an 
+ *          interval triggered by an interrupt and there is a scheduler that controls 
+ *          what data gets logged at each interval. All the data gets saved to the 
+ *          file created before entering this state. The screen is shut off during this 
+ *          state as it's not needed. The data logging LED will flash to indicate that 
+ *          data logging is progress. 
+ *          
+ *          Entered from the run prep state only. Exits to the post run state if the 
+ *          user stops the data log with a button push. Can also exit to the fault state 
+ *          if a fault occurs in the system. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -212,7 +233,13 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Post run state 
  * 
- * @details 
+ * @details Stops logging data then saves and closes the log file. The post run state 
+ *          message is displayed to the screen and that state waits a short period of 
+ *          time before exiting. LEDs will indicate the end of data logging. 
+ *          
+ *          Entered from the run state state after a data log or from the run prep state 
+ *          if data log file creation was unsuccessful. Exits to the idle state when 
+ *          done. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -222,7 +249,17 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Data transfer selection state 
  * 
- * @details 
+ * @details Displays the data selection state message which gives the user the option 
+ *          between sending or receiving data from the system which the user can choose 
+ *          with the buttons. Sending data involves offloading data logs to an external 
+ *          device and receiving data involves taking input from an external device to 
+ *          update system settings. Alternatively, the user can cancel and go back to the 
+ *          idle state with a different button press. 
+ *          
+ *          Entered from the idle state only. Exits to the idle state or the device 
+ *          search state depending on the user button input. If the user chooses to send 
+ *          data and there are no log files to send then the system will exit to the TX 
+ *          prep state which will end up moving the system back to the idle state. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -232,7 +269,14 @@ void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Search for Bluetooth connection state 
  * 
- * @details 
+ * @details Turns the Bluetooth module on and waits for an external device to connect to 
+ *          it. A connection is needed in order to exchange data logs and system 
+ *          settings. The Bluetooth LED will toggle quickly to indicate a searching 
+ *          state. The user can choose to cancel the search with a button press. 
+ *          
+ *          Enters from the data selection state only. Exits to either the idle state 
+ *          if the user cancels the search, or pre TX or pre RX states if a connection 
+ *          is made. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -242,7 +286,14 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Pre RX state 
  * 
- * @details 
+ * @details Displays the pre RX state message and waits for the user to start the RX 
+ *          state or abort to operation. The Bluetooth LED will blink slowly to indicate 
+ *          a connection but the system will continuously monitor the connection and 
+ *          abort the operation if a connection is lost. 
+ *          
+ *          Enters from the device search state only once a Bluetooth connection is made 
+ *          to an external device. Exits to the idle state if aborted, the RX state if 
+ *          the user chooses to proceed, or the post RX state if connection is lost. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -252,7 +303,16 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief RX state 
  * 
- * @details 
+ * @details Continuously poles the Bluetooth device and processes any new data received. 
+ *          This data is used to update system settings/information and any data that is 
+ *          not of a valid format will be discarded. If Bluetooth connection is lost 
+ *          then the operation will be aborted. The RX state message is displayed to the 
+ *          screen which will give the user the option to stop the transaction with a 
+ *          button press. 
+ *          
+ *          Entered from pre RX state only. Exits to the post RX state when done or if 
+ *          a connection is lost. Can exit to the fault state if the system detects a 
+ *          fault. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -262,7 +322,13 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Post RX state 
  * 
- * @details 
+ * @details Saves the new data received during the RX state to the parameter files then 
+ *          waits a short period of time before returning to the idle state. Once done 
+ *          the Bluetooth will be shut off. A post RX state message will be displayed 
+ *          and the Bluetooth LED will indicate that the transaction is over. 
+ *          
+ *          Entered from the RX state after a transaction or from either the RX or pre 
+ *          RX state if Bluetooth connection is lost. Exits to the idle state only. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -270,9 +336,19 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl);
 
 
 /**
- * @brief PRE TX state 
+ * @brief Pre TX state 
  * 
- * @details 
+ * @details Prepares a log file for sending to an external device via Bluetooth, and if 
+ *          successful then displays the pre TX message and waits for the user to start 
+ *          the TX state or exit to idle with a button press. If no log file exists then 
+ *          abort the state. Continuously checks the Bluetooth connection status and 
+ *          aborts the operation if connection is lost. 
+ *          
+ *          Enters from the device search state once a Bluetooth connection is made, the 
+ *          data selection state if no log file exists for sending, or from the post TX 
+ *          state if the user chooses to send another log file. Exits to the idle state 
+ *          if the user cancels, the TX state if the user proceeds with a transfer, or 
+ *          to the post TX state if connection is lost. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -282,7 +358,14 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief TX state 
  * 
- * @details 
+ * @details Sends a data log file to a connected external device via Bluetooth until the 
+ *          whole file has been sent. The user has the option to cancel the transaction 
+ *          before it's finished with a button press. If Bluetooth connection is lost 
+ *          before the end of the transaction then the operation will be aborted. 
+ *          
+ *          Enters from the pre TX state only. Exits to the post TX state when the 
+ *          transaction is finished or the operation is aborted. It can exit to the 
+ *          fault state if a fauult occurs in the system. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -292,7 +375,13 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Post TX state 
  * 
- * @details 
+ * @details If the transaction is successful then the log file is closed and deleted from 
+ *          the system. Waits for a period of time before exiting. 
+ *          
+ *          Enters from the TX state after a transaction or from the TX and pre TX states 
+ *          if the operation is aborted. Defaults back to the pre TX state if there are 
+ *          more log files available to send and there is still a connection. Otherwise 
+ *          return to the idle state. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -302,7 +391,12 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Pre calibration state 
  * 
- * @details 
+ * @details Displays the pre calibration state message to prompt the user to prepare the 
+ *          system for calibration. The user can choose to proceed to calibration or 
+ *          return to idle with a button push. 
+ *          
+ *          Enters from the idle state only. Exits to the idle state if canceled or to 
+ *          the calibration state if proceeding. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -312,7 +406,16 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Calibrate state 
  * 
- * @details 
+ * @details Records potentiometer and IMU data continously for a short period of time 
+ *          which gets used to determine the resting value of each sensor. The system 
+ *          should be held still during this time. The screen and LEDs will indicate 
+ *          to the user that calibration is taking place. Once finished, the recorded 
+ *          values will be averaged to get the new calibration values for these 
+ *          sensors. These values are is used to correct for sensor errors and it 
+ *          gets reflected in the data log values. 
+ *          
+ *          Entered from the pre calibration state only. Exits to the post calibration 
+ *          state only. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -322,7 +425,10 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Post calibration state 
  * 
- * @details 
+ * @details Saves the new calibration values to the parameter files and displays the 
+ *          post calibration state message to indicate that calibration is complete. 
+ *          
+ *          Entered from the calibration state only. Exits to the idle state only. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -332,7 +438,16 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Low power state 
  * 
- * @details 
+ * @details This state occurs in response to the battery SOC dropping too low. This state 
+ *          puts all devices into low power mode to save power and waits for the battery 
+ *          SOC to rise above a threshold. Although the state looks for the SOC to change, 
+ *          once in this state the user should power down the system. There is a user 
+ *          button available to temporarily light the screen to show that the system is 
+ *          in low power mode. A low power LED will also flash. 
+ *          
+ *          Enters whenever the battery SOC is too low. Exits only when the SOC is high 
+ *          enough. It is not recommended to charge the battery while the system is 
+ *          running. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -342,7 +457,12 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Fault state 
  * 
- * @details 
+ * @details Occurs when the system sees a fault. Stops any existing operation, displays 
+ *          a fault message to the screen and waits for the user to trigger a system 
+ *          reset. 
+ *          
+ *          Entered from any continuous state when there is a fault. Exits to the reset 
+ *          state when the user triggers a reset with a button press. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -352,7 +472,10 @@ void mtbdl_fault_state(mtbdl_trackers_t *mtbdl);
 /**
  * @brief Reset state 
  * 
- * @details 
+ * @details Resets any devices or data as needed during a system reset. Immediately goes 
+ *          to the idle state when done. 
+ *          
+ *          Entered from the fault state only. Exits to the idle state only. 
  * 
  * @param mtbdl : main controller tracking info 
  */
@@ -518,7 +641,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
             break; 
 
         case MTBDL_IDLE_STATE: 
@@ -538,7 +660,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_PRECALIBRATE_STATE;  
             }
-
             break; 
 
         case MTBDL_RUN_PREP_STATE: 
@@ -558,7 +679,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_RUN_COUNTDOWN_STATE; 
             }
-
             break; 
 
         case MTBDL_RUN_COUNTDOWN_STATE: 
@@ -578,7 +698,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_POSTRUN_STATE; 
             }
-
             break; 
 
         case MTBDL_POSTRUN_STATE: 
@@ -606,7 +725,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_PRETX_STATE; 
             }
-
             break; 
 
         case MTBDL_DEV_SEARCH_STATE: 
@@ -626,7 +744,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_PRETX_STATE; 
             }
-
             break; 
 
         case MTBDL_PRERX_STATE: 
@@ -646,7 +763,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_RX_STATE; 
             }
-
             break; 
 
         case MTBDL_RX_STATE: 
@@ -658,7 +774,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_POSTRX_STATE; 
             }
-
             break; 
 
         case MTBDL_POSTRX_STATE: 
@@ -666,7 +781,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
             break; 
 
         case MTBDL_PRETX_STATE: 
@@ -686,7 +800,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_TX_STATE; 
             }
-
             break; 
 
         case MTBDL_TX_STATE: 
@@ -698,7 +811,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_POSTTX_STATE; 
             }
-
             break; 
 
         case MTBDL_POSTTX_STATE: 
@@ -710,7 +822,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
             break; 
 
         case MTBDL_PRECALIBRATE_STATE: 
@@ -726,7 +837,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_CALIBRATE_STATE;  
             }
-
             break; 
         
         case MTBDL_CALIBRATE_STATE: 
@@ -734,7 +844,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_POSTCALIBRATE_STATE;  
             }
-
             break; 
 
         case MTBDL_POSTCALIBRATE_STATE: 
@@ -742,7 +851,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
             break; 
 
         case MTBDL_LOWPWR_STATE: 
@@ -750,7 +858,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
             break; 
 
         case MTBDL_FAULT_STATE: 
@@ -758,7 +865,6 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_RESET_STATE; 
             }
-            
             break; 
 
         case MTBDL_RESET_STATE: 
@@ -1300,9 +1406,9 @@ void mtbdl_data_select_state(
     // Button 2 - triggers the pre send (TX) state 
     else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
     {
-        // Before going to the device search state the code first check if there are any log 
+        // Before going to the device search state the code first checks if there are any log 
         // files saved in the system. If there are none then the data select bit is not set 
-        // which will ultimately aborts the TX state and tells the user there are no files 
+        // which will ultimately aborts the TX state and tell the user there are no files 
         // available for sending. 
         if (mtbdl_tx_check())
         {

@@ -68,8 +68,6 @@ typedef enum {
 
 /**
  * @brief State check counter values 
- * 
- * @details 
  */
 typedef enum {
     MTBDL_STATE_CHECK_CNT_1 = 1, 
@@ -156,30 +154,39 @@ typedef void (*mtbdl_func_ptr_t)(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_init_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_init_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
  * @brief Idle state 
  * 
- * @details 
+ * @details Display general state information and system options on the screen and wait 
+ *          for the user to choose an option using the buttons. Update the GPS connection 
+ *          status on the screen and with the LEDs. 
+ *          
+ *          Enter the run prep, data selection or calibration prep state depending on the 
+ *          button pressed. This is the default state for the system meaning it's where 
+ *          states revert to when features of the system were finished. 
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_idle_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_idle_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
  * @brief Run prep state 
  * 
- * @details 
+ * @details Checks if there's room for a new log file to be created. If the number of log 
+ *          files it at its capacity then the state is aborted. If there is room then 
+ *          the run prep message is displayed and the state waits for the user to choose 
+ *          between proceeding to log data or returning to the idle state. The GPS 
+ *          connection status will be indicated on the screen and through the LEDs but 
+ *          will not prevent the user from starting a data log. The run prep state LED 
+ *          will also flash. 
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_run_prep_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -189,8 +196,7 @@ void mtbdl_run_prep_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_run_countdown_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -200,8 +206,7 @@ void mtbdl_run_countdown_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_run_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_run_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -211,8 +216,7 @@ void mtbdl_run_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_postrun_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -222,8 +226,7 @@ void mtbdl_postrun_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_data_select_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -233,8 +236,7 @@ void mtbdl_data_select_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_dev_search_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -244,8 +246,7 @@ void mtbdl_dev_search_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_prerx_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -255,8 +256,7 @@ void mtbdl_prerx_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_rx_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_rx_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -266,8 +266,7 @@ void mtbdl_rx_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_postrx_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -277,8 +276,7 @@ void mtbdl_postrx_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_pretx_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -288,8 +286,7 @@ void mtbdl_pretx_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_tx_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_tx_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -299,8 +296,7 @@ void mtbdl_tx_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_posttx_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -310,8 +306,7 @@ void mtbdl_posttx_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_precalibrate_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -321,8 +316,7 @@ void mtbdl_precalibrate_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_calibrate_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -332,8 +326,7 @@ void mtbdl_calibrate_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_postcalibrate_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -343,8 +336,7 @@ void mtbdl_postcalibrate_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_lowpwr_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -354,8 +346,7 @@ void mtbdl_lowpwr_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_fault_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_fault_state(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -365,8 +356,7 @@ void mtbdl_fault_state(
  * 
  * @param mtbdl : main controller tracking info 
  */
-void mtbdl_reset_state(
-    mtbdl_trackers_t *mtbdl); 
+void mtbdl_reset_state(mtbdl_trackers_t *mtbdl); 
 
 //=======================================================================================
 
@@ -2147,8 +2137,9 @@ void mtbdl_lowpwr_state(
         mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
     }
 
-    // If SOC is above the minimum threshold then we can exit low power state 
-    // TODO replace this with a check on the SOC 
+    // If SOC is above the minimum threshold then we can exit low power state. 
+    // A button press is put here instead temporarily umtil SOC calibration has 
+    // been created. 
     // Button 3 - triggers the idle state 
     if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
     {
@@ -2282,7 +2273,7 @@ void mtbdl_reset_state(
     // Set the init state flag once ready 
     mtbdl->init = SET_BIT; 
 
-    // TODO Reset devices 
+    // Reset devices 
     hw125_set_reset_flag(); 
     
     //==================================================

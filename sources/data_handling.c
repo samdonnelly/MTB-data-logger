@@ -193,6 +193,9 @@ typedef struct mtbdl_data_s
 }
 mtbdl_data_t; 
 
+// Data record instance 
+static mtbdl_data_t mtbdl_data; 
+
 
 // Logging schedule data 
 typedef struct mtbdl_log_stream_state_s 
@@ -346,10 +349,6 @@ void mtbdl_log_stream_user(void);
 //=======================================================================================
 // Variables 
 
-// Data record instance 
-static mtbdl_data_t mtbdl_data; 
-
-
 // Log stream table 
 static mtbdl_log_stream stream_table[MTBDL_NUM_LOG_STREAMS] = 
 {
@@ -405,48 +404,16 @@ void mtbdl_data_init(
     IRQn_Type log_irqn, 
     ADC_TypeDef *adc)
 {
+    // Reset the whole data record 
+    memset((void *)&mtbdl_data, CLEAR, sizeof(mtbdl_data_t)); 
+
     // Peripherals 
     mtbdl_data.rpm_irq = rpm_irqn; 
     mtbdl_data.log_irq = log_irqn; 
     mtbdl_data.adc = adc; 
 
-    // Bike parameters 
-    mtbdl_data.fork_psi = CLEAR; 
-    mtbdl_data.fork_comp = CLEAR; 
-    mtbdl_data.fork_reb = CLEAR; 
-    mtbdl_data.shock_psi = CLEAR; 
-    mtbdl_data.shock_lock = CLEAR; 
-    mtbdl_data.shock_reb = CLEAR; 
-
-    // System parameters 
-    mtbdl_data.log_index = CLEAR; 
-    mtbdl_data.accel_x_rest = CLEAR; 
-    mtbdl_data.accel_y_rest = CLEAR; 
-    mtbdl_data.accel_z_rest = CLEAR; 
-    mtbdl_data.pot_fork_rest = CLEAR; 
-    mtbdl_data.pot_shock_rest = CLEAR; 
-
     // System data 
-    mtbdl_data.soc = CLEAR; 
-    memset((void *)mtbdl_data.adc_buff, CLEAR, sizeof(mtbdl_data.adc_buff)); 
     mtbdl_data.navstat = M8Q_NAVSTAT_NF; 
-    memset((void *)mtbdl_data.utc_time, CLEAR, sizeof(mtbdl_data.utc_time)); 
-    memset((void *)mtbdl_data.utc_date, CLEAR, sizeof(mtbdl_data.utc_date)); 
-    memset((void *)mtbdl_data.lat_str, CLEAR, sizeof(mtbdl_data.lat_str)); 
-    mtbdl_data.NS = CLEAR; 
-    memset((void *)mtbdl_data.lon_str, CLEAR, sizeof(mtbdl_data.lon_str)); 
-    mtbdl_data.EW = CLEAR; 
-    mtbdl_data.accel_x = CLEAR; 
-    mtbdl_data.accel_y = CLEAR; 
-    mtbdl_data.accel_z = CLEAR; 
-
-    // LEDs 
-    memset((void *)mtbdl_data.led_colour_data, CLEAR, sizeof(mtbdl_data.led_colour_data)); 
-
-    // SD card 
-    memset((void *)mtbdl_data.data_buff, CLEAR, sizeof(mtbdl_data.data_buff)); 
-    memset((void *)mtbdl_data.filename, CLEAR, sizeof(mtbdl_data.filename)); 
-    mtbdl_data.tx_status = CLEAR_BIT; 
 }
 
 
@@ -1120,8 +1087,7 @@ void mtbdl_rx_prep(void)
 void mtbdl_rx(void)
 {
     // Local variables 
-    unsigned int param_index; 
-    unsigned int temp_data; 
+    unsigned int param_index, temp_data; 
 
     // Read Bluetooth data if available 
     if (hc05_data_status())
@@ -1138,7 +1104,6 @@ void mtbdl_rx(void)
         {
             case MTBDL_PARM_FPSI:
                 mtbdl_data.fork_psi = temp_data; 
-
                 break;
 
             case MTBDL_PARM_FC:
@@ -1146,7 +1111,6 @@ void mtbdl_rx(void)
                 {
                     mtbdl_data.fork_comp = temp_data; 
                 }
-
                 break;
 
             case MTBDL_PARM_FR:
@@ -1154,12 +1118,10 @@ void mtbdl_rx(void)
                 {
                     mtbdl_data.fork_reb = temp_data; 
                 }
-
                 break;
 
             case MTBDL_PARM_SPSI:
                 mtbdl_data.shock_psi = temp_data; 
-
                 break;
 
             case MTBDL_PARM_SL:
@@ -1167,7 +1129,6 @@ void mtbdl_rx(void)
                 {
                     mtbdl_data.shock_lock = temp_data; 
                 }
-
                 break;
 
             case MTBDL_PARM_SR:
@@ -1175,10 +1136,9 @@ void mtbdl_rx(void)
                 {
                     mtbdl_data.shock_reb = temp_data; 
                 }
-
                 break;
             
-            default:
+            default: 
                 break;
         }
 
@@ -1361,7 +1321,10 @@ void mtbdl_set_idle_msg(void)
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
     // Create an editable copy of the message 
-    for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) msg[i] = mtbdl_idle_msg[i]; 
+    for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) 
+    {
+        msg[i] = mtbdl_idle_msg[i]; 
+    }
 
     // Format the message with data 
     // snprintf will NULL terminate the string at the screen line length so in order to use 
@@ -1402,7 +1365,10 @@ void mtbdl_set_run_prep_msg(void)
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
 
     // Create an editable copy of the message 
-    for (uint8_t i = 0; i < MTBDL_MSG_LEN_3_LINE; i++) msg[i] = mtbdl_run_prep_msg[i]; 
+    for (uint8_t i = 0; i < MTBDL_MSG_LEN_3_LINE; i++) 
+    {
+        msg[i] = mtbdl_run_prep_msg[i]; 
+    }
 
     // Convert the NAVSTAT code to an easily readable value 
 
@@ -1426,7 +1392,10 @@ void mtbdl_set_pretx_msg(void)
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
     // Create an editable copy of the message 
-    for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) msg[i] = mtbdl_pretx_msg[i]; 
+    for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) 
+    {
+        msg[i] = mtbdl_pretx_msg[i]; 
+    }
 
     // Format the message with data 
     // The log index is adjusted because it will be one ahead of the most recent log 

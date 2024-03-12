@@ -304,7 +304,9 @@ void mtbdl_set_run_prep_msg(void);
 /**
  * @brief Format the pre TX state message 
  * 
- * @details 
+ * @details The pre TX state message contains the current log file index which tells the 
+ *          user how many log files are available to be sent. This function adds the log 
+ *          index to the message before writing it to the screen. 
  */
 void mtbdl_set_pretx_msg(void); 
 
@@ -312,15 +314,17 @@ void mtbdl_set_pretx_msg(void);
 
 
 //==================================================
-// LEDs 
+// Data checks and updates 
 
 /**
  * @brief Update LED colours 
  * 
- * @details 
+ * @details Assigns the specified colour to the LED and updates the LED output. This 
+ *          function only needs to update one LED at a time because LEDs in this system 
+ *          are only used as indicators for the user. 
  * 
- * @param led_index 
- * @param led_code 
+ * @param led_index : LED to update 
+ * @param led_code : colour code that that sets the colour of the LED 
  */
 void mtbdl_led_update(
     ws2812_led_index_t led_index, 
@@ -330,7 +334,9 @@ void mtbdl_led_update(
 /**
  * @brief Set trail marker flag 
  * 
- * @details 
+ * @details Used by the run state while data logging to set the trail marker flag when 
+ *          the marker button is pushed. The trail marker gets written to the log file 
+ *          so the used can identify points within the log. 
  */
 void mtbdl_set_trailmark(void); 
 

@@ -141,17 +141,25 @@ void mtbdl_write_sys_params(
 /**
  * @brief Log name preparation 
  * 
- * @details 
+ * @details Checks if there is room to create a new log file, and if so, generates a new 
+ *          log file name. If the number of log file is at its capacity then the function 
+ *          will return false. 
  * 
- * @return uint8_t 
+ * @return uint8_t : file availability status 
  */
 uint8_t mtbdl_log_name_prep(void); 
 
-
+//=======================================================================================
+// 
+//=======================================================================================
 /**
  * @brief Log file prep 
  * 
  * @details 
+ * The log file preparation function should be called before this function so a new file 
+ * name can be created. 
+ * 
+ * @see mtbdl_log_name_prep 
  */
 void mtbdl_log_file_prep(void); 
 
@@ -186,17 +194,25 @@ void mtbdl_log_end(void);
 // RX state functions 
 
 /**
- * @brief RX user interface preparation 
+ * @brief RX user interface start 
  * 
- * @details 
+ * @details Passes a user prompt to the Bluetooth module which gets sent to an external 
+ *          device. Note that the Bluetooth module must be connected to a device that can 
+ *          display the sent messages for this to have an effect. The prompt tells the 
+ *          user that the system is ready to receive its input. 
  */
 void mtbdl_rx_prep(void); 
 
 
 /**
- * @brief Read and assign the user input 
+ * @brief Read user input 
  * 
- * @details 
+ * @details Poles the Bluetooth module for new data, then once new data is available it's 
+ *          read and checked against valid commands. If a match is found then system 
+ *          settings/parameters are updated. If the user input does not match one of the 
+ *          available commands then nothing will change. This function should be called 
+ *          continuously to check for data and provide a new user prompt after data is 
+ *          input. 
  */
 void mtbdl_rx(void); 
 
@@ -207,11 +223,9 @@ void mtbdl_rx(void);
 // TX state functions 
 
 /**
- * @brief Check if there are no log files 
+ * @brief Check log file count 
  * 
- * @details 
- * 
- * @return uint8_t 
+ * @return uint8_t : log file index 
  */
 uint8_t mtbdl_tx_check(void); 
 
@@ -219,9 +233,10 @@ uint8_t mtbdl_tx_check(void);
 /**
  * @brief Prepare to send a data log file 
  * 
- * @details 
+ * @details If a log file exists that matches the most recent data log index then this 
+ *          function will open that file and return true. Otherwise it will return false. 
  * 
- * @return uint8_t 
+ * @return uint8_t : status of the file check 
  */
 uint8_t mtbdl_tx_prep(void); 
 
@@ -229,9 +244,19 @@ uint8_t mtbdl_tx_prep(void);
 /**
  * @brief Transfer data log contents 
  * 
- * @details 
+ * @details Reads a single line from an open data log file and passes the info to the 
+ *          Bluetooth module for sending out to an external device. The end of the file 
+ *          is checked for after each line. Once the end of the file is seen the function 
+ *          will return false. This function does not loop so it needs to be repeatedly 
+ *          called. 
  * 
- * @return uint8_t : 
+ *          Note that this function does not check for a valid open file. The TX prep 
+ *          function should be called before this function to make sure there is a file 
+ *          open before trying to read from the SD card. 
+ * 
+ * @see mtbdl_tx_prep 
+ * 
+ * @return uint8_t : end of file status 
  */
 uint8_t mtbdl_tx(void); 
 
@@ -239,7 +264,9 @@ uint8_t mtbdl_tx(void);
 /**
  * @brief Close the log file and delete it 
  * 
- * @details 
+ * @details Closes the open data log file, and if the transaction completed successfully 
+ *          then the log file will be deleted and the log index updated. Note that this 
+ *          function should only be called after 'mtbdl_tx' is done being called. 
  */
 void mtbdl_tx_end(void); 
 
@@ -252,7 +279,15 @@ void mtbdl_tx_end(void);
 /**
  * @brief Calibration data prep 
  * 
- * @details 
+ * @details Prepare the calibration data, enables reading from the IMU and potentiometers 
+ *          and enables data sampling interrupt. This must be called before using the 
+ *          calibration function. 
+ *          
+ *          Calibration requires finding the resting values/offsets of the bike IMU and 
+ *          suspension potentiometers. These offsets are used "zero" the readings so 
+ *          data logs values are more accurate. 
+ * 
+ * @see mtbdl_calibrate 
  */
 void mtbdl_cal_prep(void); 
 
@@ -260,7 +295,19 @@ void mtbdl_cal_prep(void);
 /**
  * @brief Calibration 
  * 
- * @details 
+ * @details Records IMU and suspension potentiometer values periodically (every time the 
+ *          data sampling interrupt runs) by summing each successive reading. The number 
+ *          of times the values are recorded is tracked. The sum of these values will be 
+ *          used to find the average reading over a period of time in the calibration 
+ *          calculation function. Note that since the values get summed together, the 
+ *          amount of time this function is continuously called should be considered. 
+ *          
+ *          Calibration requires finding the resting values/offsets of the bike IMU and 
+ *          suspension potentiometers. These offsets are used "zero" the readings so 
+ *          data logs values are more accurate. 
+ * 
+ * @see mtbdl_cal_prep 
+ * @see mtbdl_cal_calc 
  */
 void mtbdl_calibrate(void); 
 
@@ -268,7 +315,17 @@ void mtbdl_calibrate(void);
 /**
  * @brief Calibration calculation 
  * 
- * @details 
+ * @details Disables the data sampling interrupt and averages the sensor readings 
+ *          accumulated during the calibration function to provide new sensor calibration/
+ *          offset values. This function only provides new calibration data if the 
+ *          calibration function is called first. Note that this function does not update 
+ *          the parameters file. That should be done separately if values are to be saved. 
+ *          
+ *          Calibration requires finding the resting values/offsets of the bike IMU and 
+ *          suspension potentiometers. These offsets are used "zero" the readings so 
+ *          data logs values are more accurate. 
+ * 
+ * @see mtbdl_calibrate 
  */
 void mtbdl_cal_calc(void); 
 

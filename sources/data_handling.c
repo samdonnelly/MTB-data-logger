@@ -32,7 +32,6 @@
 
 // Data logging 
 #define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
-#define MTBDL_LOG_NUM_MIN 0              // Min data log files 
 #define MTBDL_LOG_PERIOD 10              // (ms) Period between data samples 
 #define MTBDL_NUM_LOG_STREAMS 6          // Number of data logging streams 
 #define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
@@ -1083,10 +1082,9 @@ void mtbdl_rx_prep(void)
 }
 
 
-// Read and assign the user input 
+// Read user input 
 void mtbdl_rx(void)
 {
-    // Local variables 
     unsigned int param_index, temp_data; 
 
     // Read Bluetooth data if available 
@@ -1094,10 +1092,11 @@ void mtbdl_rx(void)
     {
         // Read and parse the data from the HC-05 
         hc05_read(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-        sscanf(mtbdl_data.data_buff, 
-               mtbdl_rx_input, 
-               &param_index, 
-               &temp_data); 
+        sscanf(
+            mtbdl_data.data_buff, 
+            mtbdl_rx_input, 
+            &param_index, 
+            &temp_data); 
 
         // Check for a data match 
         switch (param_index)
@@ -1153,15 +1152,10 @@ void mtbdl_rx(void)
 //=======================================================================================
 // TX state functions 
 
-// Check if there are no log files 
+// Check log file count 
 uint8_t mtbdl_tx_check(void)
 {
-    if (mtbdl_data.log_index != MTBDL_LOG_NUM_MIN)
-    {
-        return TRUE; 
-    }
-
-    return FALSE; 
+    return mtbdl_data.log_index; 
 }
 
 
@@ -1174,16 +1168,16 @@ uint8_t mtbdl_tx_prep(void)
         return FALSE; 
     }
 
-    // Log files exist - generate a new log file name 
-    // The log index is adjusted because it will be one ahead of the most recent log 
-    // file number after the most recent log has been created 
-    snprintf(mtbdl_data.filename, 
-             MTBDL_MAX_DATA_STR_LEN, 
-             mtbdl_log_file, 
-             (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
-
-    // Move to the data directory 
+    // Log files exist. Move to the data directory. 
     hw125_set_dir(mtbdl_data_dir); 
+
+    // Generate a log file name. The log index is adjusted because it will be one ahead 
+    // of the most recent log file number after the most recent log has been created 
+    snprintf(
+        mtbdl_data.filename, 
+        MTBDL_MAX_DATA_STR_LEN, 
+        mtbdl_log_file, 
+        (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
 
     // Check for the existance of the specified file number 
     if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
@@ -1201,10 +1195,8 @@ uint8_t mtbdl_tx_prep(void)
 // Transfer data log contents 
 uint8_t mtbdl_tx(void)
 {
-    // Read a line from the data log 
+    // Read a line from the data log and send it out via the Bluetooth module. 
     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-    // Send the data over Bluetooth 
     hc05_send(mtbdl_data.data_buff); 
 
     // Check for end of file - if true we can stop the transaction 

@@ -527,41 +527,26 @@ void mtbdl_app_init(
     gpio_pin_num_t user_btn_3, 
     gpio_pin_num_t user_btn_4)
 {
+    // Reset all tracking info 
+    memset((void *)&mtbdl_trackers, CLEAR, sizeof(mtbdl_trackers_t)); 
+
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
-    mtbdl_trackers.fault_code = CLEAR; 
     mtbdl_trackers.user_btn_port = user_btn_gpio; 
 
     // Timing information 
     mtbdl_trackers.timer_nonblocking = timer_nonblocking; 
     mtbdl_trackers.delay_timer.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
-    mtbdl_trackers.delay_timer.time_cnt_total = CLEAR; 
-    mtbdl_trackers.delay_timer.time_cnt = CLEAR; 
     mtbdl_trackers.delay_timer.time_start = SET_BIT; 
-    mtbdl_trackers.led_state = CLEAR; 
 
     // User buttons 
     mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
     mtbdl_trackers.user_btn_2 = (uint8_t)user_btn_2; 
     mtbdl_trackers.user_btn_3 = (uint8_t)user_btn_3; 
     mtbdl_trackers.user_btn_4 = (uint8_t)user_btn_4; 
-    mtbdl_trackers.user_btn_1_block = CLEAR; 
-    mtbdl_trackers.user_btn_2_block = CLEAR; 
-    mtbdl_trackers.user_btn_3_block = CLEAR; 
-    mtbdl_trackers.user_btn_4_block = CLEAR; 
 
     // State flags 
     mtbdl_trackers.init = SET_BIT; 
-    mtbdl_trackers.idle = CLEAR_BIT; 
-    mtbdl_trackers.run = CLEAR_BIT; 
-    mtbdl_trackers.data_select = CLEAR_BIT; 
-    mtbdl_trackers.tx = CLEAR_BIT; 
-    mtbdl_trackers.rx = CLEAR_BIT; 
-    mtbdl_trackers.calibrate = CLEAR_BIT; 
-    mtbdl_trackers.low_pwr = CLEAR_BIT; 
-    mtbdl_trackers.noncrit_fault = CLEAR_BIT; 
-    mtbdl_trackers.fault = CLEAR_BIT; 
-    mtbdl_trackers.reset = CLEAR_BIT; 
 }
 
 

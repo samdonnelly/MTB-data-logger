@@ -20,7 +20,7 @@
 
 // Application 
 #include "data_handling.h" 
-#include "int_handlers.h" 
+#include "stm32f4xx_it.h" 
 
 // Config files 
 #include "strs.h" 

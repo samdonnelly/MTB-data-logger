@@ -553,7 +553,6 @@ void mtbdl_app_init(
 // MTB DL application 
 void mtbdl_app(void)
 {
-    // Local variables 
     mtbdl_states_t next_state = mtbdl_trackers.state; 
 
     //===================================================
@@ -886,8 +885,7 @@ void mtbdl_app(void)
 // State functions 
 
 // Init state 
-void mtbdl_init_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -957,10 +955,8 @@ void mtbdl_init_state(
 
 
 // Idle state 
-void mtbdl_idle_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
 {
-    // Local variables 
     static uint32_t time_count = CLEAR; 
 
     //==================================================
@@ -1075,10 +1071,8 @@ void mtbdl_idle_state(
 
 
 // Pre run state 
-void mtbdl_run_prep_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
 {
-    // Local variables 
     static uint32_t time_count = CLEAR; 
 
     //==================================================
@@ -1191,8 +1185,7 @@ void mtbdl_run_prep_state(
 
 
 // Run countdown state 
-void mtbdl_run_countdown_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1247,8 +1240,7 @@ void mtbdl_run_countdown_state(
 
 
 // Run state 
-void mtbdl_run_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1302,8 +1294,7 @@ void mtbdl_run_state(
 
 
 // Post run state 
-void mtbdl_postrun_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1360,8 +1351,7 @@ void mtbdl_postrun_state(
 
 
 // Data transfer selection 
-void mtbdl_data_select_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1429,8 +1419,7 @@ void mtbdl_data_select_state(
 
 
 // Search for Bluetooth connection 
-void mtbdl_dev_search_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1513,8 +1502,7 @@ void mtbdl_dev_search_state(
 
 
 // Pre RX state 
-void mtbdl_prerx_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1603,8 +1591,7 @@ void mtbdl_prerx_state(
 
 
 // RX state 
-void mtbdl_rx_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1699,8 +1686,7 @@ void mtbdl_rx_state(
 
 
 // Post RX state 
-void mtbdl_postrx_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1748,8 +1734,7 @@ void mtbdl_postrx_state(
 
 
 // Pre TX state 
-void mtbdl_pretx_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1859,8 +1844,7 @@ void mtbdl_pretx_state(
 
 
 // TX state 
-void mtbdl_tx_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -1947,8 +1931,7 @@ void mtbdl_tx_state(
 
 
 // Post TX state 
-void mtbdl_posttx_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -2005,8 +1988,7 @@ void mtbdl_posttx_state(
 
 
 // Pre calibration state 
-void mtbdl_precalibrate_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -2092,8 +2074,7 @@ void mtbdl_precalibrate_state(
 
 
 // Calibration state 
-void mtbdl_calibrate_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -2150,8 +2131,7 @@ void mtbdl_calibrate_state(
 
 
 // Post calibration state 
-void mtbdl_postcalibrate_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
 {
     //===================================================
     // State entry 
@@ -2190,8 +2170,7 @@ void mtbdl_postcalibrate_state(
 
 
 // Low power state 
-void mtbdl_lowpwr_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -2291,8 +2270,7 @@ void mtbdl_lowpwr_state(
 
 
 // Fault state 
-void mtbdl_fault_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_fault_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 
@@ -2348,8 +2326,7 @@ void mtbdl_fault_state(
 
 
 // reset state 
-void mtbdl_reset_state(
-    mtbdl_trackers_t *mtbdl)
+void mtbdl_reset_state(mtbdl_trackers_t *mtbdl)
 {
     //==================================================
     // State entry 

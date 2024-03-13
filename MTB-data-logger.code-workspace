@@ -34,7 +34,9 @@
 			"led_colours.h": "c",
 			"ws2812_driver.h": "c",
 			"mtbdl_init.h": "c",
-			"mtbdl_interface.h": "c"
+			"mtbdl_interface.h": "c",
+			"stm32f4xx_it.h": "c",
+			"stm32f4xx_hal.h": "c"
 		}
 	}
 }

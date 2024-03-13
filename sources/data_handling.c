@@ -469,73 +469,51 @@ void mtbdl_adc_dma_init(
 // Parameters 
 
 // Write bike parameters to file 
-void mtbdl_write_bike_params(
-    uint8_t mode)
+void mtbdl_write_bike_params(uint8_t mode)
 {
-    // Move to the parameters directory 
+    // Move to the parameters directory, open the bike parameters file for writing, 
+    // format and write the bike parameters from the data record to the file, then close 
+    // the file. 
     hw125_set_dir(mtbdl_param_dir); 
-
-    // Open the file for writing 
     hw125_open(mtbdl_bike_param_file, mode); 
-
-    // Format and write the bike parameters 
     mtbdl_format_write_bike_params(); 
-
-    // Close the file 
     hw125_close(); 
 }
 
 
 // Read bike parameter on file 
-void mtbdl_read_bike_params(
-    uint8_t mode)
+void mtbdl_read_bike_params(uint8_t mode)
 {
-    // Move to the parameters directory 
+    // Move to the parameters directory, open the bike parameters file for reading, 
+    // read the parameters and store them in the data record, then close the file. 
     hw125_set_dir(mtbdl_param_dir); 
-
-    // Open the file for reading 
     hw125_open(mtbdl_bike_param_file, mode); 
-
-    // Read and format the bike parameters 
     mtbdl_format_read_bike_params(); 
-
-    // Close the file 
     hw125_close(); 
 }
 
 
 // Write system parameters to file 
-void mtbdl_write_sys_params(
-    uint8_t mode)
+void mtbdl_write_sys_params(uint8_t mode)
 {
-    // Move to the parameters directory 
+    // Move to the parameters directory, open the system parameters file for writing, 
+    // format and write the system parameters from the data record to the file, then 
+    // close the file. 
     hw125_set_dir(mtbdl_param_dir); 
-    
-    // Open the file for writing 
     hw125_open(mtbdl_sys_param_file, mode); 
-
-    // Format and write the system parameters 
     mtbdl_format_write_sys_params(); 
-
-    // Close the file 
     hw125_close(); 
 }
 
 
 // Read system parameters on file 
-void mtbdl_read_sys_params(
-    uint8_t mode)
+void mtbdl_read_sys_params(uint8_t mode)
 {
-    // Move to the parameters directory 
+    // Move to the parameters directory, open the system parameters file for reading, 
+    // read the parameters and store them in the data record, then close the file. 
     hw125_set_dir(mtbdl_param_dir); 
-
-    // Open the file for reading 
     hw125_open(mtbdl_sys_param_file, mode); 
-
-    // Read and format the system parameters 
     mtbdl_format_read_sys_params(); 
-
-    // Close the file 
     hw125_close(); 
 }
 

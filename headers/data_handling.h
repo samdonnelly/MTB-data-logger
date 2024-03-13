@@ -90,47 +90,59 @@ void mtbdl_adc_dma_init(
 // Parameters 
 
 /**
- * @brief Read bike parameters on file 
- * 
- * @details 
- * 
- * @param mode : file open mode flag - see hw125 driver 
- */
-void mtbdl_read_bike_params(
-    uint8_t mode); 
-
-
-/**
  * @brief Write bike parameters to file 
  * 
- * @details 
+ * @details Writes the bike parameters currently stored in the data record to the bike 
+ *          parameters file on the SD card. Saving this data allows for the system to 
+ *          remember info after reboot. Bike parameters include the fork and shock 
+ *          settings such as psi and rebound settings. These can be updated in the RX 
+ *          mode. 
  * 
  * @param mode : file open mode flag - see hw125 driver 
  */
-void mtbdl_write_bike_params(
-    uint8_t mode); 
+void mtbdl_write_bike_params(uint8_t mode); 
 
 
 /**
- * @brief Read system parameters on file 
+ * @brief Read bike parameters on file 
  * 
- * @details 
+ * @details Reads the bike parameters file on the SD card and stores the info in the data 
+ *          record. This function is called on startup if a bike parameters file already 
+ *          exists. This allows the system to use parameters previously saved before a 
+ *          reboot. Bike parameters include the fork and shock settings such as psi and 
+ *          rebound settings. 
  * 
  * @param mode : file open mode flag - see hw125 driver 
  */
-void mtbdl_read_sys_params(
-    uint8_t mode); 
+void mtbdl_read_bike_params(uint8_t mode); 
 
 
 /**
  * @brief Write system parameters to file 
  * 
- * @details 
+ * @details Writes the system parameters currently stored in the data record to the 
+ *          system parameters file on the SD card. Saving this data allows for the system 
+ *          to remember info after reboot. System parameters include the IMU and 
+ *          potentiometer calibration data and the log index. These can be updated after 
+ *          calibration, data logging or TX mode. 
  * 
  * @param mode : file open mode flag - see hw125 driver 
  */
-void mtbdl_write_sys_params(
-    uint8_t mode); 
+void mtbdl_write_sys_params(uint8_t mode); 
+
+
+/**
+ * @brief Read system parameters on file 
+ * 
+ * @details Reads the system parameters file on the SD card and stores the info in the 
+ *          data record. This function is called on startup if a system parameters file 
+ *          already exists. This allows the system to use parameters previously saved 
+ *          before a reboot. System parameters include the IMU and potentiometer 
+ *          calibration data and the log index. 
+ * 
+ * @param mode : file open mode flag - see hw125 driver 
+ */
+void mtbdl_read_sys_params(uint8_t mode); 
 
 //==================================================
 
@@ -149,15 +161,17 @@ void mtbdl_write_sys_params(
  */
 uint8_t mtbdl_log_name_prep(void); 
 
-//=======================================================================================
-// 
-//=======================================================================================
+
 /**
  * @brief Log file prep 
  * 
- * @details 
- * The log file preparation function should be called before this function so a new file 
- * name can be created. 
+ * @details Moves to the log file directory on the SD card and attempts to create and 
+ *          open a new log file using the name generated in the name preparation function. 
+ *          If successful, the new log file will have all the system information written 
+ *          to it as a reference for the user when they go to view the file. 
+ *          
+ *          Note that the log file preparation function should be called before this 
+ *          function so a new file name can be created. 
  * 
  * @see mtbdl_log_name_prep 
  */
@@ -167,7 +181,9 @@ void mtbdl_log_file_prep(void);
 /**
  * @brief Log data prep 
  * 
- * @details 
+ * @details Resets data logging info and enables interrupts, all of which are needed 
+ *          before beginning to log data correctly. Without a call to this function, no 
+ *          data will be logged in the logging function. 
  */
 void mtbdl_log_data_prep(void); 
 
@@ -175,7 +191,21 @@ void mtbdl_log_data_prep(void);
 /**
  * @brief Logging data 
  * 
- * @details 
+ * @details Logs bike data every sample period which is triggered by the sample period 
+ *          interrupt. When triggered, data will be logged based on a predefined schedule 
+ *          that samples data only as often as it's needed. Data includes trailmarkers 
+ *          set by a user button press, suspension position potentiometer readings, wheel 
+ *          speed calculations based on hall effect sensor frequency, IMU rates and GPS 
+ *          position. Trailmarkers and suspension position are the only pieces of data 
+ *          that get logged every interval/period. When data is read, it gets written to 
+ *          the open log file on the SD card. This function should be called continuously 
+ *          while in the data logging state. 
+ *          
+ *          Before calling this function, the log file and data need to be prepared. 
+ * 
+ * @see mtbdl_log_name_prep 
+ * @see mtbdl_log_file_prep 
+ * @see mtbdl_log_data_prep 
  */
 void mtbdl_logging(void); 
 
@@ -183,7 +213,9 @@ void mtbdl_logging(void);
 /**
  * @brief End the data logging 
  * 
- * @details 
+ * @details Disables interrupts, saves and closes the log file, and updates the log index. 
+ *          This function must be called after the logging function in order to finish 
+ *          the logging process. 
  */
 void mtbdl_log_end(void); 
 

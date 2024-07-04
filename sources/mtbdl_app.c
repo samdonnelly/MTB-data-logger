@@ -23,9 +23,6 @@
 //=======================================================================================
 // Macros 
 
-// System info 
-#define MTBDL_NUM_STATES 20              // Number of system states 
-
 // Timing info 
 #define MTBDL_LCD_SLEEP 10000000         // (us) Inactive time before screen backlight off 
 #define MTBDL_LCD_LP_SLEEP 3000000       // (us) Low power state message display time 
@@ -62,7 +59,8 @@ typedef enum {
     MTBDL_POSTCALIBRATE_STATE,   // State 16 : Post calibration 
     MTBDL_LOWPWR_STATE,          // State 17 : Low power mode 
     MTBDL_FAULT_STATE,           // State 18 : Fault 
-    MTBDL_RESET_STATE            // State 19 : Reset 
+    MTBDL_RESET_STATE,           // State 19 : Reset 
+    MTBDL_NUM_STATES             // Not a state - number of system states 
 } mtbdl_states_t; 
 
 
@@ -136,8 +134,7 @@ static mtbdl_trackers_t mtbdl_trackers;
 /**
  * @brief System state machine function pointer 
  */
-typedef void (*mtbdl_func_ptr_t)(
-    mtbdl_trackers_t *mtbdl); 
+typedef void (*mtbdl_func_ptr_t)(mtbdl_trackers_t *mtbdl); 
 
 //=======================================================================================
 
@@ -1467,7 +1464,7 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        mtbdl->led_state = 1 - mtbdl->led_state; 
+        mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
         // Toggle Bluetooth LED quickly while not connected 
         if (mtbdl->led_state)
@@ -1559,7 +1556,7 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        mtbdl->led_state = 1 - mtbdl->led_state; 
+        mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)
@@ -1646,7 +1643,7 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        mtbdl->led_state = 1 - mtbdl->led_state; 
+        mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)
@@ -1809,7 +1806,7 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        mtbdl->led_state = 1 - mtbdl->led_state; 
+        mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)
@@ -1899,7 +1896,7 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
                     &mtbdl->delay_timer.time_cnt, 
                     &mtbdl->delay_timer.time_start))
     {
-        mtbdl->led_state = 1 - mtbdl->led_state; 
+        mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)

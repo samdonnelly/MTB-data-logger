@@ -917,7 +917,7 @@ void mtbdl_log_stream_speed(void)
                                 (mtbdl_data.rev_buff_index + 1) : CLEAR; 
 
     // Record the total revolutions over the last MTBDL_REV_SAMPLE_SIZE samples 
-    for (uint8_t i = 0; i < MTBDL_REV_SAMPLE_SIZE; i++)
+    for (uint8_t i = CLEAR; i < MTBDL_REV_SAMPLE_SIZE; i++)
     {
         revs += mtbdl_data.rev_buff[i]; 
     }
@@ -1291,7 +1291,7 @@ void mtbdl_set_idle_msg(void)
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
     // Create an editable copy of the message 
-    for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) 
+    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
     {
         msg[i] = mtbdl_idle_msg[i]; 
     }
@@ -1335,7 +1335,7 @@ void mtbdl_set_run_prep_msg(void)
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
 
     // Create an editable copy of the message 
-    for (uint8_t i = 0; i < MTBDL_MSG_LEN_3_LINE; i++) 
+    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_3_LINE; i++) 
     {
         msg[i] = mtbdl_run_prep_msg[i]; 
     }
@@ -1362,7 +1362,7 @@ void mtbdl_set_pretx_msg(void)
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
     // Create an editable copy of the message 
-    for (uint8_t i = 0; i < MTBDL_MSG_LEN_4_LINE; i++) 
+    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
     {
         msg[i] = mtbdl_pretx_msg[i]; 
     }

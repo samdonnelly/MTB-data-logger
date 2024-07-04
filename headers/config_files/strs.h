@@ -18,17 +18,16 @@
 //=======================================================================================
 // Directories 
 
+extern const char 
 // Project root directory on SD card 
-extern const char mtbdl_dir[]; 
-
+mtbdl_dir[], 
 // Sub-directories 
-extern const char mtbdl_param_dir[];           // Parameters sub-directory 
-extern const char mtbdl_data_dir[];            // Data logging sub-directory 
-
+mtbdl_param_dir[],           // Parameters sub-directory 
+mtbdl_data_dir[],            // Data logging sub-directory 
 // File names 
-extern const char mtbdl_bike_param_file[];     // Bike parameters file 
-extern const char mtbdl_sys_param_file[];      // System parameters file 
-extern const char mtbdl_log_file[];            // Log file name template 
+mtbdl_bike_param_file[],     // Bike parameters file 
+mtbdl_sys_param_file[],      // System parameters file 
+mtbdl_log_file[];            // Log file name template 
 
 //=======================================================================================
 
@@ -36,24 +35,23 @@ extern const char mtbdl_log_file[];            // Log file name template
 //=======================================================================================
 // File information 
 
+extern const char 
 // Bike parameter information 
-extern const char mtbdl_param_fork_info[];     // Fork setup parameters 
-extern const char mtbdl_param_shock_info[];    // Shock setup parameters 
-
+mtbdl_param_fork_info[],     // Fork setup parameters 
+mtbdl_param_shock_info[],    // Shock setup parameters 
 // System parameter information 
-extern const char mtbdl_param_index[];         // Log file index 
-extern const char mtbdl_param_accel_rest[];    // Resting accelerometer data 
-extern const char mtbdl_param_pot_rest[];      // Resting potentiometer data 
-extern const char mtbdl_param_time[];          // Time of file creation 
-extern const char mtbdl_param_data[];          // Data logging info 
-
+mtbdl_param_index[],         // Log file index 
+mtbdl_param_accel_rest[],    // Resting accelerometer data 
+mtbdl_param_pot_rest[],      // Resting potentiometer data 
+mtbdl_param_time[],          // Time of file creation 
+mtbdl_param_data[],          // Data logging info 
 // Data log information 
-extern const char mtbdl_data_log_start[];      // Signifies the start of the logging info 
-extern const char mtbdl_data_log_end[];        // End of the log file 
-extern const char mtbdl_data_log_1[];          // Data log message 1 - standard 
-extern const char mtbdl_data_log_2[];          // Data log message 2 - includes wheel speed 
-extern const char mtbdl_data_log_3[];          // Data log message 3 - includes accelerometer 
-extern const char mtbdl_data_log_4[];          // Data log message 4 - includes GPS 
+mtbdl_data_log_start[],      // Signifies the start of the logging info 
+mtbdl_data_log_end[],        // End of the log file 
+mtbdl_data_log_1[],          // Data log message 1 - standard 
+mtbdl_data_log_2[],          // Data log message 2 - includes wheel speed 
+mtbdl_data_log_3[],          // Data log message 3 - includes accelerometer 
+mtbdl_data_log_4[];          // Data log message 4 - includes GPS 
 
 //=======================================================================================
 
@@ -61,9 +59,10 @@ extern const char mtbdl_data_log_4[];          // Data log message 4 - includes 
 //=======================================================================================
 // User interface strings 
 
+extern const char 
 // RX info 
-extern const char mtbdl_rx_prompt[];           // User prompt during RX state 
-extern const char mtbdl_rx_input[];            // User input during the RX state 
+mtbdl_rx_prompt[],           // User prompt during RX state 
+mtbdl_rx_input[];            // User input during the RX state 
 
 //=======================================================================================
 

@@ -42,6 +42,9 @@ set(STM32CUBEMX_INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/FATFS/Target
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/FATFS/App
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
+    ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/Drivers/CMSIS/Device/ST/STM32F4xx/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/Drivers/CMSIS/Include
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc

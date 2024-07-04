@@ -1,9 +1,9 @@
 /**
- * @file mtbdl_interface.h
+ * @file mtbdl.h
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL interface 
+ * @brief MTB data logger interface 
  * 
  * @version 0.1
  * @date 2024-03-06
@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef _MTBDL_INTERFACE_H_ 
-#define _MTBDL_INTERFACE_H_ 
+#ifndef _MTBDL_H_ 
+#define _MTBDL_H_ 
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,4 +73,4 @@ void mtbdl_app(void);
 }
 #endif
 
-#endif   // _MTBDL_INTERFACE_H_ 
+#endif   // _MTBDL_H_ 

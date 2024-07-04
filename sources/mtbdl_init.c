@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL main application code initialization 
+ * @brief MTB data logger setup 
  * 
  * @version 0.1
  * @date 2022-02-12
@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "mtbdl_interface.h" 
+#include "mtbdl.h" 
 
 //=======================================================================================
 

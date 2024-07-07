@@ -1,9 +1,9 @@
 /**
- * @file strs.c
+ * @file data_logging_config.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL system strings 
+ * @brief MTB data logging configuration 
  * 
  * @version 0.1
  * @date 2023-05-21
@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "strs.h" 
+#include "data_logging_config.h" 
 
 //=======================================================================================
 

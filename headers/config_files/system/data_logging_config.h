@@ -1,9 +1,9 @@
 /**
- * @file strs.h 
+ * @file data_logging_config.h 
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL system strings header 
+ * @brief MTB data logging configuration interface 
  * 
  * @version 0.1
  * @date 2023-05-21
@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef _STRS_H_ 
-#define _STRS_H_ 
+#ifndef _DATA_LOGGING_CONFIG_H_ 
+#define _DATA_LOGGING_CONFIG_H_ 
 
 //=======================================================================================
 // Directories 
@@ -66,4 +66,4 @@ mtbdl_rx_input[];            // User input during the RX state
 
 //=======================================================================================
 
-#endif   // _STRS_H_ 
+#endif   // _DATA_LOGGING_CONFIG_H_ 

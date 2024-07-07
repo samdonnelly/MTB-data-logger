@@ -23,7 +23,7 @@
 #include "stm32f4xx_it.h" 
 
 // Config files 
-#include "strs.h" 
+#include "data_logging_config.h" 
 #include "led_colours.h" 
 #include "screen_msgs.h" 
 #include "m8q_config.h" 

@@ -1,9 +1,9 @@
 /**
- * @file data_handling.h
+ * @file data_logging.h
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL data handling interface 
+ * @brief MTB data logging interface 
  * 
  * @version 0.1
  * @date 2023-05-24
@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef _DATA_HANDLING_H_ 
-#define _DATA_HANDLING_H_ 
+#ifndef _DATA_LOGGING_H_ 
+#define _DATA_LOGGING_H_ 
 
 //=======================================================================================
 // Includes 
@@ -433,4 +433,4 @@ void mtbdl_set_trailmark(void);
 
 //=======================================================================================
 
-#endif   // _DATA_HANDLING_H_ 
+#endif   // _DATA_LOGGING_H_ 

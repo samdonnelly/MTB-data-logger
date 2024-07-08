@@ -1,5 +1,5 @@
 /**
- * @file mtbdl_app.c
+ * @file mtbdl_main.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 

@@ -1,9 +1,9 @@
 /**
- * @file data_handling.c
+ * @file data_logging.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL data handling implementation 
+ * @brief MTB data logging 
  * 
  * @version 0.1
  * @date 2023-05-24

@@ -1,9 +1,9 @@
 /**
- * @file led_colours.c
+ * @file ws2812_config.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL LED colour definition 
+ * @brief WS2812 LED config 
  * 
  * @version 0.1
  * @date 2023-06-12
@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "led_colours.h"
+#include "ws2812_config.h"
 
 //=======================================================================================
 

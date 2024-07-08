@@ -1,9 +1,9 @@
 /**
- * @file screen_msgs.c
+ * @file hd44789u_config.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief 
+ * @brief HD44780U screen config 
  * 
  * @version 0.1
  * @date 2023-05-15
@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "screen_msgs.h" 
+#include "hd44780u_config.h" 
 
 //=======================================================================================
 

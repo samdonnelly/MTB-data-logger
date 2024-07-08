@@ -1,9 +1,9 @@
 /**
- * @file led_colours.h
+ * @file ws2812_config.h
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB DL LED colour definition header 
+ * @brief WS2812 LED config interface 
  * 
  * @version 0.1
  * @date 2023-06-12
@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef _LED_COLOURS_H_ 
-#define _LED_COLOURS_H_ 
+#ifndef _WS2812_CONFIG_H_ 
+#define _WS2812_CONFIG_H_ 
 
 //=======================================================================================
 // Includes 
@@ -57,4 +57,4 @@ extern uint32_t mtbdl_led7_1;   // Button pressed
 
 //=======================================================================================
 
-#endif   // _LED_COLOURS_H_ 
+#endif   // _WS2812_CONFIG_H_ 

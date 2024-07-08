@@ -36,7 +36,9 @@
 			"mtbdl_init.h": "c",
 			"mtbdl_interface.h": "c",
 			"stm32f4xx_it.h": "c",
-			"stm32f4xx_hal.h": "c"
+			"stm32f4xx_hal.h": "c",
+			"data_logging_config.h": "c",
+			"ws2812_config.h": "c"
 		}
 	}
 }

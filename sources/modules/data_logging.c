@@ -391,6 +391,15 @@ static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] =
     {97,   MTBDL_LOG_STREAM_ACCEL}    // Step 24 
 }; 
 
+
+//==================================================
+// Dev 
+
+// Log stream table: 
+// - Scheduling is defined by a counter (period) and an offset (start time). 
+
+//==================================================
+
 //=======================================================================================
 
 

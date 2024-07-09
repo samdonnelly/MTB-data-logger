@@ -38,7 +38,9 @@
 			"stm32f4xx_it.h": "c",
 			"stm32f4xx_hal.h": "c",
 			"data_logging_config.h": "c",
-			"ws2812_config.h": "c"
+			"ws2812_config.h": "c",
+			"data_logging.h": "c",
+			"system_parameters.h": "c"
 		}
 	}
 }

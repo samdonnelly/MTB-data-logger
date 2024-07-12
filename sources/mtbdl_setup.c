@@ -345,14 +345,43 @@ void mtbdl_init()
     //===================================================
     // System setup 
 
-    // MTB DL application init 
-    mtbdl_app_init(
-        TIM9, 
-        GPIOC, 
-        GPIOX_PIN_0, 
-        GPIOX_PIN_1, 
-        GPIOX_PIN_2, 
-        GPIOX_PIN_3); 
+    // // MTB DL application init 
+    // mtbdl_app_init(
+    //     TIM9, 
+    //     GPIOC, 
+    //     GPIOX_PIN_0, 
+    //     GPIOX_PIN_1, 
+    //     GPIOX_PIN_2, 
+    //     GPIOX_PIN_3); 
+
+    // System information 
+    mtbdl_trackers.state = MTBDL_INIT_STATE; 
+    mtbdl_trackers.fault_code = CLEAR; 
+    mtbdl_trackers.user_btn_port = GPIOC; 
+
+    // Timing information 
+    mtbdl_trackers.timer_nonblocking = TIM9; 
+    mtbdl_trackers.delay_timer.clk_freq = tim_get_pclk_freq(mtbdl_trackers.timer_nonblocking); 
+    mtbdl_trackers.delay_timer.time_cnt_total = CLEAR; 
+    mtbdl_trackers.delay_timer.time_cnt = CLEAR; 
+    mtbdl_trackers.delay_timer.time_start = SET_BIT; 
+    mtbdl_trackers.led_state = CLEAR; 
+
+    // Screen messages 
+    memset((void *)mtbdl_trackers.msg, CLEAR, sizeof(mtbdl_trackers.msg)); 
+    mtbdl_trackers.msg_len = CLEAR; 
+
+    // User buttons 
+    mtbdl_trackers.user_btn_1 = (uint8_t)GPIOX_PIN_0; 
+    mtbdl_trackers.user_btn_2 = (uint8_t)GPIOX_PIN_1; 
+    mtbdl_trackers.user_btn_3 = (uint8_t)GPIOX_PIN_2; 
+    mtbdl_trackers.user_btn_4 = (uint8_t)GPIOX_PIN_3; 
+
+    // State flags 
+    mtbdl_trackers.init = SET_BIT; 
+
+
+
 
     // Data record init 
     mtbdl_data_init(

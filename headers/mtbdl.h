@@ -81,6 +81,9 @@ typedef struct mtbdl_trackers_s
     hd44780u_msgs_t *msg;                       // Message content 
     uint8_t msg_len;                            // Message length (number of lines) 
 
+    // Modules 
+    mtbdl_data_t data_logging; 
+
     // User buttons 
     uint8_t user_btn_1;                         // User button 1 pin number 
     uint8_t user_btn_2;                         // User button 2 pin number 

@@ -21,37 +21,6 @@
 
 
 //=======================================================================================
-// Macros 
-
-#define MTBDL_MAX_DATA_STR_LEN 60        // Max string length containing data 
-#define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
-#define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
-
-// Calibration 
-#define MTBDL_NUM_CAL_DATA 5             // Number of parameters that require calibration 
-
-// Data logging 
-#define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
-#define MTBDL_LOG_PERIOD 10              // (ms) Period between data samples 
-#define MTBDL_NUM_LOG_STREAMS 6          // Number of data logging streams 
-#define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
-#define MTBDL_LOG_COUNT_CYCLE 99         // Log sample sequence max timer counter value 
-#define MTBDL_COO_BUFF_LEN 6             // Coordinate buffer size - data from M8Q driver 
-#define MTBDL_TIME_BUFF_LEN 10           // UTC time buffer size - data from M8Q driver 
-#define MTBDL_DATE_BUFF_LEN 7            // UTC date buffer size - data from M8Q driver 
-
-// Wheel RPM info 
-#define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
-#define MTBDL_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
-
-// Debugging 
-#define MTBDL_DEBUG 0                    // Conditional compilation for debugging 
-#define MTBDL_DEBUG_SAMPLE_COUNT 999     // Number of data samples to take in debug mode 
-
-//=======================================================================================
-
-
-//=======================================================================================
 // Enums 
 
 /**
@@ -107,93 +76,96 @@ typedef enum {
 //=======================================================================================
 // Structures 
 
-// System data record 
-typedef struct mtbdl_data_s 
-{
-    // Peripherals 
-    IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
-    IRQn_Type log_irq;                          // Log sample period interrupt number 
-    ADC_TypeDef *adc;                           // ADC port battery soc and pots 
+// // System data record 
+// typedef struct mtbdl_data_s 
+// {
+//     // Peripherals 
+//     IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
+//     IRQn_Type log_irq;                          // Log sample period interrupt number 
+//     ADC_TypeDef *adc;                           // ADC port battery soc and pots 
 
-    // Bike parameters 
-    uint8_t fork_psi;                           // Fork pressure (psi) 
-    uint8_t fork_comp;                          // Fork compression setting 
-    uint8_t fork_reb;                           // Fork rebound setting 
-    uint8_t shock_psi;                          // Shock pressure (psi) 
-    uint8_t shock_lock;                         // Shock lockout setting 
-    uint8_t shock_reb;                          // Shock rebound setting 
+//     // Bike parameters 
+//     uint8_t fork_psi;                           // Fork pressure (psi) 
+//     uint8_t fork_comp;                          // Fork compression setting 
+//     uint8_t fork_reb;                           // Fork rebound setting 
+//     uint8_t shock_psi;                          // Shock pressure (psi) 
+//     uint8_t shock_lock;                         // Shock lockout setting 
+//     uint8_t shock_reb;                          // Shock rebound setting 
 
-    // System parameters 
-    uint8_t log_index;                          // Data log index 
-    int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
-    int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
-    int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
-    uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
-    uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
+//     // System parameters 
+//     uint8_t log_index;                          // Data log index 
+//     int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
+//     int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
+//     int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
+//     uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
+//     uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
-    // System data 
-    uint8_t soc;                                // Battery SOC 
-    uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
-    uint16_t navstat;                           // Navigation status of GPS module 
-    uint8_t utc_time[MTBDL_TIME_BUFF_LEN];      // UTC time recorded by the GPS module 
-    uint8_t utc_date[MTBDL_DATE_BUFF_LEN];      // UTC date recorded by the GPS module 
-    uint8_t deg_min_lat[MTBDL_COO_BUFF_LEN];    // Latitude: degrees and minutes integer part 
-    uint8_t min_frac_lat[MTBDL_COO_BUFF_LEN];   // Latitude: minuutes fractional part 
-    uint8_t lat_str[MTBDL_COO_BUFF_LEN];        // Latitude string 
-    uint8_t NS;                                 // North/South indicator of latitude 
-    uint8_t deg_min_lon[MTBDL_COO_BUFF_LEN];    // Longitude: degrees and minutes integer part 
-    uint8_t min_frac_lon[MTBDL_COO_BUFF_LEN];   // Longitude: minuutes fractional part 
-    uint8_t lon_str[MTBDL_COO_BUFF_LEN];        // Longitude string 
-    uint8_t EW;                                 // Eeast/West indicator of longitude 
-    int16_t accel_x;                            // x-axis acceleration reading 
-    int16_t accel_y;                            // y-axis acceleration reading 
-    int16_t accel_z;                            // z-axis acceleration reading 
+//     // System data 
+//     uint8_t soc;                                // Battery SOC 
+//     uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
+//     uint16_t navstat;                           // Navigation status of GPS module 
+//     uint8_t utc_time[MTBDL_TIME_BUFF_LEN];      // UTC time recorded by the GPS module 
+//     uint8_t utc_date[MTBDL_DATE_BUFF_LEN];      // UTC date recorded by the GPS module 
+//     uint8_t deg_min_lat[MTBDL_COO_BUFF_LEN];    // Latitude: degrees and minutes integer part 
+//     uint8_t min_frac_lat[MTBDL_COO_BUFF_LEN];   // Latitude: minuutes fractional part 
+//     uint8_t lat_str[MTBDL_COO_BUFF_LEN];        // Latitude string 
+//     uint8_t NS;                                 // North/South indicator of latitude 
+//     uint8_t deg_min_lon[MTBDL_COO_BUFF_LEN];    // Longitude: degrees and minutes integer part 
+//     uint8_t min_frac_lon[MTBDL_COO_BUFF_LEN];   // Longitude: minuutes fractional part 
+//     uint8_t lon_str[MTBDL_COO_BUFF_LEN];        // Longitude string 
+//     uint8_t EW;                                 // Eeast/West indicator of longitude 
+//     int16_t accel_x;                            // x-axis acceleration reading 
+//     int16_t accel_y;                            // y-axis acceleration reading 
+//     int16_t accel_z;                            // z-axis acceleration reading 
 
-    // Calibration data 
-    int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
-    int32_t cal_index;                          // Calibration sample index 
+//     // Calibration data 
+//     int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
+//     int32_t cal_index;                          // Calibration sample index 
 
-    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
-    uint32_t led_colour_data[WS2812_LED_NUM]; 
+//     // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+//     uint32_t led_colour_data[WS2812_LED_NUM]; 
 
-    // Wheel RPM info 
-    uint8_t rev_count;                          // Wheel revolution counter 
-    uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
-    uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
+//     // Wheel RPM info 
+//     uint8_t rev_count;                          // Wheel revolution counter 
+//     uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
+//     uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
 
-    // SD card 
-    char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
-    char filename[MTBDL_MAX_DATA_STR_LEN];      // Buffer for storing a file name 
-    uint8_t tx_status : 1;                      // TX transaction status 
+//     // SD card 
+//     char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
+//     char filename[MTBDL_MAX_DATA_STR_LEN];      // Buffer for storing a file name 
+//     uint8_t tx_status : 1;                      // TX transaction status 
 
-    // Log tracking 
-    uint32_t time_count;                        // Time tracking counter for logging 
-    uint8_t stream_index;                       // Index for log stream sequencing 
-    uint8_t led_toggle : 1;                     // LED toggle bit 
-    uint8_t run_count  : 1;                     // Log stream toggle 
-    uint8_t trailmark  : 1;                     // Trail marker flag 
-    uint8_t user_input : 1;                     // User input flag 
-    uint8_t log_stream : 3;                     // Logging stream number (mtbdl_log_streams_t)
+//     // Log tracking 
+//     uint32_t time_count;                        // Time tracking counter for logging 
+//     uint8_t stream_index;                       // Index for log stream sequencing 
+//     uint8_t led_toggle : 1;                     // LED toggle bit 
+//     uint8_t run_count  : 1;                     // Log stream toggle 
+//     uint8_t trailmark  : 1;                     // Trail marker flag 
+//     uint8_t user_input : 1;                     // User input flag 
+//     uint8_t log_stream : 3;                     // Logging stream number (mtbdl_log_streams_t)
 
-#if MTBDL_DEBUG 
-    // Testing 
-    uint16_t time_stop; 
-    uint16_t time_limit; 
-    uint16_t count_standard; 
-    uint16_t count_wait; 
-    uint8_t time_overflow; 
-    uint8_t count_blink; 
-    uint8_t count_speed; 
-    uint8_t count_accel; 
-    uint8_t count_gps; 
-    uint8_t count_user; 
-    uint16_t adc_count; 
-#endif   // MTBDL_DEBUG 
-}
-mtbdl_data_t; 
+// #if MTBDL_DEBUG 
+//     // Testing 
+//     uint16_t time_stop; 
+//     uint16_t time_limit; 
+//     uint16_t count_standard; 
+//     uint16_t count_wait; 
+//     uint8_t time_overflow; 
+//     uint8_t count_blink; 
+//     uint8_t count_speed; 
+//     uint8_t count_accel; 
+//     uint8_t count_gps; 
+//     uint8_t count_user; 
+//     uint16_t adc_count; 
+// #endif   // MTBDL_DEBUG 
+// }
+// mtbdl_data_t; 
+
+// // Data record instance 
+// static mtbdl_data_t mtbdl_data; 
 
 // Data record instance 
-static mtbdl_data_t mtbdl_data; 
+mtbdl_data_t mtbdl_data; 
 
 
 // Logging schedule data 

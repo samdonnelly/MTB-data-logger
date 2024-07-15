@@ -22,6 +22,7 @@
 #include "stm32f4xx_it.h" 
 #include "data_logging.h" 
 #include "system_parameters.h" 
+#include "user_interface.h" 
 
 // Config files 
 #include "data_logging_config.h" 

@@ -83,6 +83,8 @@ typedef struct mtbdl_trackers_s
 
     // Modules 
     mtbdl_data_t data_logging; 
+    mtbdl_params_t sys_params; 
+    mtbdl_ui_t user_interface; 
 
     // User buttons 
     uint8_t user_btn_1;                         // User button 1 pin number 

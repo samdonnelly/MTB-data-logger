@@ -59,7 +59,7 @@
 //=======================================================================================
 // Structure 
 
-// System data record 
+// Data logging data record 
 typedef struct mtbdl_data_s 
 {
     // Peripherals 

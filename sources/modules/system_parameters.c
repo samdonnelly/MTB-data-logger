@@ -33,7 +33,7 @@
  *          created log files. The bike parameters file is written upon creation and 
  *          when saving new settings. 
  */
-void mtbdl_format_write_bike_params(void); 
+void params_bike_format_write(void); 
 
 
 /**
@@ -43,7 +43,7 @@ void mtbdl_format_write_bike_params(void);
  *          into the data record. These settings are stored in the bike parameters file 
  *          and this function is only called during startup if the file already exists. 
  */
-void mtbdl_format_read_bike_params(void); 
+void params_bike_read_formats(void); 
 
 
 /**
@@ -56,7 +56,7 @@ void mtbdl_format_read_bike_params(void);
  *          upon creation, when saving new settings and keeping track of the log file 
  *          number/index. 
  */
-void mtbdl_format_write_sys_params(void); 
+void params_sys_format_writes(void); 
 
 
 /**
@@ -66,7 +66,7 @@ void mtbdl_format_write_sys_params(void);
  *          record. These settings are stored in the system parameters file and this 
  *          function is only called during startup if the file already exists. 
  */
-void mtbdl_format_read_sys_params(void); 
+void params_sys_read_formats(void); 
 
 //=======================================================================================
 
@@ -82,7 +82,7 @@ void mtbdl_format_read_sys_params(void);
 //     // the file. 
 //     hw125_set_dir(mtbdl_param_dir); 
 //     hw125_open(mtbdl_bike_param_file, mode); 
-//     mtbdl_format_write_bike_params(); 
+//     params_bike_format_write(); 
 //     hw125_close(); 
 // }
 
@@ -94,7 +94,7 @@ void mtbdl_format_read_sys_params(void);
 //     // read the parameters and store them in the data record, then close the file. 
 //     hw125_set_dir(mtbdl_param_dir); 
 //     hw125_open(mtbdl_bike_param_file, mode); 
-//     mtbdl_format_read_bike_params(); 
+//     params_bike_read_formats(); 
 //     hw125_close(); 
 // }
 
@@ -107,7 +107,7 @@ void mtbdl_format_read_sys_params(void);
 //     // close the file. 
 //     hw125_set_dir(mtbdl_param_dir); 
 //     hw125_open(mtbdl_sys_param_file, mode); 
-//     mtbdl_format_write_sys_params(); 
+//     params_sys_format_writes(); 
 //     hw125_close(); 
 // }
 
@@ -119,13 +119,13 @@ void mtbdl_format_read_sys_params(void);
 //     // read the parameters and store them in the data record, then close the file. 
 //     hw125_set_dir(mtbdl_param_dir); 
 //     hw125_open(mtbdl_sys_param_file, mode); 
-//     mtbdl_format_read_sys_params(); 
+//     params_sys_read_formats(); 
 //     hw125_close(); 
 // }
 
 
 // // Format and write the bike parameters 
-// void mtbdl_format_write_bike_params(void)
+// void params_bike_format_write(void)
 // {
 //     // Write fork parameters 
 //     snprintf(
@@ -152,7 +152,7 @@ void mtbdl_format_read_sys_params(void);
 
 
 // // Read and format the bike parameters 
-// void mtbdl_format_read_bike_params(void)
+// void params_bike_read_formats(void)
 // {
 //     // Read fork parameters 
 //     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
@@ -177,7 +177,7 @@ void mtbdl_format_read_sys_params(void);
 
 
 // // Format and write the system parameters 
-// void mtbdl_format_write_sys_params(void)
+// void params_sys_format_writes(void)
 // {
 //     // Write logging parameters 
 //     snprintf(
@@ -212,7 +212,7 @@ void mtbdl_format_read_sys_params(void);
 
 
 // // Read and format the system parameters 
-// void mtbdl_format_read_sys_params(void)
+// void params_sys_read_formats(void)
 // {
 //     // Read logging parameters 
 //     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 

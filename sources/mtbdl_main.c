@@ -51,52 +51,6 @@ typedef enum {
 //=======================================================================================
 // Structures 
 
-// // MTB DL system trackers 
-// typedef struct mtbdl_trackers_s 
-// {
-//     // System information 
-//     mtbdl_states_t state;                       // State of the system controller 
-//     uint16_t fault_code;                        // System fault code 
-//     GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
-
-//     // Timing information 
-//     TIM_TypeDef *timer_nonblocking;             // Timer used for non-blocking delays 
-//     tim_compare_t delay_timer;                  // Delay timing info 
-//     uint8_t led_state;                          // LED counter used with non-blocking timer 
-
-//     // Screen message 
-//     hd44780u_msgs_t *msg;                       // Message content 
-//     uint8_t msg_len;                            // Message length (number of lines) 
-
-//     // User buttons 
-//     uint8_t user_btn_1;                         // User button 1 pin number 
-//     uint8_t user_btn_2;                         // User button 2 pin number 
-//     uint8_t user_btn_3;                         // User button 3 pin number 
-//     uint8_t user_btn_4;                         // User button 4 pin number 
-//     uint8_t user_btn_1_block : 1;               // Stops repeated actions on btn 1 press 
-//     uint8_t user_btn_2_block : 1;               // Stops repeated actions on btn 2 press 
-//     uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
-//     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
-
-//     // State flags 
-//     uint8_t init          : 1;                  // Ensures the init state is run 
-//     uint8_t idle          : 1;                  // Idle state flag 
-//     uint8_t run           : 1;                  // Run state flag 
-//     uint8_t data_select   : 1;                  // Data transfer select state flag 
-//     uint8_t tx            : 1;                  // Send/transmit data state flag 
-//     uint8_t rx            : 1;                  // Read/receive data state flag 
-//     uint8_t calibrate     : 1;                  // Calibration state flag 
-//     uint8_t low_pwr       : 1;                  // Low power state flag 
-//     uint8_t noncrit_fault : 1;                  // Non-critical fault state flag 
-//     uint8_t fault         : 1;                  // Fault state flag 
-//     uint8_t reset         : 1;                  // Reset state flag 
-// }
-// mtbdl_trackers_t; 
-
-
-// // Instance of the system data trackers 
-// static mtbdl_trackers_t mtbdl_trackers; 
-
 // Instance of the system data trackers 
 mtbdl_trackers_t mtbdl_trackers; 
 
@@ -551,38 +505,6 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
 
 //=======================================================================================
 // System controller 
-
-// // MTB DL controller init 
-// void mtbdl_app_init(
-//     TIM_TypeDef *timer_nonblocking, 
-//     GPIO_TypeDef *user_btn_gpio, 
-//     gpio_pin_num_t user_btn_1, 
-//     gpio_pin_num_t user_btn_2, 
-//     gpio_pin_num_t user_btn_3, 
-//     gpio_pin_num_t user_btn_4)
-// {
-//     // Reset all tracking info 
-//     memset((void *)&mtbdl_trackers, CLEAR, sizeof(mtbdl_trackers_t)); 
-
-//     // System information 
-//     mtbdl_trackers.state = MTBDL_INIT_STATE; 
-//     mtbdl_trackers.user_btn_port = user_btn_gpio; 
-
-//     // Timing information 
-//     mtbdl_trackers.timer_nonblocking = timer_nonblocking; 
-//     mtbdl_trackers.delay_timer.clk_freq = tim_get_pclk_freq(timer_nonblocking); 
-//     mtbdl_trackers.delay_timer.time_start = SET_BIT; 
-
-//     // User buttons 
-//     mtbdl_trackers.user_btn_1 = (uint8_t)user_btn_1; 
-//     mtbdl_trackers.user_btn_2 = (uint8_t)user_btn_2; 
-//     mtbdl_trackers.user_btn_3 = (uint8_t)user_btn_3; 
-//     mtbdl_trackers.user_btn_4 = (uint8_t)user_btn_4; 
-
-//     // State flags 
-//     mtbdl_trackers.init = SET_BIT; 
-// }
-
 
 // MTB DL application 
 void mtbdl_app(void)

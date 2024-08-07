@@ -15,10 +15,6 @@
 #ifndef _MTBDL_H_ 
 #define _MTBDL_H_ 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 //=======================================================================================
 // Includes 
 
@@ -113,7 +109,6 @@ mtbdl_trackers_t;
 
 
 // Instance of the system data trackers 
-// static mtbdl_trackers_t mtbdl_trackers; 
 extern mtbdl_trackers_t mtbdl_trackers; 
 
 //=======================================================================================
@@ -128,28 +123,6 @@ extern mtbdl_trackers_t mtbdl_trackers;
 void mtbdl_init(void); 
 
 
-// /**
-//  * @brief MTB DL controller init 
-//  * 
-//  * @details Initializes the main controller tracking information. Must be called during 
-//  *          setup of the system. 
-//  * 
-//  * @param timer_nonblocking : TIM port used for non-blocking delays 
-//  * @param user_btn_gpio : GPIO port used for user buttons 
-//  * @param user_btn_1 : user button 1 pin number 
-//  * @param user_btn_2 : user button 2 pin number 
-//  * @param user_btn_3 : user button 3 pin number 
-//  * @param user_btn_4 : user button 4 pin number 
-//  */
-// void mtbdl_app_init(
-//     TIM_TypeDef *timer_nonblocking, 
-//     GPIO_TypeDef *user_btn_gpio, 
-//     gpio_pin_num_t user_btn_1, 
-//     gpio_pin_num_t user_btn_2, 
-//     gpio_pin_num_t user_btn_3, 
-//     gpio_pin_num_t user_btn_4); 
-
-
 /**
  * @brief MTB DL application 
  * 
@@ -159,9 +132,5 @@ void mtbdl_init(void);
 void mtbdl_app(void); 
 
 //=======================================================================================
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif   // _MTBDL_H_ 

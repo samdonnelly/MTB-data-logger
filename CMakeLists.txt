@@ -57,6 +57,7 @@ set(PROJECT_INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/headers/config_files/system
     ${CMAKE_CURRENT_SOURCE_DIR}/headers/includes
     ${CMAKE_CURRENT_SOURCE_DIR}/headers/modules
+    ${CMAKE_CURRENT_SOURCE_DIR}/headers/modules/development
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/headers/devices
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/headers/peripherals
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/headers/tools)
@@ -101,6 +102,8 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/config_files/system/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/modules/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/modules/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/modules/development/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/modules/development/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/sources/devices/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/sources/devices/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../STM32F4-driver-library/sources/peripherals/*.c

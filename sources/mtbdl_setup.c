@@ -345,15 +345,6 @@ void mtbdl_init()
     //===================================================
     // System setup 
 
-    // // MTB DL application init 
-    // mtbdl_app_init(
-    //     TIM9, 
-    //     GPIOC, 
-    //     GPIOX_PIN_0, 
-    //     GPIOX_PIN_1, 
-    //     GPIOX_PIN_2, 
-    //     GPIOX_PIN_3); 
-
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
     mtbdl_trackers.fault_code = CLEAR; 
@@ -379,8 +370,6 @@ void mtbdl_init()
 
     // State flags 
     mtbdl_trackers.init = SET_BIT; 
-
-
 
 
     // Data record init 

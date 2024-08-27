@@ -71,6 +71,14 @@ typedef void (*mtbdl_func_ptr_t)(mtbdl_trackers_t *mtbdl);
 //=======================================================================================
 // Function prototypes 
 
+// System status checks 
+void system_status_checks(void); 
+
+
+// Button status 
+void system_button_status(void); 
+
+
 /**
  * @brief Initialization state 
  * 
@@ -81,6 +89,8 @@ typedef void (*mtbdl_func_ptr_t)(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_init_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_init_state_entry(void); 
+void mtbdl_init_state_exit(void); 
 
 
 /**
@@ -97,6 +107,8 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_idle_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_idle_state_entry(void); 
+void mtbdl_idle_state_exit(void); 
 
 
 /**
@@ -117,6 +129,8 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_run_prep_state_entry(void); 
+void mtbdl_run_prep_state_exit(void); 
 
 
 /**
@@ -132,6 +146,8 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_run_countdown_state_entry(void); 
+void mtbdl_run_countdown_state_exit(void); 
 
 
 /**
@@ -154,6 +170,8 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_run_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_run_state_entry(void); 
+void mtbdl_run_state_exit(void); 
 
 
 /**
@@ -170,6 +188,8 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_postrun_state_entry(void); 
+void mtbdl_postrun_state_exit(void); 
 
 
 /**
@@ -190,6 +210,8 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_data_select_state_entry(void); 
+void mtbdl_data_select_state_exit(void); 
 
 
 /**
@@ -207,6 +229,8 @@ void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_dev_search_state_entry(void); 
+void mtbdl_dev_search_state_exit(void); 
 
 
 /**
@@ -224,6 +248,8 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_prerx_state_entry(void); 
+void mtbdl_prerx_state_exit(void); 
 
 
 /**
@@ -243,6 +269,8 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_rx_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_rx_state_entry(void); 
+void mtbdl_rx_state_exit(void); 
 
 
 /**
@@ -259,6 +287,8 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_postrx_state_entry(void); 
+void mtbdl_postrx_state_exit(void); 
 
 
 /**
@@ -279,6 +309,8 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_pretx_state_entry(void); 
+void mtbdl_pretx_state_exit(void); 
 
 
 /**
@@ -296,6 +328,8 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_tx_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_tx_state_entry(void); 
+void mtbdl_tx_state_exit(void); 
 
 
 /**
@@ -312,6 +346,8 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_posttx_state_entry(void); 
+void mtbdl_posttx_state_exit(void); 
 
 
 /**
@@ -327,6 +363,8 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_precalibrate_state_entry(void); 
+void mtbdl_precalibrate_state_exit(void); 
 
 
 /**
@@ -346,6 +384,8 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_calibrate_state_entry(void); 
+void mtbdl_calibrate_state_exit(void); 
 
 
 /**
@@ -359,6 +399,8 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_postcalibrate_state_entry(void); 
+void mtbdl_postcalibrate_state_exit(void); 
 
 
 /**
@@ -378,6 +420,8 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_lowpwr_state_entry(void); 
+void mtbdl_lowpwr_state_exit(void); 
 
 
 /**
@@ -393,6 +437,8 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_fault_state(mtbdl_trackers_t *mtbdl); 
+void mtbdl_fault_state_entry(void); 
+void mtbdl_fault_state_exit(void); 
 
 
 /**
@@ -406,66 +452,6 @@ void mtbdl_fault_state(mtbdl_trackers_t *mtbdl);
  * @param mtbdl : main controller tracking info 
  */
 void mtbdl_reset_state(mtbdl_trackers_t *mtbdl); 
-
-
-// State entry/exit functions 
-void mtbdl_init_state_entry(void); 
-void mtbdl_init_state_exit(void); 
-
-void mtbdl_idle_state_entry(void); 
-void mtbdl_idle_state_exit(void); 
-
-void mtbdl_run_prep_state_entry(void); 
-void mtbdl_run_prep_state_exit(void); 
-
-void mtbdl_run_countdown_state_entry(void); 
-void mtbdl_run_countdown_state_exit(void); 
-
-void mtbdl_run_state_entry(void); 
-void mtbdl_run_state_exit(void); 
-
-void mtbdl_postrun_state_entry(void); 
-void mtbdl_postrun_state_exit(void); 
-
-void mtbdl_data_select_state_entry(void); 
-void mtbdl_data_select_state_exit(void); 
-
-void mtbdl_dev_search_state_entry(void); 
-void mtbdl_dev_search_state_exit(void); 
-
-void mtbdl_prerx_state_entry(void); 
-void mtbdl_prerx_state_exit(void); 
-
-void mtbdl_rx_state_entry(void); 
-void mtbdl_rx_state_exit(void); 
-
-void mtbdl_postrx_state_entry(void); 
-void mtbdl_postrx_state_exit(void); 
-
-void mtbdl_pretx_state_entry(void); 
-void mtbdl_pretx_state_exit(void); 
-
-void mtbdl_tx_state_entry(void); 
-void mtbdl_tx_state_exit(void); 
-
-void mtbdl_posttx_state_entry(void); 
-void mtbdl_posttx_state_exit(void); 
-
-void mtbdl_precalibrate_state_entry(void); 
-void mtbdl_precalibrate_state_exit(void); 
-
-void mtbdl_calibrate_state_entry(void); 
-void mtbdl_calibrate_state_exit(void); 
-
-void mtbdl_postcalibrate_state_entry(void); 
-void mtbdl_postcalibrate_state_exit(void); 
-
-void mtbdl_lowpwr_state_entry(void); 
-void mtbdl_lowpwr_state_exit(void); 
-
-void mtbdl_fault_state_entry(void); 
-void mtbdl_fault_state_exit(void); 
-
 void mtbdl_reset_state_entry(void); 
 void mtbdl_reset_state_exit(void); 
 
@@ -504,72 +490,17 @@ static mtbdl_func_ptr_t mtbdl_state_table[MTBDL_NUM_STATES] =
 
 
 //=======================================================================================
-// System controller 
+// Main controller 
 
-// MTB DL application 
 void mtbdl_app(void)
 {
     mtbdl_states_t next_state = mtbdl_trackers.state; 
 
-    //===================================================
-    // Device status checks 
+    // System status checks 
+    system_status_checks(); 
 
-    if (hd44780u_get_fault_code())
-    {
-        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_0); 
-    }
-    if (mpu6050_get_fault_code(DEVICE_ONE))
-    {
-        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_1); 
-    }
-    if (m8q_get_fault_code())
-    {
-        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_2); 
-    }
-    if (hw125_get_fault_code())
-    {
-        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_3); 
-    }
-    if (hc05_get_status())
-    {
-        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_4); 
-    }
-
-    //===================================================
-
-    //===================================================
-    // User buttons 
-
-    // Update user input button status 
-    if (handler_flags.tim1_up_tim10_glbl_flag)
-    {
-        handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
-        debounce((uint8_t)gpio_port_read(mtbdl_trackers.user_btn_port)); 
-    }
-
-    // Free the button pressed status as soon as possible & turn the LEDs off 
-    if (debounce_released(mtbdl_trackers.user_btn_1) && mtbdl_trackers.user_btn_1_block)
-    {
-        mtbdl_trackers.user_btn_1_block = CLEAR; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led_clear); 
-    }
-    if (debounce_released(mtbdl_trackers.user_btn_2) && mtbdl_trackers.user_btn_2_block)
-    {
-        mtbdl_trackers.user_btn_2_block = CLEAR; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led_clear); 
-    }
-    if (debounce_released(mtbdl_trackers.user_btn_3) && mtbdl_trackers.user_btn_3_block)
-    {
-        mtbdl_trackers.user_btn_3_block = CLEAR; 
-        mtbdl_led_update(WS2812_LED_5, mtbdl_led_clear); 
-    }
-    if (debounce_released(mtbdl_trackers.user_btn_4) && mtbdl_trackers.user_btn_4_block)
-    {
-        mtbdl_trackers.user_btn_4_block = CLEAR; 
-        mtbdl_led_update(WS2812_LED_4, mtbdl_led_clear); 
-    }
-    
-    //===================================================
+    // Button status 
+    system_button_status(); 
 
     //===================================================
     // System state machine 
@@ -821,10 +752,8 @@ void mtbdl_app(void)
 
     //===================================================
 
-    // Execute the state 
+    // Execute the state function then update the record 
     mtbdl_state_table[next_state](&mtbdl_trackers); 
-
-    // Update the state 
     mtbdl_trackers.state = next_state; 
 
     // Call device controllers 
@@ -834,13 +763,72 @@ void mtbdl_app(void)
     m8q_controller(); 
 }
 
+
+// System status checks 
+void system_status_checks(void)
+{
+    if (hd44780u_get_fault_code())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_0); 
+    }
+    if (mpu6050_get_fault_code(DEVICE_ONE))
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_1); 
+    }
+    if (m8q_get_fault_code())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_2); 
+    }
+    if (hw125_get_fault_code())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_3); 
+    }
+    if (hc05_get_status())
+    {
+        mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_4); 
+    }
+}
+
+
+// Button status 
+void system_button_status(void)
+{
+    // Update user input button status 
+    if (handler_flags.tim1_up_tim10_glbl_flag)
+    {
+        handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
+        debounce((uint8_t)gpio_port_read(mtbdl_trackers.user_btn_port)); 
+    }
+
+    // Free the button pressed status as soon as possible & turn the LEDs off 
+    if (debounce_released(mtbdl_trackers.user_btn_1) && mtbdl_trackers.user_btn_1_block)
+    {
+        mtbdl_trackers.user_btn_1_block = CLEAR; 
+        mtbdl_led_update(WS2812_LED_7, mtbdl_led_clear); 
+    }
+    if (debounce_released(mtbdl_trackers.user_btn_2) && mtbdl_trackers.user_btn_2_block)
+    {
+        mtbdl_trackers.user_btn_2_block = CLEAR; 
+        mtbdl_led_update(WS2812_LED_6, mtbdl_led_clear); 
+    }
+    if (debounce_released(mtbdl_trackers.user_btn_3) && mtbdl_trackers.user_btn_3_block)
+    {
+        mtbdl_trackers.user_btn_3_block = CLEAR; 
+        mtbdl_led_update(WS2812_LED_5, mtbdl_led_clear); 
+    }
+    if (debounce_released(mtbdl_trackers.user_btn_4) && mtbdl_trackers.user_btn_4_block)
+    {
+        mtbdl_trackers.user_btn_4_block = CLEAR; 
+        mtbdl_led_update(WS2812_LED_4, mtbdl_led_clear); 
+    }
+}
+
 //=======================================================================================
 
 
 //=======================================================================================
-// State functions 
-
 // Init state 
+
 void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -894,7 +882,33 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Init state entry 
+void mtbdl_init_state_entry(void)
+{
+    // Display the startup message 
+    hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
+
+    // Turn on the init state LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_3); 
+}
+
+
+// Init state exit 
+void mtbdl_init_state_exit(void)
+{
+    // Clear the screen startup message 
+    hd44780u_set_clear_flag(); 
+
+    // Turn off the init state LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Idle state 
+
 void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
 {
     static uint32_t time_count = CLEAR; 
@@ -984,7 +998,41 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Pre run state 
+// Idle state entry 
+void mtbdl_idle_state_entry(void)
+{
+    // Display the idle state message 
+    mtbdl_set_idle_msg(); 
+
+    // Set the screen to power save mode 
+    hd44780u_set_pwr_save_flag(); 
+    hd44780u_set_sleep_time(MTBDL_LCD_SLEEP); 
+
+    // Put the HC-05 into low power mode 
+    hc05_off(); 
+
+    // Put the MPU-6050 into low power mode 
+    mpu6050_set_low_power(DEVICE_ONE); 
+}
+
+
+// Idle state exit 
+void mtbdl_idle_state_exit(void)
+{
+    // Clear the idle state message and take the screen out of power save mode 
+    hd44780u_set_clear_flag(); 
+    hd44780u_clear_pwr_save_flag(); 
+
+    // Turn off the GPS LED 
+    mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Run prep state 
+
 void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
 {
     static uint32_t time_count = CLEAR; 
@@ -1086,7 +1134,30 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Pre run (run prep) state entry 
+void mtbdl_run_prep_state_entry(void)
+{
+    // 
+}
+
+
+// Pre run (run prep) state exit 
+void mtbdl_run_prep_state_exit(void)
+{
+    // Clear the run prep state message 
+    hd44780u_set_clear_flag(); 
+
+    // Make sure the data logging and GPS LEDs are off 
+    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Run countdown state 
+
 void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1116,7 +1187,42 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Run countdown state entry 
+void mtbdl_run_countdown_state_entry(void)
+{
+    // Display the run countdown state message 
+    hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
+
+    // Turn on the data logging LED 
+    mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+
+    // SD card will be written to constantly so no need for the check state 
+    hw125_clear_check_flag(); 
+
+    // Take the MPU-6050 out of low power mode 
+    mpu6050_clear_low_power(DEVICE_ONE); 
+}
+
+
+// Run countdown state exit 
+void mtbdl_run_countdown_state_exit(void)
+{
+    // Put the screen in low power mode 
+    hd44780u_set_low_pwr_flag(); 
+
+    // Turn off the data logging LED 
+    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+
+    // Prep the logging data 
+    mtbdl_log_data_prep(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Run state 
+
 void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1164,7 +1270,26 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Run state entry 
+void mtbdl_run_state_entry(void)
+{
+    // 
+}
+
+
+// Run state exit 
+void mtbdl_run_state_exit(void)
+{
+    // Take the screen out of low power mode 
+    hd44780u_clear_low_pwr_flag(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Post run state 
+
 void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1206,7 +1331,35 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Data transfer selection 
+// Post run state entry 
+void mtbdl_postrun_state_entry(void)
+{
+    // 
+}
+
+
+// Post run state exit 
+void mtbdl_postrun_state_exit(void)
+{
+    // Clear the post run state message 
+    hd44780u_set_clear_flag(); 
+
+    // Turn off the data logging LED 
+    mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+
+    // Set the SD card controller check flag 
+    hw125_set_check_flag(); 
+
+    // Turn off the data logging LED 
+    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Data transfer selection state 
+
 void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1263,7 +1416,27 @@ void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Search for Bluetooth connection 
+// Data selection state entry 
+void mtbdl_data_select_state_entry(void)
+{
+    // Display the data select state message 
+    hd44780u_set_msg(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
+}
+
+
+// Data selection state exit 
+void mtbdl_data_select_state_exit(void)
+{
+    // Clear the data select state message 
+    hd44780u_set_clear_flag(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Device search state (search for a Bluetooth connection) 
+
 void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1328,7 +1501,33 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Pre RX state 
+// Device search state entry 
+void mtbdl_dev_search_state_entry(void)
+{
+    // Display the device connection search state message 
+    hd44780u_set_msg(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
+
+    // Take the HC-05 out of low power mode 
+    hc05_on(); 
+}
+
+
+// Device search state exit 
+void mtbdl_dev_search_state_exit(void)
+{
+    // Clear the device connection search state message 
+    hd44780u_set_clear_flag(); 
+
+    // Make sure Bluetooth LED is off 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Pre data receive (RX) state 
+
 void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1405,7 +1604,27 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// RX state 
+// Pre RX state entry 
+void mtbdl_prerx_state_entry(void)
+{
+    // Display the pre rx state message 
+    hd44780u_set_msg(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
+}
+
+
+// Pre RX state exit 
+void mtbdl_prerx_state_exit(void)
+{
+    // Clear the pre rx state message 
+    hd44780u_set_clear_flag();  
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Data receive (RX) state 
+
 void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1485,7 +1704,30 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Post RX state 
+// RX state entry 
+void mtbdl_rx_state_entry(void)
+{
+    // Display the rx state message 
+    hd44780u_set_msg(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
+
+    // Begin the RX user interface 
+    mtbdl_rx_prep(); 
+}
+
+
+// RX state exit 
+void mtbdl_rx_state_exit(void)
+{
+    // Clear the rx state message 
+    hd44780u_set_clear_flag(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Post data receive (RX) state 
+
 void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1520,7 +1762,33 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Pre TX state 
+// Post RX state entry 
+void mtbdl_postrx_state_entry(void)
+{
+    // Turn on the Bluetooth LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+
+    // Save the parameters to file and update tracking info 
+    mtbdl_write_bike_params(HW125_MODE_OEW); 
+}
+
+
+// Post RX state exit 
+void mtbdl_postrx_state_exit(void)
+{
+    // Clear the post rx state message 
+    hd44780u_set_clear_flag(); 
+
+    // Turn off the Bluetooth LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Pre data send (TX) state 
+
 void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1619,7 +1887,29 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// TX state 
+// Pre TX state entry 
+void mtbdl_pretx_state_entry(void)
+{
+    // 
+}
+
+
+// Pre TX state exit 
+void mtbdl_pretx_state_exit(void)
+{
+    // Clear the pre rx state message 
+    hd44780u_set_clear_flag(); 
+
+    // Clear the Bluetooth LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Data send (TX) state 
+
 void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1698,7 +1988,26 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Post TX state 
+// TX state entry 
+void mtbdl_tx_state_entry(void)
+{
+    // 
+}
+
+
+// TX state exit 
+void mtbdl_tx_state_exit(void)
+{
+    // Clear the tx state message 
+    hd44780u_set_clear_flag(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Post data send (TX) state 
+
 void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1742,7 +2051,33 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Post TX state entry 
+void mtbdl_posttx_state_entry(void)
+{
+    // Turn on the Bluetooth LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+
+    // End the transaction 
+    mtbdl_tx_end(); 
+}
+
+
+// Post TX state exit 
+void mtbdl_posttx_state_exit(void)
+{
+    // Clear the post tx state message 
+    hd44780u_set_clear_flag(); 
+
+    // Turn off the Bluetooth LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Pre calibration state 
+
 void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1811,8 +2146,12 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
     }
 }
 
+//=======================================================================================
 
+
+//=======================================================================================
 // Calibration state 
+
 void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1850,7 +2189,37 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Calibration state entry 
+void mtbdl_calibrate_state_entry(void)
+{
+    // Display the calibration state message 
+    hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
+
+    // Prepare to record data for calibration 
+    mtbdl_cal_prep(); 
+
+    // Turn on the calibration LED 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
+}
+
+
+// Calibration state exit 
+void mtbdl_calibrate_state_exit(void)
+{
+    // Calculate the calibration values 
+    mtbdl_cal_calc(); 
+
+    // Clear the calibration state message and turn off the calibration LED 
+    hd44780u_set_clear_flag(); 
+    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Post calibration state 
+
 void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1880,7 +2249,28 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Post calibration state entry 
+void mtbdl_postcalibrate_state_entry(void)
+{
+    // Display the post calibration message and record the calibration data
+    hd44780u_set_msg(mtbdl_postcal_msg, MTBDL_MSG_LEN_1_LINE); 
+    mtbdl_write_sys_params(HW125_MODE_OEW); 
+}
+
+
+// Post calibration state exit 
+void mtbdl_postcalibrate_state_exit(void)
+{
+    // Clear the post calibration message 
+    hd44780u_set_clear_flag(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Low power state 
+
 void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1951,7 +2341,43 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
 }
 
 
+// Low power state entry 
+void mtbdl_lowpwr_state_entry(void)
+{
+    // Display the low power state message 
+    hd44780u_set_msg(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_2_LINE); 
+
+    // Put the screen into power save mode 
+    hd44780u_set_pwr_save_flag(); 
+    hd44780u_set_sleep_time(MTBDL_LCD_LP_SLEEP); 
+
+    // Put the GPS into low power mode 
+    m8q_set_low_pwr_flag(); 
+
+    // Make sure the MPU-6050 and HC-05 are in low power mode 
+    mpu6050_set_low_power(DEVICE_ONE); 
+    hc05_off(); 
+}
+
+
+// Low power state exit 
+void mtbdl_lowpwr_state_exit(void)
+{
+    // Clear the idle state message and take devices out of low power mode 
+    hd44780u_set_clear_flag(); 
+    hd44780u_clear_pwr_save_flag(); 
+    m8q_clear_low_pwr_flag(); 
+
+    // Make sure the low power LED if off 
+    mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Fault state 
+
 void mtbdl_fault_state(mtbdl_trackers_t *mtbdl)
 {
     // State entry 
@@ -1984,412 +2410,6 @@ void mtbdl_fault_state(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Reset state 
-void mtbdl_reset_state(mtbdl_trackers_t *mtbdl)
-{
-    // State entry 
-    if (mtbdl->reset)
-    {
-        mtbdl->reset = CLEAR_BIT; 
-        mtbdl_reset_state_entry(); 
-    }
-
-    // State exit 
-    mtbdl->init = SET_BIT; 
-    mtbdl_reset_state_exit(); 
-}
-
-//=======================================================================================
-
-
-//=======================================================================================
-// State entry/exit 
-
-// Init state entry 
-void mtbdl_init_state_entry(void)
-{
-    // Display the startup message 
-    hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
-
-    // Turn on the init state LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_3); 
-}
-
-
-// Init state exit 
-void mtbdl_init_state_exit(void)
-{
-    // Clear the screen startup message 
-    hd44780u_set_clear_flag(); 
-
-    // Turn off the init state LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-}
-
-
-// Idle state entry 
-void mtbdl_idle_state_entry(void)
-{
-    // Display the idle state message 
-    mtbdl_set_idle_msg(); 
-
-    // Set the screen to power save mode 
-    hd44780u_set_pwr_save_flag(); 
-    hd44780u_set_sleep_time(MTBDL_LCD_SLEEP); 
-
-    // Put the HC-05 into low power mode 
-    hc05_off(); 
-
-    // Put the MPU-6050 into low power mode 
-    mpu6050_set_low_power(DEVICE_ONE); 
-}
-
-
-// Idle state exit 
-void mtbdl_idle_state_exit(void)
-{
-    // Clear the idle state message and take the screen out of power save mode 
-    hd44780u_set_clear_flag(); 
-    hd44780u_clear_pwr_save_flag(); 
-
-    // Turn off the GPS LED 
-    mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
-}
-
-
-// Pre run (run prep) state entry 
-void mtbdl_run_prep_state_entry(void)
-{
-    // 
-}
-
-
-// Pre run (run prep) state exit 
-void mtbdl_run_prep_state_exit(void)
-{
-    // Clear the run prep state message 
-    hd44780u_set_clear_flag(); 
-
-    // Make sure the data logging and GPS LEDs are off 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
-    mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
-}
-
-
-// Run countdown state entry 
-void mtbdl_run_countdown_state_entry(void)
-{
-    // Display the run countdown state message 
-    hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
-
-    // Turn on the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
-
-    // SD card will be written to constantly so no need for the check state 
-    hw125_clear_check_flag(); 
-
-    // Take the MPU-6050 out of low power mode 
-    mpu6050_clear_low_power(DEVICE_ONE); 
-}
-
-
-// Run countdown state exit 
-void mtbdl_run_countdown_state_exit(void)
-{
-    // Put the screen in low power mode 
-    hd44780u_set_low_pwr_flag(); 
-
-    // Turn off the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
-
-    // Prep the logging data 
-    mtbdl_log_data_prep(); 
-}
-
-
-// Run state entry 
-void mtbdl_run_state_entry(void)
-{
-    // 
-}
-
-
-// Run state exit 
-void mtbdl_run_state_exit(void)
-{
-    // Take the screen out of low power mode 
-    hd44780u_clear_low_pwr_flag(); 
-}
-
-
-// Post run state entry 
-void mtbdl_postrun_state_entry(void)
-{
-    // 
-}
-
-
-// Post run state exit 
-void mtbdl_postrun_state_exit(void)
-{
-    // Clear the post run state message 
-    hd44780u_set_clear_flag(); 
-
-    // Turn off the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
-
-    // Set the SD card controller check flag 
-    hw125_set_check_flag(); 
-
-    // Turn off the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
-}
-
-
-// Data selection state entry 
-void mtbdl_data_select_state_entry(void)
-{
-    // Display the data select state message 
-    hd44780u_set_msg(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
-}
-
-
-// Data selection state exit 
-void mtbdl_data_select_state_exit(void)
-{
-    // Clear the data select state message 
-    hd44780u_set_clear_flag(); 
-}
-
-
-// Device search state entry 
-void mtbdl_dev_search_state_entry(void)
-{
-    // Display the device connection search state message 
-    hd44780u_set_msg(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
-
-    // Take the HC-05 out of low power mode 
-    hc05_on(); 
-}
-
-
-// Device search state exit 
-void mtbdl_dev_search_state_exit(void)
-{
-    // Clear the device connection search state message 
-    hd44780u_set_clear_flag(); 
-
-    // Make sure Bluetooth LED is off 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-}
-
-
-// Pre RX state entry 
-void mtbdl_prerx_state_entry(void)
-{
-    // Display the pre rx state message 
-    hd44780u_set_msg(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
-}
-
-
-// Pre RX state exit 
-void mtbdl_prerx_state_exit(void)
-{
-    // Clear the pre rx state message 
-    hd44780u_set_clear_flag();  
-}
-
-
-// RX state entry 
-void mtbdl_rx_state_entry(void)
-{
-    // Display the rx state message 
-    hd44780u_set_msg(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
-
-    // Begin the RX user interface 
-    mtbdl_rx_prep(); 
-}
-
-
-// RX state exit 
-void mtbdl_rx_state_exit(void)
-{
-    // Clear the rx state message 
-    hd44780u_set_clear_flag(); 
-}
-
-
-// Post RX state entry 
-void mtbdl_postrx_state_entry(void)
-{
-    // Turn on the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
-
-    // Save the parameters to file and update tracking info 
-    mtbdl_write_bike_params(HW125_MODE_OEW); 
-}
-
-
-// Post RX state exit 
-void mtbdl_postrx_state_exit(void)
-{
-    // Clear the post rx state message 
-    hd44780u_set_clear_flag(); 
-
-    // Turn off the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-}
-
-
-// Pre TX state entry 
-void mtbdl_pretx_state_entry(void)
-{
-    // 
-}
-
-
-// Pre TX state exit 
-void mtbdl_pretx_state_exit(void)
-{
-    // Clear the pre rx state message 
-    hd44780u_set_clear_flag(); 
-
-    // Clear the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-}
-
-
-// TX state entry 
-void mtbdl_tx_state_entry(void)
-{
-    // 
-}
-
-
-// TX state exit 
-void mtbdl_tx_state_exit(void)
-{
-    // Clear the tx state message 
-    hd44780u_set_clear_flag(); 
-}
-
-
-// Post TX state entry 
-void mtbdl_posttx_state_entry(void)
-{
-    // Turn on the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
-
-    // End the transaction 
-    mtbdl_tx_end(); 
-}
-
-
-// Post TX state exit 
-void mtbdl_posttx_state_exit(void)
-{
-    // Clear the post tx state message 
-    hd44780u_set_clear_flag(); 
-
-    // Turn off the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-}
-
-
-// Pre calibration state entry 
-void mtbdl_precalibrate_state_entry(void)
-{
-    // Display the pre calibration state message 
-    hd44780u_set_msg(mtbdl_precal_msg, MTBDL_MSG_LEN_4_LINE); 
-}
-
-
-// Pre calibration state exit 
-void mtbdl_precalibrate_state_exit(void)
-{
-    // Clear the pre calibration state message 
-    hd44780u_set_clear_flag(); 
-
-    // Make sure the calibration LED is off 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-}
-
-
-// Calibration state entry 
-void mtbdl_calibrate_state_entry(void)
-{
-    // Display the calibration state message 
-    hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
-
-    // Prepare to record data for calibration 
-    mtbdl_cal_prep(); 
-
-    // Turn on the calibration LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
-}
-
-
-// Calibration state exit 
-void mtbdl_calibrate_state_exit(void)
-{
-    // Calculate the calibration values 
-    mtbdl_cal_calc(); 
-
-    // Clear the calibration state message and turn off the calibration LED 
-    hd44780u_set_clear_flag(); 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
-}
-
-
-// Post calibration state entry 
-void mtbdl_postcalibrate_state_entry(void)
-{
-    // Display the post calibration message and record the calibration data
-    hd44780u_set_msg(mtbdl_postcal_msg, MTBDL_MSG_LEN_1_LINE); 
-    mtbdl_write_sys_params(HW125_MODE_OEW); 
-}
-
-
-// Post calibration state exit 
-void mtbdl_postcalibrate_state_exit(void)
-{
-    // Clear the post calibration message 
-    hd44780u_set_clear_flag(); 
-}
-
-
-// Low power state entry 
-void mtbdl_lowpwr_state_entry(void)
-{
-    // Display the low power state message 
-    hd44780u_set_msg(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_2_LINE); 
-
-    // Put the screen into power save mode 
-    hd44780u_set_pwr_save_flag(); 
-    hd44780u_set_sleep_time(MTBDL_LCD_LP_SLEEP); 
-
-    // Put the GPS into low power mode 
-    m8q_set_low_pwr_flag(); 
-
-    // Make sure the MPU-6050 and HC-05 are in low power mode 
-    mpu6050_set_low_power(DEVICE_ONE); 
-    hc05_off(); 
-}
-
-
-// Low power state exit 
-void mtbdl_lowpwr_state_exit(void)
-{
-    // Clear the idle state message and take devices out of low power mode 
-    hd44780u_set_clear_flag(); 
-    hd44780u_clear_pwr_save_flag(); 
-    m8q_clear_low_pwr_flag(); 
-
-    // Make sure the low power LED if off 
-    mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
-}
-
-
 // Fault state entry 
 void mtbdl_fault_state_entry(void)
 {
@@ -2414,6 +2434,26 @@ void mtbdl_fault_state_exit(void)
 
     // Clear the fault state message 
     hd44780u_set_clear_flag(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Reset state 
+
+void mtbdl_reset_state(mtbdl_trackers_t *mtbdl)
+{
+    // State entry 
+    if (mtbdl->reset)
+    {
+        mtbdl->reset = CLEAR_BIT; 
+        mtbdl_reset_state_entry(); 
+    }
+
+    // State exit 
+    mtbdl->init = SET_BIT; 
+    mtbdl_reset_state_exit(); 
 }
 
 

@@ -92,6 +92,8 @@ typedef struct mtbdl_trackers_s
     uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
 
+    ui_btn_num_t btn_press; 
+
     // State flags 
     uint8_t init          : 1;                  // Ensures the init state is run 
     uint8_t idle          : 1;                  // Idle state flag 

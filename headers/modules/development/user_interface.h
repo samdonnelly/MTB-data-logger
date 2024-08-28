@@ -24,12 +24,26 @@
 
 
 //=======================================================================================
+// 
+
+typedef enum {
+    UI_BTN_NONE, 
+    UI_BTN_1, 
+    UI_BTN_2, 
+    UI_BTN_3, 
+    UI_BTN_4 
+} ui_btn_num_t; 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Structures 
 
 // User interface data record 
 typedef struct mtbdl_ui_s 
 {
-    uint8_t test; 
+    GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
 
     // User buttons 
     uint8_t user_btn_1;                         // User button 1 pin number 
@@ -40,6 +54,16 @@ typedef struct mtbdl_ui_s
     uint8_t user_btn_2_block : 1;               // Stops repeated actions on btn 2 press 
     uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
+
+    // LEDs 
+    uint32_t user_led_0;                        // User LED 0 - data logging 
+    uint32_t user_led_1;                        // User LED 1 - GPS position lock 
+    uint32_t user_led_2;                        // User LED 2 - state indicator 
+    uint32_t user_led_3;                        // User LED 3 - fault & low power 
+    uint32_t user_led_4;                        // User LED 4 - user button 4 status 
+    uint32_t user_led_5;                        // User LED 5 - user button 3 status 
+    uint32_t user_led_6;                        // User LED 6 - user button 2 status 
+    uint32_t user_led_7;                        // User LED 7 - user button 1 status 
 }
 mtbdl_ui_t; 
 
@@ -60,10 +84,10 @@ mtbdl_ui_t;
  */
 void ui_init(
     GPIO_TypeDef *btn_port, 
-    gpio_pin_num_t btn1, 
-    gpio_pin_num_t btn2, 
-    gpio_pin_num_t btn3, 
-    gpio_pin_num_t btn4); 
+    pin_selector_t btn1, 
+    pin_selector_t btn2, 
+    pin_selector_t btn3, 
+    pin_selector_t btn4); 
 
 //=======================================================================================
 
@@ -71,11 +95,18 @@ void ui_init(
 //=======================================================================================
 // Input functions 
 
-// Button press check 
-void ui_button_press(void); 
+/**
+ * @brief Button press check 
+ * 
+ * @return ui_btn_num_t 
+ */
+ui_btn_num_t ui_button_press(void); 
 
 
-// Button release check 
+/**
+ * @brief Button release check 
+ * 
+ */
 void ui_button_release(void); 
 
 //=======================================================================================

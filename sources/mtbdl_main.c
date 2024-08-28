@@ -108,6 +108,7 @@ void mtbdl_init_state_exit(void);
  */
 void mtbdl_idle_state(mtbdl_trackers_t *mtbdl); 
 void mtbdl_idle_state_entry(void); 
+void mtbdl_idle_user_input_check(mtbdl_trackers_t *mtbdl); 
 void mtbdl_idle_state_exit(void); 
 
 
@@ -920,40 +921,11 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
         mtbdl_idle_state_entry(); 
     }
 
+    // Check for user button input 
+    mtbdl_idle_state_input_check(mtbdl); 
+
     //==================================================
     // Checks 
-
-    // Button 1 - triggers the pre run state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->run = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-    }
-    
-    // Button 2 - triggers the data transfer selection state 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        mtbdl->data_select = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
-    }
-    
-    // Button 3 - triggers the alternate functions state 
-    else if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
-    {
-        mtbdl->calibrate = SET_BIT; 
-        mtbdl->user_btn_3_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_5, mtbdl_led5_1); 
-    }
-    
-    // Button 4 - Turns the screen backlight on 
-    else if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
-    {
-        mtbdl->user_btn_4_block = SET_BIT; 
-        hd44780u_wake_up(); 
-        mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
-    }
 
     // Check for GPS position lock - update the screen message and LED with the status 
     // Calculate the battery SOC - update the screen message with the status 
@@ -1013,6 +985,76 @@ void mtbdl_idle_state_entry(void)
 
     // Put the MPU-6050 into low power mode 
     mpu6050_set_low_power(DEVICE_ONE); 
+}
+
+
+// Idle state user button input check 
+void mtbdl_idle_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - triggers the pre run state 
+        case UI_BTN_1: 
+            mtbdl->run = SET_BIT; 
+            mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+            break; 
+
+        // Button 2 - triggers the data transfer selection state 
+        case UI_BTN_2: 
+            mtbdl->data_select = SET_BIT; 
+            mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
+            break; 
+
+        // Button 3 - triggers the alternate functions state 
+        case UI_BTN_3: 
+            mtbdl->calibrate = SET_BIT; 
+            mtbdl_led_update(WS2812_LED_5, mtbdl_led5_1); 
+            break; 
+
+        // Button 4 - Turns the screen backlight on 
+        case UI_BTN_4: 
+            hd44780u_wake_up(); 
+            mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
+            break; 
+
+        default: 
+            break; 
+    }
+
+
+    // // Button 1 - triggers the pre run state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->run = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+    // }
+    
+    // // Button 2 - triggers the data transfer selection state 
+    // else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     mtbdl->data_select = SET_BIT; 
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
+    // }
+    
+    // // Button 3 - triggers the alternate functions state 
+    // else if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
+    // {
+    //     mtbdl->calibrate = SET_BIT; 
+    //     mtbdl->user_btn_3_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_5, mtbdl_led5_1); 
+    // }
+    
+    // // Button 4 - Turns the screen backlight on 
+    // else if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
+    // {
+    //     mtbdl->user_btn_4_block = SET_BIT; 
+    //     hd44780u_wake_up(); 
+    //     mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
+    // }
 }
 
 

@@ -18,8 +18,9 @@
 //=======================================================================================
 // Includes 
 
-// Application 
 #include "stm32f4xx_it.h" 
+
+// Modules 
 #include "data_logging.h" 
 #include "system_parameters.h" 
 #include "user_interface.h" 

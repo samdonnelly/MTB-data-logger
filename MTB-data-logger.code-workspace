@@ -41,7 +41,8 @@
 			"ws2812_config.h": "c",
 			"data_logging.h": "c",
 			"system_parameters.h": "c",
-			"switch_debounce.h": "c"
+			"switch_debounce.h": "c",
+			"user_interface.h": "c"
 		}
 	}
 }

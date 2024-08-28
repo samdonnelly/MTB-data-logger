@@ -47,6 +47,28 @@ mtbdl_ui_t;
 
 
 //=======================================================================================
+// Initialization 
+
+/**
+ * @brief User interface init 
+ * 
+ * @param btn_port 
+ * @param btn1 
+ * @param btn2 
+ * @param btn3 
+ * @param btn4 
+ */
+void ui_init(
+    GPIO_TypeDef *btn_port, 
+    gpio_pin_num_t btn1, 
+    gpio_pin_num_t btn2, 
+    gpio_pin_num_t btn3, 
+    gpio_pin_num_t btn4); 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Input functions 
 
 // Button press check 

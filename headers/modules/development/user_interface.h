@@ -55,18 +55,9 @@ typedef struct mtbdl_ui_s
     uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
 
-    // LEDs 
-    uint32_t user_led_0;                        // User LED 0 - data logging 
-    uint32_t user_led_1;                        // User LED 1 - GPS position lock 
-    uint32_t user_led_2;                        // User LED 2 - state indicator 
-    uint32_t user_led_3;                        // User LED 3 - fault & low power 
-    uint32_t user_led_4;                        // User LED 4 - user button 4 status 
-    uint32_t user_led_5;                        // User LED 5 - user button 3 status 
-    uint32_t user_led_6;                        // User LED 6 - user button 2 status 
-    uint32_t user_led_7;                        // User LED 7 - user button 1 status 
-
     // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
     uint32_t led_colour_data[WS2812_LED_NUM]; 
+    uint32_t led_colours[WS2812_LED_NUM]; 
 }
 mtbdl_ui_t; 
 
@@ -99,6 +90,12 @@ void ui_init(
 // Input functions 
 
 /**
+ * @brief Button status update 
+ */
+void ui_button_update(void); 
+
+
+/**
  * @brief Button press check 
  * 
  * @return ui_btn_num_t 
@@ -108,7 +105,6 @@ ui_btn_num_t ui_button_press(void);
 
 /**
  * @brief Button release check 
- * 
  */
 void ui_button_release(void); 
 

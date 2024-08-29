@@ -16,6 +16,8 @@
 // Includes 
 
 #include "user_interface.h" 
+#include "ws2812_config.h" 
+#include "stm32f4xx_it.h" 
 
 //=======================================================================================
 
@@ -75,6 +77,18 @@ void ui_init(
 //=======================================================================================
 // Input - buttons, RX mode 
 
+// Button status update 
+void ui_button_update(void)
+{
+    // Update user input button status 
+    if (handler_flags.tim1_up_tim10_glbl_flag)
+    {
+        handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
+        debounce((uint8_t)gpio_port_read(mtbdl_ui.user_btn_port)); 
+    }
+}
+
+
 // Button press check 
 ui_btn_num_t ui_button_press(void)
 {
@@ -84,7 +98,7 @@ ui_btn_num_t ui_button_press(void)
     if (debounce_pressed(mtbdl_ui.user_btn_1) && !mtbdl_ui.user_btn_1_block)
     {
         mtbdl_ui.user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_ui.user_led_7); 
+        ui_led_update(WS2812_LED_7, mtbdl_ui.led_colours[WS2812_LED_7]); 
         btn_num = UI_BTN_1; 
     }
     
@@ -92,7 +106,7 @@ ui_btn_num_t ui_button_press(void)
     else if (debounce_pressed(mtbdl_ui.user_btn_2) && !mtbdl_ui.user_btn_2_block)
     {
         mtbdl_ui.user_btn_2_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_ui.user_led_6); 
+        ui_led_update(WS2812_LED_6, mtbdl_ui.led_colours[WS2812_LED_6]); 
         btn_num = UI_BTN_2; 
     }
     
@@ -100,7 +114,7 @@ ui_btn_num_t ui_button_press(void)
     else if (debounce_pressed(mtbdl_ui.user_btn_3) && !mtbdl_ui.user_btn_3_block)
     {
         mtbdl_ui.user_btn_3_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_5, mtbdl_ui.user_led_5); 
+        ui_led_update(WS2812_LED_5, mtbdl_ui.led_colours[WS2812_LED_5]); 
         btn_num = UI_BTN_3; 
     }
     
@@ -108,7 +122,7 @@ ui_btn_num_t ui_button_press(void)
     else if (debounce_pressed(mtbdl_ui.user_btn_4) && !mtbdl_ui.user_btn_4_block)
     {
         mtbdl_ui.user_btn_4_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_4, mtbdl_ui.user_led_4); 
+        ui_led_update(WS2812_LED_4, mtbdl_ui.led_colours[WS2812_LED_4]); 
         btn_num = UI_BTN_4; 
     }
 
@@ -125,28 +139,28 @@ void ui_button_release(void)
     if (debounce_released(mtbdl_ui.user_btn_1) && mtbdl_ui.user_btn_1_block)
     {
         mtbdl_ui.user_btn_1_block = CLEAR; 
-        // mtbdl_led_update(WS2812_LED_7, mtbdl_led_clear); 
+        ui_led_update(WS2812_LED_7, mtbdl_led_clear); 
     }
     
     // Button 2 
     if (debounce_released(mtbdl_ui.user_btn_2) && mtbdl_ui.user_btn_2_block)
     {
         mtbdl_ui.user_btn_2_block = CLEAR; 
-        // mtbdl_led_update(WS2812_LED_6, mtbdl_led_clear); 
+        ui_led_update(WS2812_LED_6, mtbdl_led_clear); 
     }
     
     // Button 3 
     if (debounce_released(mtbdl_ui.user_btn_3) && mtbdl_ui.user_btn_3_block)
     {
         mtbdl_ui.user_btn_3_block = CLEAR; 
-        // mtbdl_led_update(WS2812_LED_5, mtbdl_led_clear); 
+        ui_led_update(WS2812_LED_5, mtbdl_led_clear); 
     }
     
     // Button 4 
     if (debounce_released(mtbdl_ui.user_btn_4) && mtbdl_ui.user_btn_4_block)
     {
         mtbdl_ui.user_btn_4_block = CLEAR; 
-        // mtbdl_led_update(WS2812_LED_4, mtbdl_led_clear); 
+        ui_led_update(WS2812_LED_4, mtbdl_led_clear); 
     }
 }
 
@@ -155,11 +169,6 @@ void ui_button_release(void)
 
 //=======================================================================================
 // Output - screen, TX mode, LEDs 
-//=======================================================================================
-
-
-//=======================================================================================
-// Setters 
 
 // LED colour update 
 void ui_led_update(
@@ -167,6 +176,21 @@ void ui_led_update(
     uint32_t colour)
 {
     mtbdl_ui.led_colour_data[led_num] = colour; 
+    ws2812_send(DEVICE_ONE, mtbdl_ui.led_colour_data); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Setters 
+
+// LED colour set 
+void ui_led_set(
+    ws2812_led_index_t led_num, 
+    uint32_t colour)
+{
+    mtbdl_ui.led_colours[led_num] = colour; 
 }
 
 //=======================================================================================

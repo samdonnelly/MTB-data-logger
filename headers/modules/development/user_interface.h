@@ -64,6 +64,9 @@ typedef struct mtbdl_ui_s
     uint32_t user_led_5;                        // User LED 5 - user button 3 status 
     uint32_t user_led_6;                        // User LED 6 - user button 2 status 
     uint32_t user_led_7;                        // User LED 7 - user button 1 status 
+
+    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+    uint32_t led_colour_data[WS2812_LED_NUM]; 
 }
 mtbdl_ui_t; 
 

@@ -163,10 +163,10 @@ void ui_button_release(void)
 
 // LED colour update 
 void ui_led_update(
-    uint8_t led, 
+    ws2812_led_index_t led_num, 
     uint32_t colour)
 {
-    // 
+    mtbdl_ui.led_colour_data[led_num] = colour; 
 }
 
 //=======================================================================================

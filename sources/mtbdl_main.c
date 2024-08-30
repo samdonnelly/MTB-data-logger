@@ -842,7 +842,7 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
     }
 
     // Check for user button input 
-    mtbdl_idle_user_input_check(mtbdl); 
+    mtbdl_init_user_input_check(mtbdl); 
 
     //==================================================
     // Checks 
@@ -897,7 +897,7 @@ void mtbdl_init_state_entry(void)
 
 
 // Init state user button input check 
-void mtbdl_idle_user_input_check(mtbdl_trackers_t *mtbdl)
+void mtbdl_init_user_input_check(mtbdl_trackers_t *mtbdl)
 {
     mtbdl->btn_press = ui_button_press(); 
 
@@ -953,7 +953,7 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
     }
 
     // Check for user button input 
-    mtbdl_idle_state_input_check(mtbdl); 
+    mtbdl_idle_user_input_check(mtbdl); 
 
     //==================================================
     // Checks 
@@ -1136,27 +1136,11 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
         mtbdl_run_prep_state_entry(); 
     }
 
+    // Check for user button input 
+    mtbdl_run_prep_user_input_check(mtbdl); 
+
     //==================================================
     // Checks 
-
-    // Button 1 - triggers the run state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->run = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-
-        // Prepare the log file 
-        mtbdl_log_file_prep(); 
-    }
-    
-    // Button 2 - cancels the run state --> triggers idle state 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
-    }
 
     // Check the GPS position lock status and update the status LEDs 
     if (tim_compare(mtbdl->timer_nonblocking, 
@@ -1220,6 +1204,49 @@ void mtbdl_run_prep_state_entry(void)
 }
 
 
+// Pre-run state user button input check 
+void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - triggers the run state 
+        case UI_BTN_1: 
+            mtbdl->run = SET_BIT; 
+            mtbdl_log_file_prep();   // Prepare the log file 
+            break; 
+
+        // Button 2 - cancels the run state --> triggers idle state 
+        case UI_BTN_2: 
+            mtbdl->idle = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - triggers the run state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->run = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+
+    //     // Prepare the log file 
+    //     mtbdl_log_file_prep(); 
+    // }
+    
+    // // Button 2 - cancels the run state --> triggers idle state 
+    // else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
+    // }
+}
+
+
 // Pre run (run prep) state exit 
 void mtbdl_run_prep_state_exit(void)
 {
@@ -1246,9 +1273,7 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
         mtbdl_run_countdown_state_entry(); 
     }
 
-    //==================================================
     // State exit 
-
     // Wait for a short period of time before leaving the init state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
@@ -1261,8 +1286,6 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
         mtbdl->run = SET_BIT; 
         mtbdl_run_countdown_state_exit(); 
     }
-
-    //==================================================
 }
 
 
@@ -1316,26 +1339,9 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
         mtbdl->run = CLEAR_BIT; 
         mtbdl_run_state_entry(); 
     }
-    
-    //==================================================
-    // Check user button input 
 
-    // Button 1 - stops the run state --> triggers the post run state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->run = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-    }
-    
-    // Button 2 - Sets a marker 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        mtbdl->user_btn_2_block = SET_BIT; 
-        mtbdl_set_trailmark(); 
-    }
-    
-    //==================================================
+    // Check for user button input 
+    mtbdl_run_user_input_check(mtbdl); 
 
     //==================================================
     // Record data 
@@ -1363,6 +1369,44 @@ void mtbdl_run_state_entry(void)
     ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
     ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
     ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+}
+
+
+// Run state user button input check 
+void mtbdl_run_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - stops the run state --> triggers the post run state 
+        case UI_BTN_1: 
+            mtbdl->run = SET_BIT; 
+            break; 
+
+        // Button 2 - Sets a marker 
+        case UI_BTN_2: 
+            mtbdl_set_trailmark(); 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - stops the run state --> triggers the post run state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->run = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+    // }
+    
+    // // Button 2 - Sets a marker 
+    // else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    //     mtbdl_set_trailmark(); 
+    // }
 }
 
 
@@ -1462,44 +1506,8 @@ void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl)
         mtbdl_data_select_state_entry(); 
     }
 
-    //==================================================
-    // Check user button input 
-
-    // Button 1 - triggers the pre receive (RX) state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->rx = SET_BIT; 
-        mtbdl->data_select = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-    }
-    
-    // Button 2 - triggers the pre send (TX) state 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        // Before going to the device search state the code first checks if there are any log 
-        // files saved in the system. If there are none then the data select bit is not set 
-        // which will ultimately aborts the TX state and tell the user there are no files 
-        // available for sending. 
-        if (mtbdl_tx_check())
-        {
-            // Files exist - go to the device search state 
-            mtbdl->data_select = SET_BIT; 
-        }
-        mtbdl->tx = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
-    }
-    
-    // Button 3 - triggers the idle state - cancels data selection 
-    else if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
-    {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->user_btn_3_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_5, mtbdl_led5_1); 
-    }
-    
-    //==================================================
+    // Check for user button input 
+    mtbdl_data_select_user_input_check(mtbdl); 
 
     // State exit 
     if (mtbdl->data_select || mtbdl->tx || mtbdl->idle || mtbdl->fault_code)
@@ -1520,6 +1528,78 @@ void mtbdl_data_select_state_entry(void)
     ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
     ui_led_set(WS2812_LED_5, mtbdl_led5_1); 
     ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+}
+
+
+// Data selection state user button input check 
+void mtbdl_data_select_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - triggers the pre receive (RX) state 
+        case UI_BTN_1: 
+            mtbdl->rx = SET_BIT; 
+            mtbdl->data_select = SET_BIT; 
+            break; 
+
+        // Button 2 - triggers the pre send (TX) state 
+        case UI_BTN_2: 
+            // Before going to the device search state the code first checks if there are any log 
+            // files saved in the system. If there are none then the data select bit is not set 
+            // which will ultimately aborts the TX state and tell the user there are no files 
+            // available for sending. 
+            if (mtbdl_tx_check())
+            {
+                // Files exist - go to the device search state 
+                mtbdl->data_select = SET_BIT; 
+            }
+            mtbdl->tx = SET_BIT; 
+            break; 
+
+        // Button 3 - triggers the idle state - cancels data selection 
+        case UI_BTN_3: 
+            mtbdl->idle = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - triggers the pre receive (RX) state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->rx = SET_BIT; 
+    //     mtbdl->data_select = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+    // }
+    
+    // // Button 2 - triggers the pre send (TX) state 
+    // else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     // Before going to the device search state the code first checks if there are any log 
+    //     // files saved in the system. If there are none then the data select bit is not set 
+    //     // which will ultimately aborts the TX state and tell the user there are no files 
+    //     // available for sending. 
+    //     if (mtbdl_tx_check())
+    //     {
+    //         // Files exist - go to the device search state 
+    //         mtbdl->data_select = SET_BIT; 
+    //     }
+    //     mtbdl->tx = SET_BIT; 
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
+    // }
+    
+    // // Button 3 - triggers the idle state - cancels data selection 
+    // else if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
+    // {
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl->user_btn_3_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_5, mtbdl_led5_1); 
+    // }
 }
 
 
@@ -1545,16 +1625,11 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
         mtbdl_dev_search_state_entry(); 
     }
 
+    // Check for user button input 
+    mtbdl_dev_search_user_input_check(mtbdl); 
+
     //==================================================
     // Checks 
-
-    // Button 1 - triggers the idle state - cancels device search 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-    }
 
     // If the HC-05 is connected to a device then move to the next state 
     if (hc05_status())
@@ -1617,6 +1692,32 @@ void mtbdl_dev_search_state_entry(void)
 }
 
 
+// Device search state user button input check 
+void mtbdl_dev_search_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - triggers the idle state - cancels device search 
+        case UI_BTN_1: 
+            mtbdl->idle = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - triggers the idle state - cancels device search 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+    // }
+}
+
+
 // Device search state exit 
 void mtbdl_dev_search_state_exit(void)
 {
@@ -1643,24 +1744,11 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
         mtbdl_prerx_state_entry(); 
     }
 
+    // Check for user buttob input 
+    mtbdl_prerx_user_input_check(mtbdl); 
+
     //==================================================
     // Checks 
-
-    // Button 1 - triggers the rx state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->rx = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-    }
-    
-    // Button 2 - cancels the rx state --> triggers idle state 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
-    }
 
     // If the HC-05 gets disconnected then abort the potential transfer 
     if (!hc05_status())
@@ -1723,6 +1811,45 @@ void mtbdl_prerx_state_entry(void)
 }
 
 
+// Pre-RX state user button input check 
+void mtbdl_prerx_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - triggers the rx state 
+        case UI_BTN_1: 
+            mtbdl->rx = SET_BIT; 
+            break; 
+
+        // Button 2 - cancels the rx state --> triggers idle state 
+        case UI_BTN_2: 
+            mtbdl->idle = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - triggers the rx state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->rx = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+    // }
+    
+    // // Button 2 - cancels the rx state --> triggers idle state 
+    // else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
+    // }
+}
+
+
 // Pre RX state exit 
 void mtbdl_prerx_state_exit(void)
 {
@@ -1745,19 +1872,11 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
         mtbdl_rx_state_entry(); 
     }
 
+    // Check for user button input 
+    mtbdl_rx_user_input_check(mtbdl); 
+
     //==================================================
     // Checks 
-
-    // Button 1 - stops the rx state --> triggers the post rx state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->rx = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-
-        mtbdl->msg = mtbdl_postrx_msg; 
-        mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
-    }
 
     // If the HC-05 gets disconnected then abort the transfer 
     // Update the non-critical fault message 
@@ -1832,6 +1951,37 @@ void mtbdl_rx_state_entry(void)
 }
 
 
+// RX state user button input check 
+void mtbdl_rx_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - stops the rx state --> triggers the post rx state 
+        case UI_BTN_1: 
+            mtbdl->rx = SET_BIT; 
+            mtbdl->msg = mtbdl_postrx_msg; 
+            mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - stops the rx state --> triggers the post rx state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->rx = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+
+    //     mtbdl->msg = mtbdl_postrx_msg; 
+    //     mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
+    // }
+}
+
+
 // RX state exit 
 void mtbdl_rx_state_exit(void)
 {
@@ -1858,9 +2008,7 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
         mtbdl_postrx_state_entry(); 
     }
 
-    //==================================================
     // State exit 
-
     // Wait for a short period of time before leaving the post rx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
@@ -1874,8 +2022,6 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
         mtbdl->idle = SET_BIT; 
         mtbdl_postrx_state_exit(); 
     }
-    
-    //==================================================
 }
 
 
@@ -1937,27 +2083,11 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
         mtbdl_pretx_state_entry(); 
     }
 
+    // Check for user button input 
+    mtbdl_pretx_user_input_check(mtbdl); 
+
     //==================================================
     // Checks 
-
-    // Button 1 - triggers the tx state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->tx = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-    }
-    
-    // Button 2 - cancels the tx state --> triggers idle state 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
-
-        // End the data transfer 
-        mtbdl_tx_end(); 
-    }
 
     // If the HC-05 gets disconnected then abort the potential transfer 
     // This check uses the tx bit to reflect the existance of log files saved in the system. 
@@ -2021,6 +2151,48 @@ void mtbdl_pretx_state_entry(void)
 }
 
 
+// Pre-TX state user button input check 
+void mtbdl_pretx_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - triggers the tx state 
+        case UI_BTN_1: 
+            mtbdl->tx = SET_BIT; 
+            break; 
+
+        // Button 2 - cancels the tx state --> triggers idle state 
+        case UI_BTN_2: 
+            mtbdl->idle = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - triggers the tx state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->tx = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+    // }
+    
+    // // Button 2 - cancels the tx state --> triggers idle state 
+    // else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
+
+    //     // End the data transfer 
+    //     mtbdl_tx_end(); 
+    // }
+}
+
+
 // Pre TX state exit 
 void mtbdl_pretx_state_exit(void)
 {
@@ -2051,16 +2223,11 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
         mtbdl_tx_state_entry(); 
     }
 
+    // Check for user button input 
+    mtbdl_tx_user_input_check(mtbdl); 
+
     //==================================================
     // Checks 
-
-    // Button 1 - stops the tx state --> triggers the post tx state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->tx = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-    }
 
     // Transfer data log contents and set the tx bit if the transfer finishes 
     if (mtbdl_tx())
@@ -2126,6 +2293,32 @@ void mtbdl_tx_state_entry(void)
 }
 
 
+// TX state user button input check 
+void mtbdl_tx_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - stops the tx state --> triggers the post tx state 
+        case UI_BTN_1: 
+            mtbdl->tx = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - stops the tx state --> triggers the post tx state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->tx = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+    // }
+}
+
+
 // TX state exit 
 void mtbdl_tx_state_exit(void)
 {
@@ -2151,9 +2344,7 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
         mtbdl_posttx_state_entry(); 
     }
 
-    //==================================================
     // State exit 
-
     // Wait for a short period of time before leaving the post tx state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
@@ -2177,8 +2368,6 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
         mtbdl->noncrit_fault = CLEAR_BIT; 
         mtbdl_posttx_state_exit(); 
     }
-    
-    //==================================================
 }
 
 
@@ -2224,29 +2413,8 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
         mtbdl_precalibrate_state_entry(); 
     }
 
-    //==================================================
-    // Checks 
-
-    // Button 1 - triggers the calibration state 
-    if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
-    {
-        mtbdl->calibrate = SET_BIT; 
-        mtbdl->user_btn_1_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
-
-        // Take the MPU-6050 out of low power mode 
-        mpu6050_clear_low_power(DEVICE_ONE); 
-    }
-    
-    // Button 2 - cancels the calibration state --> triggers idle state 
-    else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
-    {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->user_btn_2_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
-    }
-    
-    //==================================================
+    // Check for user button input 
+    mtbdl_precalibrate_user_input_check(mtbdl); 
 
     //===================================================
     // LED update 
@@ -2295,6 +2463,49 @@ void mtbdl_precalibrate_state_entry(void)
 }
 
 
+// Pre-calibration state user button input check 
+void mtbdl_precalibrate_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 1 - triggers the calibration state 
+        case UI_BTN_1: 
+            mtbdl->calibrate = SET_BIT; 
+            mpu6050_clear_low_power(DEVICE_ONE);   // Take MPU-6050 out of low power mode 
+            break; 
+
+        // Button 2 - cancels the calibration state --> triggers idle state 
+        case UI_BTN_2: 
+            mtbdl->idle = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 1 - triggers the calibration state 
+    // if (debounce_pressed(mtbdl->user_btn_1) && !(mtbdl->user_btn_1_block))
+    // {
+    //     mtbdl->calibrate = SET_BIT; 
+    //     mtbdl->user_btn_1_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_7, mtbdl_led7_1); 
+
+    //     // Take the MPU-6050 out of low power mode 
+    //     mpu6050_clear_low_power(DEVICE_ONE); 
+    // }
+    
+    // // Button 2 - cancels the calibration state --> triggers idle state 
+    // else if (debounce_pressed(mtbdl->user_btn_2) && !(mtbdl->user_btn_2_block))
+    // {
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl->user_btn_2_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_6, mtbdl_led6_1); 
+    // }
+}
+
+
 // Pre-calibration state exit 
 void mtbdl_precalibrate_state_exit(void)
 {
@@ -2316,17 +2527,11 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
         mtbdl_calibrate_state_entry(); 
     }
 
-    //==================================================
     // Sample data 
-
     // This function records data that gets used to calculate the calibration values 
     mtbdl_calibrate(); 
 
-    //==================================================
-
-    //==================================================
     // State exit 
-
     // Wait until calibration is done before leaving the state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
@@ -2339,8 +2544,6 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
         mtbdl->calibrate = SET_BIT; 
         mtbdl_calibrate_state_exit(); 
     }
-    
-    //==================================================
 }
 
 
@@ -2390,9 +2593,7 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
         mtbdl_postcalibrate_state_entry(); 
     }
 
-    //===================================================
     // State exit 
-
     // Wait for a period of time before returning to the idle state 
     if (tim_compare(mtbdl->timer_nonblocking, 
                     mtbdl->delay_timer.clk_freq, 
@@ -2405,8 +2606,6 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
         mtbdl->idle = SET_BIT; 
         mtbdl_postcalibrate_state_exit(); 
     }
-
-    //===================================================
 }
 
 
@@ -2447,28 +2646,8 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
         mtbdl_lowpwr_state_entry(); 
     }
 
-    //==================================================
-    // Checks 
-    
-    // Button 4 - Turns the screen backlight on 
-    if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
-    {
-        mtbdl->user_btn_4_block = SET_BIT; 
-        hd44780u_wake_up(); 
-        mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
-    }
-
-    // If SOC is above the minimum threshold then we can exit low power state. 
-    // A button press is put here instead temporarily umtil SOC calibration has 
-    // been created. 
-    // Button 3 - triggers the idle state 
-    if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
-    {
-        mtbdl->user_btn_3_block = SET_BIT; 
-        mtbdl->low_pwr = SET_BIT; 
-    }
-
-    //===================================================
+    // Check for user button input 
+    mtbdl_lowpwr_user_input_check(mtbdl); 
     
     //===================================================
     // LED update 
@@ -2533,6 +2712,50 @@ void mtbdl_lowpwr_state_entry(void)
 }
 
 
+// Low power state user button input check 
+void mtbdl_lowpwr_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 3 - triggers the idle state 
+        // If SOC is above the minimum threshold then we can exit low power state. 
+        // A button press is put here instead temporarily umtil SOC calibration has 
+        // been created. 
+        case UI_BTN_3: 
+            mtbdl->low_pwr = SET_BIT; 
+            break; 
+
+        // Button 4 - Turns the screen backlight on 
+        case UI_BTN_4: 
+            hd44780u_wake_up(); 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 4 - Turns the screen backlight on 
+    // if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
+    // {
+    //     mtbdl->user_btn_4_block = SET_BIT; 
+    //     hd44780u_wake_up(); 
+    //     mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
+    // }
+
+    // // If SOC is above the minimum threshold then we can exit low power state. 
+    // // A button press is put here instead temporarily umtil SOC calibration has 
+    // // been created. 
+    // // Button 3 - triggers the idle state 
+    // if (debounce_pressed(mtbdl->user_btn_3) && !(mtbdl->user_btn_3_block))
+    // {
+    //     mtbdl->user_btn_3_block = SET_BIT; 
+    //     mtbdl->low_pwr = SET_BIT; 
+    // }
+}
+
+
 // Low power state exit 
 void mtbdl_lowpwr_state_exit(void)
 {
@@ -2560,18 +2783,8 @@ void mtbdl_fault_state(mtbdl_trackers_t *mtbdl)
         mtbdl_fault_state_entry(); 
     }
 
-    //==================================================
-    // Check user button input 
-
-    // Button 4 - triggers a system reset (reset state) 
-    if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
-    {
-        mtbdl->reset = SET_BIT; 
-        mtbdl->user_btn_4_block = SET_BIT; 
-        mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
-    }
-    
-    //==================================================
+    // Check for user button input 
+    mtbdl_fault_user_input_check(mtbdl); 
 
     // State exit 
     if (mtbdl->reset)
@@ -2602,6 +2815,32 @@ void mtbdl_fault_state_entry(void)
     ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
     ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
     ui_led_set(WS2812_LED_4, mtbdl_led4_1); 
+}
+
+
+// Fault state user button input check 
+void mtbdl_fault_user_input_check(mtbdl_trackers_t *mtbdl)
+{
+    mtbdl->btn_press = ui_button_press(); 
+
+    switch (mtbdl->btn_press)
+    {
+        // Button 4 - triggers a system reset (reset state) 
+        case UI_BTN_4: 
+            mtbdl->reset = SET_BIT; 
+            break; 
+
+        default: 
+            break; 
+    }
+
+    // // Button 4 - triggers a system reset (reset state) 
+    // if (debounce_pressed(mtbdl->user_btn_4) && !(mtbdl->user_btn_4_block))
+    // {
+    //     mtbdl->reset = SET_BIT; 
+    //     mtbdl->user_btn_4_block = SET_BIT; 
+    //     mtbdl_led_update(WS2812_LED_4, mtbdl_led4_1); 
+    // }
 }
 
 

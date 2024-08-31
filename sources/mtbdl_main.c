@@ -75,8 +75,8 @@ typedef void (*mtbdl_func_ptr_t)(mtbdl_trackers_t *mtbdl);
 void system_status_checks(void); 
 
 
-// Button status 
-void system_button_status(void); 
+// // Button status 
+// void system_button_status(void); 
 
 
 /**
@@ -859,23 +859,26 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
 
     //==================================================
 
-    //==================================================
     // State exit 
-
-    // Wait for a short period of time before leaving the init state 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_SLOW, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->idle = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_init_state_exit(); 
     }
 
-    //==================================================
+    // // Wait for a short period of time before leaving the init state 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_SLOW, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->delay_timer.time_start = SET_BIT; 
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl_init_state_exit(); 
+    // }
 }
 
 
@@ -960,12 +963,7 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
 
     // Check for GPS position lock - update the screen message and LED with the status 
     // Calculate the battery SOC - update the screen message with the status 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_FAST, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_FAST))
     {
         time_count += MTBDL_STATE_CHECK_FAST; 
 
@@ -988,6 +986,37 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
             time_count = CLEAR; 
         }
     }
+
+    // // Check for GPS position lock - update the screen message and LED with the status 
+    // // Calculate the battery SOC - update the screen message with the status 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_FAST, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     time_count += MTBDL_STATE_CHECK_FAST; 
+
+    //     if (time_count == MTBDL_STATE_CHECK_FAST)
+    //     {
+    //         // Turn off the GPS LED 
+    //         mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+    //     }
+    //     else if (time_count >= MTBDL_STATE_CHECK_SLOW)
+    //     {
+    //         if (m8q_get_position_navstat_lock())
+    //         {
+    //             // Turn on the GPS LED if there is a position lock 
+    //             mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+    //         }
+
+    //         // Read the battery ADC and calculate the SOC 
+
+    //         mtbdl_set_idle_msg(); 
+    //         time_count = CLEAR; 
+    //     }
+    // }
 
     //==================================================
 
@@ -1143,12 +1172,7 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
     // Checks 
 
     // Check the GPS position lock status and update the status LEDs 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_FAST, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_FAST))
     {
         time_count += MTBDL_STATE_CHECK_FAST; 
 
@@ -1180,6 +1204,45 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
             time_count = CLEAR; 
         }
     }
+
+    // // Check the GPS position lock status and update the status LEDs 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_FAST, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     time_count += MTBDL_STATE_CHECK_FAST; 
+
+    //     // GPS status and LED update 
+    //     if (time_count == MTBDL_STATE_CHECK_FAST)
+    //     {
+    //         // Turn off the GPS LED 
+    //         mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+    //     }
+    //     else if (time_count == MTBDL_STATE_CHECK_NORM)
+    //     {
+    //         // Turn on the data logging LED 
+    //         mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+    //     }
+    //     else if (time_count == (MTBDL_STATE_CHECK_NORM + MTBDL_STATE_CHECK_FAST))
+    //     {
+    //         // Turn off the data logging LED 
+    //         mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    //     }
+    //     else if (time_count >= MTBDL_STATE_CHECK_SLOW)
+    //     {
+    //         if (m8q_get_position_navstat_lock())
+    //         {
+    //             // Turn on the GPS LED if there is a GPS position lock 
+    //             mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+    //         }
+
+    //         mtbdl_set_run_prep_msg(); 
+    //         time_count = CLEAR; 
+    //     }
+    // }
 
     //==================================================
 
@@ -1274,18 +1337,25 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    // Wait for a short period of time before leaving the init state 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_SLOW, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->run = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_run_countdown_state_exit(); 
     }
+
+    // // Wait for a short period of time before leaving the init state 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_SLOW, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->delay_timer.time_start = SET_BIT; 
+    //     mtbdl->run = SET_BIT; 
+    //     mtbdl_run_countdown_state_exit(); 
+    // }
 }
 
 
@@ -1343,13 +1413,8 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
     // Check for user button input 
     mtbdl_run_user_input_check(mtbdl); 
 
-    //==================================================
-    // Record data 
-
     // Log the system data 
     mtbdl_logging(); 
-
-    //==================================================
 
     // State exit 
     if (mtbdl->run || mtbdl->fault_code)
@@ -1444,23 +1509,26 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
         mtbdl_postrun_state_entry(); 
     }
     
-    //==================================================
     // State exit 
-
-    // Wait for a short period of time before leaving the init state 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_SLOW, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->idle = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_postrun_state_exit(); 
     }
-    
-    //==================================================
+
+    // // Wait for a short period of time before leaving the init state 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_SLOW, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->delay_timer.time_start = SET_BIT; 
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl_postrun_state_exit(); 
+    // }
 }
 
 
@@ -1643,12 +1711,7 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
     // LED update 
 
     // Update the state of the LED 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_FAST, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_FAST))
     {
         mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
@@ -1662,6 +1725,27 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
             mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
+
+    // // Update the state of the LED 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_FAST, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->led_state = SET_BIT - mtbdl->led_state; 
+
+    //     // Toggle Bluetooth LED quickly while not connected 
+    //     if (mtbdl->led_state)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    //     }
+    //     else 
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    //     }
+    // }
 
     //==================================================
 
@@ -1765,12 +1849,7 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
     // LED update 
 
     // Update the state of the LED 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_NORM, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_NORM))
     {
         mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
@@ -1784,6 +1863,27 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
             mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
+
+    // // Update the state of the LED 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_NORM, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->led_state = SET_BIT - mtbdl->led_state; 
+
+    //     // Toggle Bluetooth LED slowly while connected 
+    //     if (mtbdl->led_state)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    //     }
+    //     else 
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    //     }
+    // }
 
     //==================================================
 
@@ -1894,12 +1994,7 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
     // LED update 
 
     // Update the state of the LED 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_NORM, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_NORM))
     {
         mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
@@ -1914,15 +2009,31 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
         }
     }
 
-    //==================================================
+    // // Update the state of the LED 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_NORM, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->led_state = SET_BIT - mtbdl->led_state; 
+
+    //     // Toggle Bluetooth LED slowly while connected 
+    //     if (mtbdl->led_state)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    //     }
+    //     else 
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    //     }
+    // }
 
     //==================================================
-    // Data transfer 
 
     // Read the device data 
     mtbdl_rx(); 
-
-    //==================================================
 
     // State exit 
     if (mtbdl->rx || mtbdl->fault_code)
@@ -2009,19 +2120,26 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    // Wait for a short period of time before leaving the post rx state 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_SLOW, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        // Update tracking info 
-        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->idle = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_postrx_state_exit(); 
     }
+
+    // // Wait for a short period of time before leaving the post rx state 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_SLOW, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     // Update tracking info 
+    //     mtbdl->delay_timer.time_start = SET_BIT; 
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl_postrx_state_exit(); 
+    // }
 }
 
 
@@ -2108,12 +2226,7 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
     // LED update 
 
     // Update the state of the LED 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_NORM, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_NORM))
     {
         mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
@@ -2127,6 +2240,27 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
             mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
+
+    // // Update the state of the LED 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_NORM, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->led_state = SET_BIT - mtbdl->led_state; 
+
+    //     // Toggle Bluetooth LED slowly while connected 
+    //     if (mtbdl->led_state)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    //     }
+    //     else 
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    //     }
+    // }
 
     //==================================================
 
@@ -2250,12 +2384,7 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
     // LED update 
 
     // Update the state of the LED 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_NORM, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_NORM))
     {
         mtbdl->led_state = SET_BIT - mtbdl->led_state; 
 
@@ -2269,6 +2398,27 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
             mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
+
+    // // Update the state of the LED 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_NORM, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->led_state = SET_BIT - mtbdl->led_state; 
+
+    //     // Toggle Bluetooth LED slowly while connected 
+    //     if (mtbdl->led_state)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    //     }
+    //     else 
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    //     }
+    // }
 
     //==================================================
 
@@ -2345,13 +2495,7 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    // Wait for a short period of time before leaving the post tx state 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_SLOW, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
 
@@ -2368,6 +2512,30 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
         mtbdl->noncrit_fault = CLEAR_BIT; 
         mtbdl_posttx_state_exit(); 
     }
+
+    // // Wait for a short period of time before leaving the post tx state 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_SLOW, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->delay_timer.time_start = SET_BIT; 
+
+    //     // Go back to the pre-tx state if the connection was not lost 
+    //     if (mtbdl->noncrit_fault)
+    //     {
+    //         mtbdl->idle = SET_BIT; 
+    //     }
+    //     else 
+    //     {
+    //         mtbdl->tx = SET_BIT; 
+    //     }
+
+    //     mtbdl->noncrit_fault = CLEAR_BIT; 
+    //     mtbdl_posttx_state_exit(); 
+    // }
 }
 
 
@@ -2420,12 +2588,7 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
     // LED update 
 
     // Update the state of the LED 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_NORM, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_NORM))
     {
         mtbdl->led_state++; 
 
@@ -2439,6 +2602,27 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
             mtbdl->led_state = CLEAR; 
         }
     }
+
+    // // Update the state of the LED 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_NORM, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->led_state++; 
+
+    //     if (mtbdl->led_state == MTBDL_STATE_CHECK_CNT_1)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
+    //     }
+    //     else if (mtbdl->led_state >= MTBDL_STATE_CHECK_CNT_2)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    //         mtbdl->led_state = CLEAR; 
+    //     }
+    // }
 
     //==================================================
 
@@ -2532,18 +2716,25 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
     mtbdl_calibrate(); 
 
     // State exit 
-    // Wait until calibration is done before leaving the state 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_SLOW, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->calibrate = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_calibrate_state_exit(); 
     }
+
+    // // Wait until calibration is done before leaving the state 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_SLOW, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->delay_timer.time_start = SET_BIT; 
+    //     mtbdl->calibrate = SET_BIT; 
+    //     mtbdl_calibrate_state_exit(); 
+    // }
 }
 
 
@@ -2594,18 +2785,25 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    // Wait for a period of time before returning to the idle state 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_SLOW, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->idle = SET_BIT; 
+        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_postcalibrate_state_exit(); 
     }
+
+    // // Wait for a period of time before returning to the idle state 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_SLOW, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->delay_timer.time_start = SET_BIT; 
+    //     mtbdl->idle = SET_BIT; 
+    //     mtbdl_postcalibrate_state_exit(); 
+    // }
 }
 
 
@@ -2653,12 +2851,7 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
     // LED update 
 
     // Update the state of the LED 
-    if (tim_compare(mtbdl->timer_nonblocking, 
-                    mtbdl->delay_timer.clk_freq, 
-                    MTBDL_STATE_CHECK_NORM, 
-                    &mtbdl->delay_timer.time_cnt_total, 
-                    &mtbdl->delay_timer.time_cnt, 
-                    &mtbdl->delay_timer.time_start))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_NORM))
     {
         mtbdl->led_state++; 
 
@@ -2672,6 +2865,27 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
             mtbdl->led_state = CLEAR; 
         }
     }
+
+    // // Update the state of the LED 
+    // if (tim_compare(mtbdl->timer_nonblocking, 
+    //                 mtbdl->delay_timer.clk_freq, 
+    //                 MTBDL_STATE_CHECK_NORM, 
+    //                 &mtbdl->delay_timer.time_cnt_total, 
+    //                 &mtbdl->delay_timer.time_cnt, 
+    //                 &mtbdl->delay_timer.time_start))
+    // {
+    //     mtbdl->led_state++; 
+
+    //     if (mtbdl->led_state == MTBDL_STATE_CHECK_CNT_2)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+    //     }
+    //     else if (mtbdl->led_state >= MTBDL_STATE_CHECK_CNT_3)
+    //     {
+    //         mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+    //         mtbdl->led_state = CLEAR; 
+    //     }
+    // }
 
     //==================================================
 
@@ -2891,6 +3105,42 @@ void mtbdl_reset_state_exit(void)
 {
     // Reset devices 
     hw125_set_reset_flag(); 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// LEDs 
+
+// *** This should be moved to the UI module *** 
+// void 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Timing 
+
+// *** Consider adding a timer module *** 
+
+// Non-blocking delay 
+uint8_t mtbdl_nonblocking_delay(
+    mtbdl_trackers_t *mtbdl, 
+    uint32_t delay_time)
+{
+    // Wait for a short period of time before leaving the init state 
+    if (tim_compare(mtbdl->timer_nonblocking, 
+                    mtbdl->delay_timer.clk_freq, 
+                    delay_time, 
+                    &mtbdl->delay_timer.time_cnt_total, 
+                    &mtbdl->delay_timer.time_cnt, 
+                    &mtbdl->delay_timer.time_start))
+    {
+        return TRUE; 
+    }
+
+    return FALSE; 
 }
 
 //=======================================================================================

@@ -80,17 +80,16 @@ typedef struct mtbdl_trackers_s
     // Modules 
     mtbdl_data_t data_logging; 
     mtbdl_params_t sys_params; 
-    mtbdl_ui_t user_interface; 
 
-    // User buttons 
-    uint8_t user_btn_1;                         // User button 1 pin number 
-    uint8_t user_btn_2;                         // User button 2 pin number 
-    uint8_t user_btn_3;                         // User button 3 pin number 
-    uint8_t user_btn_4;                         // User button 4 pin number 
-    uint8_t user_btn_1_block : 1;               // Stops repeated actions on btn 1 press 
-    uint8_t user_btn_2_block : 1;               // Stops repeated actions on btn 2 press 
-    uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
-    uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
+    // // User buttons 
+    // uint8_t user_btn_1;                         // User button 1 pin number 
+    // uint8_t user_btn_2;                         // User button 2 pin number 
+    // uint8_t user_btn_3;                         // User button 3 pin number 
+    // uint8_t user_btn_4;                         // User button 4 pin number 
+    // uint8_t user_btn_1_block : 1;               // Stops repeated actions on btn 1 press 
+    // uint8_t user_btn_2_block : 1;               // Stops repeated actions on btn 2 press 
+    // uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
+    // uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
 
     ui_btn_num_t btn_press; 
 

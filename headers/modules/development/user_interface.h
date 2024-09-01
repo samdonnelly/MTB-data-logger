@@ -55,9 +55,10 @@ typedef struct mtbdl_ui_s
     uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
     uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
 
-    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
-    uint32_t led_colour_data[WS2812_LED_NUM]; 
-    uint32_t led_colours[WS2812_LED_NUM]; 
+    // LEDs - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+    uint32_t led_colours[WS2812_LED_NUM];       // LED colours 
+    uint32_t led_colour_data[WS2812_LED_NUM];   // LED write buffer 
+    uint16_t led_counter; 
 }
 mtbdl_ui_t; 
 

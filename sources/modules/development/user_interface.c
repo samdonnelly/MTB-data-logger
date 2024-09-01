@@ -84,7 +84,12 @@ void ui_button_update(void)
     if (handler_flags.tim1_up_tim10_glbl_flag)
     {
         handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
+
+        // Update user button input status 
         debounce((uint8_t)gpio_port_read(mtbdl_ui.user_btn_port)); 
+
+        // Update LED timing counter 
+        mtbdl_ui.led_counter++; 
     }
 }
 
@@ -169,6 +174,39 @@ void ui_button_release(void)
 
 //=======================================================================================
 // Output - screen, TX mode, LEDs 
+
+// 
+void ui_led_flash(
+    ws2812_led_index_t led_num, 
+    uint32_t count_time, 
+    uint8_t duty, 
+    uint8_t period)
+{
+    static uint8_t counter = 0; 
+
+    // if (mtbdl_nonblocking_delay(mtbdl, count_time))
+    if (1)
+    {
+        if (counter == 0)
+        {
+            // Turn LED on 
+            // ui_led_update(led_num, mtbdl_led_clear); 
+        }
+        else if (counter == duty)
+        {
+            // Turn LED off 
+            ui_led_update(led_num, mtbdl_led_clear); 
+        }
+        else if (counter >= period)
+        {
+            // Reset counter 
+            counter = ~0; 
+        }
+
+        counter++; 
+    }
+}
+
 
 // LED colour update 
 void ui_led_update(

@@ -3114,7 +3114,34 @@ void mtbdl_reset_state_exit(void)
 // LEDs 
 
 // *** This should be moved to the UI module *** 
-// void 
+
+void ui_led_flash(
+    mtbdl_trackers_t *mtbdl, 
+    uint32_t count_time, 
+    uint8_t duty, 
+    uint8_t period)
+{
+    static uint8_t counter = 0; 
+
+    if (mtbdl_nonblocking_delay(mtbdl, count_time))
+    {
+        counter++; 
+
+        if (counter == 0)
+        {
+            // Turn LED on 
+        }
+        else if (counter == duty)
+        {
+            // Turn LED off 
+        }
+        else if (counter == period)
+        {
+            // Reset counter 
+            counter = 0; 
+        }
+    }
+}
 
 //=======================================================================================
 

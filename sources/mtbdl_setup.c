@@ -364,11 +364,11 @@ void mtbdl_init()
     memset((void *)mtbdl_trackers.msg, CLEAR, sizeof(mtbdl_trackers.msg)); 
     mtbdl_trackers.msg_len = CLEAR; 
 
-    // User buttons 
-    mtbdl_trackers.user_btn_1 = (uint8_t)GPIOX_PIN_0; 
-    mtbdl_trackers.user_btn_2 = (uint8_t)GPIOX_PIN_1; 
-    mtbdl_trackers.user_btn_3 = (uint8_t)GPIOX_PIN_2; 
-    mtbdl_trackers.user_btn_4 = (uint8_t)GPIOX_PIN_3; 
+    // // User buttons 
+    // mtbdl_trackers.user_btn_1 = (uint8_t)GPIOX_PIN_0; 
+    // mtbdl_trackers.user_btn_2 = (uint8_t)GPIOX_PIN_1; 
+    // mtbdl_trackers.user_btn_3 = (uint8_t)GPIOX_PIN_2; 
+    // mtbdl_trackers.user_btn_4 = (uint8_t)GPIOX_PIN_3; 
 
     // State flags 
     mtbdl_trackers.init = SET_BIT; 

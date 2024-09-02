@@ -23,6 +23,14 @@
 
 
 //=======================================================================================
+// Macros 
+
+#define UI_LED_COUNTER_PERIOD 200 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Variables 
 
 static mtbdl_ui_t mtbdl_ui; 
@@ -77,10 +85,9 @@ void ui_init(
 //=======================================================================================
 // Input - buttons, RX mode 
 
-// Button status update 
-void ui_button_update(void)
+// User interface update 
+void ui_status_update(void)
 {
-    // Update user input button status 
     if (handler_flags.tim1_up_tim10_glbl_flag)
     {
         handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
@@ -89,7 +96,8 @@ void ui_button_update(void)
         debounce((uint8_t)gpio_port_read(mtbdl_ui.user_btn_port)); 
 
         // Update LED timing counter 
-        mtbdl_ui.led_counter++; 
+        mtbdl_ui.led_counter = (mtbdl_ui.led_counter > UI_LED_COUNTER_PERIOD) ? 
+                               CLEAR : mtbdl_ui.led_counter + 1; 
     }
 }
 
@@ -178,32 +186,21 @@ void ui_button_release(void)
 // 
 void ui_led_flash(
     ws2812_led_index_t led_num, 
-    uint32_t count_time, 
-    uint8_t duty, 
-    uint8_t period)
+    uint8_t duty)
 {
-    static uint8_t counter = 0; 
+    static uint8_t block = 0; 
 
-    // if (mtbdl_nonblocking_delay(mtbdl, count_time))
-    if (1)
+    if ((mtbdl_ui.led_counter < duty) && !block)
     {
-        if (counter == 0)
-        {
-            // Turn LED on 
-            // ui_led_update(led_num, mtbdl_led_clear); 
-        }
-        else if (counter == duty)
-        {
-            // Turn LED off 
-            ui_led_update(led_num, mtbdl_led_clear); 
-        }
-        else if (counter >= period)
-        {
-            // Reset counter 
-            counter = ~0; 
-        }
-
-        counter++; 
+        // Turn LED on 
+        ui_led_update(led_num, mtbdl_ui.led_colours[led_num]); 
+        block = SET_BIT; 
+    }
+    else if ((mtbdl_ui.led_counter >= duty) && block)
+    {
+        // Turn LED off 
+        ui_led_update(led_num, mtbdl_led_clear); 
+        block = CLEAR_BIT; 
     }
 }
 

@@ -93,7 +93,7 @@ void ui_init(
 /**
  * @brief Button status update 
  */
-void ui_button_update(void); 
+void ui_status_update(void); 
 
 
 /**

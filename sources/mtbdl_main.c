@@ -500,8 +500,8 @@ void mtbdl_app(void)
     // System status checks 
     system_status_checks(); 
 
-    // Button status 
-    ui_button_update(); 
+    // UI update 
+    ui_status_update(); 
     ui_button_release(); 
     // system_button_status(); 
 

@@ -502,6 +502,7 @@ void mtbdl_app(void)
 
     // UI update 
     ui_status_update(); 
+    mtbdl_trackers.btn_press = ui_button_press(); 
     ui_button_release(); 
     // system_button_status(); 
 
@@ -844,9 +845,6 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
     // Check for user button input 
     mtbdl_init_user_input_check(mtbdl); 
 
-    //==================================================
-    // Checks 
-
     // Wait for the SD card to be mounted then access the file system 
     if (hw125_get_state() == HW125_ACCESS_STATE)
     {
@@ -856,8 +854,6 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
         // Set up the file structure and system info 
         mtbdl_file_sys_setup(); 
     }
-
-    //==================================================
 
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
@@ -889,21 +885,20 @@ void mtbdl_init_state_entry(void)
     hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
 
     // Turn on the init state LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_3); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_3); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led2_3); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led4_1); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led4_1); 
 }
 
 
 // Init state user button input check 
 void mtbdl_init_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 4 - Re-initialize the screen if it doesn't work 
@@ -935,7 +930,8 @@ void mtbdl_init_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Turn off the init state LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -970,14 +966,16 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
         if (time_count == MTBDL_STATE_CHECK_FAST)
         {
             // Turn off the GPS LED 
-            mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
         }
         else if (time_count >= MTBDL_STATE_CHECK_SLOW)
         {
             if (m8q_get_position_navstat_lock())
             {
                 // Turn on the GPS LED if there is a position lock 
-                mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+                // mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+                ui_led_colour_change(WS2812_LED_1, mtbdl_led1_1); 
             }
 
             // Read the battery ADC and calculate the SOC 
@@ -1047,18 +1045,16 @@ void mtbdl_idle_state_entry(void)
     mpu6050_set_low_power(DEVICE_ONE); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_set(WS2812_LED_5, mtbdl_led5_1); 
-    ui_led_set(WS2812_LED_4, mtbdl_led4_1); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led5_1); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led4_1); 
 }
 
 
 // Idle state user button input check 
 void mtbdl_idle_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - triggers the pre run state 
@@ -1128,7 +1124,8 @@ void mtbdl_idle_state_exit(void)
     hd44780u_clear_pwr_save_flag(); 
 
     // Turn off the GPS LED 
-    mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1180,24 +1177,28 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
         if (time_count == MTBDL_STATE_CHECK_FAST)
         {
             // Turn off the GPS LED 
-            mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
         }
         else if (time_count == MTBDL_STATE_CHECK_NORM)
         {
             // Turn on the data logging LED 
-            mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+            // mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+            ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
         }
         else if (time_count == (MTBDL_STATE_CHECK_NORM + MTBDL_STATE_CHECK_FAST))
         {
             // Turn off the data logging LED 
-            mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
         }
         else if (time_count >= MTBDL_STATE_CHECK_SLOW)
         {
             if (m8q_get_position_navstat_lock())
             {
                 // Turn on the GPS LED if there is a GPS position lock 
-                mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+                // mtbdl_led_update(WS2812_LED_1, mtbdl_led1_1); 
+                ui_led_colour_change(WS2812_LED_1, mtbdl_led1_1); 
             }
 
             mtbdl_set_run_prep_msg(); 
@@ -1260,18 +1261,16 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_run_prep_state_entry(void)
 {
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // Pre-run state user button input check 
 void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - triggers the run state 
@@ -1317,8 +1316,10 @@ void mtbdl_run_prep_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Make sure the data logging and GPS LEDs are off 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
-    mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1366,7 +1367,8 @@ void mtbdl_run_countdown_state_entry(void)
     hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
 
     // Turn on the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+    ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
 
     // SD card will be written to constantly so no need for the check state 
     hw125_clear_check_flag(); 
@@ -1375,10 +1377,10 @@ void mtbdl_run_countdown_state_entry(void)
     mpu6050_clear_low_power(DEVICE_ONE); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
@@ -1389,7 +1391,8 @@ void mtbdl_run_countdown_state_exit(void)
     hd44780u_set_low_pwr_flag(); 
 
     // Turn off the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
 
     // Prep the logging data 
     mtbdl_log_data_prep(); 
@@ -1430,18 +1433,16 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_run_state_entry(void)
 {
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // Run state user button input check 
 void mtbdl_run_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - stops the run state --> triggers the post run state 
@@ -1500,7 +1501,8 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
         }
 
         // Turn on the data logging LED 
-        mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+        // mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+        ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
 
         hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
         mtbdl->noncrit_fault = CLEAR_BIT; 
@@ -1536,10 +1538,10 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_postrun_state_entry(void)
 {
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
@@ -1550,13 +1552,15 @@ void mtbdl_postrun_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Turn off the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
+    ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
 
     // Set the SD card controller check flag 
     hw125_set_check_flag(); 
 
     // Turn off the data logging LED 
-    mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1592,18 +1596,16 @@ void mtbdl_data_select_state_entry(void)
     hd44780u_set_msg(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_set(WS2812_LED_5, mtbdl_led5_1); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led5_1); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // Data selection state user button input check 
 void mtbdl_data_select_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - triggers the pre receive (RX) state 
@@ -1710,6 +1712,9 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
     //===================================================
     // LED update 
 
+    // 
+    ui_led_state_update(WS2812_LED_2); 
+
     // Update the state of the LED 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_FAST))
     {
@@ -1718,11 +1723,13 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
         // Toggle Bluetooth LED quickly while not connected 
         if (mtbdl->led_state)
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
         }
         else 
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
 
@@ -1769,18 +1776,16 @@ void mtbdl_dev_search_state_entry(void)
     hc05_on(); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // Device search state user button input check 
 void mtbdl_dev_search_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - triggers the idle state - cancels device search 
@@ -1809,7 +1814,8 @@ void mtbdl_dev_search_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Make sure Bluetooth LED is off 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1856,11 +1862,13 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
         }
         else 
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
 
@@ -1904,18 +1912,16 @@ void mtbdl_prerx_state_entry(void)
     hd44780u_set_msg(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // Pre-RX state user button input check 
 void mtbdl_prerx_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - triggers the rx state 
@@ -2001,11 +2007,13 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
         }
         else 
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
 
@@ -2055,18 +2063,16 @@ void mtbdl_rx_state_entry(void)
     mtbdl_rx_prep(); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // RX state user button input check 
 void mtbdl_rx_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - stops the rx state --> triggers the post rx state 
@@ -2147,16 +2153,17 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_postrx_state_entry(void)
 {
     // Turn on the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
 
     // Save the parameters to file and update tracking info 
     mtbdl_write_bike_params(HW125_MODE_OEW); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
@@ -2167,7 +2174,8 @@ void mtbdl_postrx_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Turn off the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -2233,11 +2241,13 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
         }
         else 
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
 
@@ -2278,18 +2288,16 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_pretx_state_entry(void)
 {
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // Pre-TX state user button input check 
 void mtbdl_pretx_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - triggers the tx state 
@@ -2334,7 +2342,8 @@ void mtbdl_pretx_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Clear the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -2391,11 +2400,13 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
         // Toggle Bluetooth LED slowly while connected 
         if (mtbdl->led_state)
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
         }
         else 
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
         }
     }
 
@@ -2436,18 +2447,16 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_tx_state_entry(void)
 {
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // TX state user button input check 
 void mtbdl_tx_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - stops the tx state --> triggers the post tx state 
@@ -2543,16 +2552,17 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_posttx_state_entry(void)
 {
     // Turn on the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_1); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
 
     // End the transaction 
     mtbdl_tx_end(); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
@@ -2563,7 +2573,8 @@ void mtbdl_posttx_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Turn off the Bluetooth LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -2594,11 +2605,13 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
 
         if (mtbdl->led_state == MTBDL_STATE_CHECK_CNT_1)
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led2_2); 
         }
         else if (mtbdl->led_state >= MTBDL_STATE_CHECK_CNT_2)
         {
-            mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
             mtbdl->led_state = CLEAR; 
         }
     }
@@ -2640,18 +2653,16 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_precalibrate_state_entry(void)
 {
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
 // Pre-calibration state user button input check 
 void mtbdl_precalibrate_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 1 - triggers the calibration state 
@@ -2748,13 +2759,14 @@ void mtbdl_calibrate_state_entry(void)
     mtbdl_cal_prep(); 
 
     // Turn on the calibration LED 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_2); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led2_2); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
@@ -2766,7 +2778,8 @@ void mtbdl_calibrate_state_exit(void)
 
     // Clear the calibration state message and turn off the calibration LED 
     hd44780u_set_clear_flag(); 
-    mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -2815,10 +2828,10 @@ void mtbdl_postcalibrate_state_entry(void)
     mtbdl_write_sys_params(HW125_MODE_OEW); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
@@ -2857,11 +2870,13 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
 
         if (mtbdl->led_state == MTBDL_STATE_CHECK_CNT_2)
         {
-            mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+            // mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+            ui_led_colour_change(WS2812_LED_3, mtbdl_led3_1); 
         }
         else if (mtbdl->led_state >= MTBDL_STATE_CHECK_CNT_3)
         {
-            mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+            // mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+            ui_led_colour_change(WS2812_LED_3, mtbdl_led_clear); 
             mtbdl->led_state = CLEAR; 
         }
     }
@@ -2919,18 +2934,16 @@ void mtbdl_lowpwr_state_entry(void)
     hc05_off(); 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led5_1); 
-    ui_led_set(WS2812_LED_4, mtbdl_led4_1); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led5_1); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led4_1); 
 }
 
 
 // Low power state user button input check 
 void mtbdl_lowpwr_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 3 - triggers the idle state 
@@ -2979,7 +2992,8 @@ void mtbdl_lowpwr_state_exit(void)
     m8q_clear_low_pwr_flag(); 
 
     // Make sure the low power LED if off 
-    mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_3, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -3018,25 +3032,24 @@ void mtbdl_fault_state_entry(void)
     hd44780u_clear_pwr_save_flag(); 
 
     // Turn on the fault status LED 
-    mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+    // mtbdl_led_update(WS2812_LED_3, mtbdl_led3_1); 
+    ui_led_colour_change(WS2812_LED_3, mtbdl_led3_1); 
 
     // Record the fault code in a log 
 
     // Stop any existing processes - assess each state case 
 
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led4_1); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led4_1); 
 }
 
 
 // Fault state user button input check 
 void mtbdl_fault_user_input_check(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->btn_press = ui_button_press(); 
-
     switch (mtbdl->btn_press)
     {
         // Button 4 - triggers a system reset (reset state) 
@@ -3062,7 +3075,8 @@ void mtbdl_fault_user_input_check(mtbdl_trackers_t *mtbdl)
 void mtbdl_fault_state_exit(void)
 {
     // Turn off the fault status LED 
-    mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_3, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_3, mtbdl_led_clear); 
 
     // Clear the fault state message 
     hd44780u_set_clear_flag(); 
@@ -3093,10 +3107,10 @@ void mtbdl_reset_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_reset_state_entry(void)
 {
     // Set user button LED colours 
-    ui_led_set(WS2812_LED_7, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_set(WS2812_LED_4, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
 }
 
 
@@ -3105,42 +3119,6 @@ void mtbdl_reset_state_exit(void)
 {
     // Reset devices 
     hw125_set_reset_flag(); 
-}
-
-//=======================================================================================
-
-
-//=======================================================================================
-// LEDs 
-
-// *** This should be moved to the UI module *** 
-
-void ui_led_flash(
-    mtbdl_trackers_t *mtbdl, 
-    uint32_t count_time, 
-    uint8_t duty, 
-    uint8_t period)
-{
-    static uint8_t counter = 0; 
-
-    if (mtbdl_nonblocking_delay(mtbdl, count_time))
-    {
-        counter++; 
-
-        if (counter == 0)
-        {
-            // Turn LED on 
-        }
-        else if (counter == duty)
-        {
-            // Turn LED off 
-        }
-        else if (counter == period)
-        {
-            // Reset counter 
-            counter = 0; 
-        }
-    }
 }
 
 //=======================================================================================

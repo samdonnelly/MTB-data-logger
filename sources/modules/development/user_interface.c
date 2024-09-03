@@ -25,7 +25,11 @@
 //=======================================================================================
 // Macros 
 
-#define UI_LED_COUNTER_PERIOD 200 
+#define UI_LED_COUNTER_PERIOD 200   // 5ms interrupt * 200 == 1s counter period 
+#define UI_LED_WRITE_PERIOD 10      // 5ms interrupt * 10 == 50ms write period 
+
+#define UI_LED_DUTY_SHORT 20        // 5ms interrupt * 20 == 100ms duty cycle 
+#define UI_LED_DUTY_LONG 100        // 5ms interrupt * 100 == 500ms duty cycle 
 
 //=======================================================================================
 
@@ -34,6 +38,15 @@
 // Variables 
 
 static mtbdl_ui_t mtbdl_ui; 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Prototypes 
+
+// Update the LED output 
+void ui_led_update(void); 
 
 //=======================================================================================
 
@@ -64,6 +77,21 @@ void ui_init(
     mtbdl_ui.user_btn_3_block = CLEAR_BIT; 
     mtbdl_ui.user_btn_4_block = CLEAR_BIT; 
 
+    // LED colour data 
+    memset((void *)mtbdl_ui.led_colours, CLEAR, sizeof(mtbdl_ui.led_colours)); 
+    memset((void *)mtbdl_ui.led_write_data, CLEAR, sizeof(mtbdl_ui.led_write_data)); 
+    mtbdl_ui.led_counter = CLEAR; 
+
+    // Initialize blinking LED info 
+    mtbdl_ui.led_state[WS2812_LED_0] = 
+        (mtbdl_ui_led_blink_t){ WS2812_LED_0, UI_LED_DUTY_SHORT, CLEAR }; 
+    mtbdl_ui.led_state[WS2812_LED_1] = 
+        (mtbdl_ui_led_blink_t){ WS2812_LED_1, UI_LED_DUTY_SHORT, CLEAR }; 
+    mtbdl_ui.led_state[WS2812_LED_2] = 
+        (mtbdl_ui_led_blink_t){ WS2812_LED_2, UI_LED_DUTY_SHORT, CLEAR }; 
+    mtbdl_ui.led_state[WS2812_LED_3] = 
+        (mtbdl_ui_led_blink_t){ WS2812_LED_3, UI_LED_DUTY_SHORT, CLEAR }; 
+
     // Configure the GPIO inputs for each user button 
     gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_1, 
                   MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
@@ -83,11 +111,12 @@ void ui_init(
 
 
 //=======================================================================================
-// Input - buttons, RX mode 
+// Device update 
 
 // User interface update 
 void ui_status_update(void)
 {
+    // 5ms interrupt 
     if (handler_flags.tim1_up_tim10_glbl_flag)
     {
         handler_flags.tim1_up_tim10_glbl_flag = CLEAR; 
@@ -95,12 +124,16 @@ void ui_status_update(void)
         // Update user button input status 
         debounce((uint8_t)gpio_port_read(mtbdl_ui.user_btn_port)); 
 
-        // Update LED timing counter 
-        mtbdl_ui.led_counter = (mtbdl_ui.led_counter > UI_LED_COUNTER_PERIOD) ? 
-                               CLEAR : mtbdl_ui.led_counter + 1; 
+        // Update LED timing and output 
+        ui_led_update(); 
     }
 }
 
+//=======================================================================================
+
+
+//=======================================================================================
+// Input - buttons, RX mode 
 
 // Button press check 
 ui_btn_num_t ui_button_press(void)
@@ -111,7 +144,7 @@ ui_btn_num_t ui_button_press(void)
     if (debounce_pressed(mtbdl_ui.user_btn_1) && !mtbdl_ui.user_btn_1_block)
     {
         mtbdl_ui.user_btn_1_block = SET_BIT; 
-        ui_led_update(WS2812_LED_7, mtbdl_ui.led_colours[WS2812_LED_7]); 
+        ui_led_colour_change(WS2812_LED_7, mtbdl_ui.led_colours[WS2812_LED_7]); 
         btn_num = UI_BTN_1; 
     }
     
@@ -119,7 +152,7 @@ ui_btn_num_t ui_button_press(void)
     else if (debounce_pressed(mtbdl_ui.user_btn_2) && !mtbdl_ui.user_btn_2_block)
     {
         mtbdl_ui.user_btn_2_block = SET_BIT; 
-        ui_led_update(WS2812_LED_6, mtbdl_ui.led_colours[WS2812_LED_6]); 
+        ui_led_colour_change(WS2812_LED_6, mtbdl_ui.led_colours[WS2812_LED_6]); 
         btn_num = UI_BTN_2; 
     }
     
@@ -127,7 +160,7 @@ ui_btn_num_t ui_button_press(void)
     else if (debounce_pressed(mtbdl_ui.user_btn_3) && !mtbdl_ui.user_btn_3_block)
     {
         mtbdl_ui.user_btn_3_block = SET_BIT; 
-        ui_led_update(WS2812_LED_5, mtbdl_ui.led_colours[WS2812_LED_5]); 
+        ui_led_colour_change(WS2812_LED_5, mtbdl_ui.led_colours[WS2812_LED_5]); 
         btn_num = UI_BTN_3; 
     }
     
@@ -135,7 +168,7 @@ ui_btn_num_t ui_button_press(void)
     else if (debounce_pressed(mtbdl_ui.user_btn_4) && !mtbdl_ui.user_btn_4_block)
     {
         mtbdl_ui.user_btn_4_block = SET_BIT; 
-        ui_led_update(WS2812_LED_4, mtbdl_ui.led_colours[WS2812_LED_4]); 
+        ui_led_colour_change(WS2812_LED_4, mtbdl_ui.led_colours[WS2812_LED_4]); 
         btn_num = UI_BTN_4; 
     }
 
@@ -152,28 +185,28 @@ void ui_button_release(void)
     if (debounce_released(mtbdl_ui.user_btn_1) && mtbdl_ui.user_btn_1_block)
     {
         mtbdl_ui.user_btn_1_block = CLEAR; 
-        ui_led_update(WS2812_LED_7, mtbdl_led_clear); 
+        ui_led_colour_change(WS2812_LED_7, mtbdl_led_clear); 
     }
     
     // Button 2 
     if (debounce_released(mtbdl_ui.user_btn_2) && mtbdl_ui.user_btn_2_block)
     {
         mtbdl_ui.user_btn_2_block = CLEAR; 
-        ui_led_update(WS2812_LED_6, mtbdl_led_clear); 
+        ui_led_colour_change(WS2812_LED_6, mtbdl_led_clear); 
     }
     
     // Button 3 
     if (debounce_released(mtbdl_ui.user_btn_3) && mtbdl_ui.user_btn_3_block)
     {
         mtbdl_ui.user_btn_3_block = CLEAR; 
-        ui_led_update(WS2812_LED_5, mtbdl_led_clear); 
+        ui_led_colour_change(WS2812_LED_5, mtbdl_led_clear); 
     }
     
     // Button 4 
     if (debounce_released(mtbdl_ui.user_btn_4) && mtbdl_ui.user_btn_4_block)
     {
         mtbdl_ui.user_btn_4_block = CLEAR; 
-        ui_led_update(WS2812_LED_4, mtbdl_led_clear); 
+        ui_led_colour_change(WS2812_LED_4, mtbdl_led_clear); 
     }
 }
 
@@ -181,37 +214,50 @@ void ui_button_release(void)
 
 
 //=======================================================================================
-// Output - screen, TX mode, LEDs 
+// Output - LEDs, screen, TX mode 
 
-// 
-void ui_led_flash(
-    ws2812_led_index_t led_num, 
-    uint8_t duty)
+// Update the LED output 
+void ui_led_update(void)
 {
-    static uint8_t block = 0; 
+    static uint8_t led_write_counter = CLEAR; 
 
-    if ((mtbdl_ui.led_counter < duty) && !block)
+    // Update LED timing counter 
+    if (mtbdl_ui.led_counter++ > UI_LED_COUNTER_PERIOD)
     {
-        // Turn LED on 
-        ui_led_update(led_num, mtbdl_ui.led_colours[led_num]); 
-        block = SET_BIT; 
+        mtbdl_ui.led_counter = CLEAR; 
     }
-    else if ((mtbdl_ui.led_counter >= duty) && block)
+
+    // Update the LED output periodically 
+    if (led_write_counter++ == UI_LED_WRITE_PERIOD)
     {
-        // Turn LED off 
-        ui_led_update(led_num, mtbdl_led_clear); 
-        block = CLEAR_BIT; 
+        ws2812_send(DEVICE_ONE, mtbdl_ui.led_write_data); 
+        led_write_counter = CLEAR; 
     }
 }
 
 
-// LED colour update 
-void ui_led_update(
-    ws2812_led_index_t led_num, 
-    uint32_t colour)
+// Change the state of the LED 
+void ui_led_state_update(ws2812_led_index_t led_num)
 {
-    mtbdl_ui.led_colour_data[led_num] = colour; 
-    ws2812_send(DEVICE_ONE, mtbdl_ui.led_colour_data); 
+    if (led_num > WS2812_LED_3)
+    {
+        return; 
+    }
+
+    mtbdl_ui_led_blink_t led = mtbdl_ui.led_state[led_num]; 
+
+    if ((mtbdl_ui.led_counter < led.duty_cycle) && !led.update_blocker)
+    {
+        // Set the LED colour 
+        ui_led_colour_change(led.led_num, mtbdl_ui.led_colours[led.led_num]); 
+        led.update_blocker = SET_BIT; 
+    }
+    else if ((mtbdl_ui.led_counter >= led.duty_cycle) && led.update_blocker)
+    {
+        // Clear the LED colour 
+        ui_led_colour_change(led.led_num, mtbdl_led_clear); 
+        led.update_blocker = CLEAR_BIT; 
+    }
 }
 
 //=======================================================================================
@@ -220,12 +266,33 @@ void ui_led_update(
 //=======================================================================================
 // Setters 
 
-// LED colour set 
-void ui_led_set(
+// Store the LED colour to use 
+void ui_led_colour_set(
     ws2812_led_index_t led_num, 
     uint32_t colour)
 {
     mtbdl_ui.led_colours[led_num] = colour; 
+}
+
+
+// Change the LED colour to write next 
+void ui_led_colour_change(
+    ws2812_led_index_t led_num, 
+    uint32_t colour)
+{
+    mtbdl_ui.led_write_data[led_num] = colour; 
+}
+
+
+// Update the blinking LED duty cycle 
+void ui_led_duty_set(
+    ws2812_led_index_t led_num, 
+    uint8_t duty_cycle)
+{
+    if (led_num <= WS2812_LED_3)
+    {
+        mtbdl_ui.led_state[led_num].duty_cycle = duty_cycle; 
+    }
 }
 
 //=======================================================================================

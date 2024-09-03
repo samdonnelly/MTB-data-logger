@@ -24,7 +24,7 @@
 
 
 //=======================================================================================
-// 
+// Enums 
 
 typedef enum {
     UI_BTN_NONE, 
@@ -39,6 +39,16 @@ typedef enum {
 
 //=======================================================================================
 // Structures 
+
+// LED blink record 
+typedef struct mtbdl_ui_led_blink_s 
+{
+    ws2812_led_index_t led_num; 
+    uint8_t duty_cycle; 
+    uint8_t update_blocker; 
+}
+mtbdl_ui_led_blink_t; 
+
 
 // User interface data record 
 typedef struct mtbdl_ui_s 
@@ -57,8 +67,9 @@ typedef struct mtbdl_ui_s
 
     // LEDs - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
     uint32_t led_colours[WS2812_LED_NUM];       // LED colours 
-    uint32_t led_colour_data[WS2812_LED_NUM];   // LED write buffer 
+    uint32_t led_write_data[WS2812_LED_NUM];    // LED write buffer 
     uint16_t led_counter; 
+    mtbdl_ui_led_blink_t led_state[WS2812_LED_NUM]; 
 }
 mtbdl_ui_t; 
 
@@ -70,6 +81,11 @@ mtbdl_ui_t;
 
 /**
  * @brief User interface init 
+ * 
+ * @details 
+ *          
+ *          The button pins must be pins 0-7. Anything higher will be truncated. This 
+ *          happens due to the switch debounce driver data size. 
  * 
  * @param btn_port 
  * @param btn1 
@@ -88,13 +104,18 @@ void ui_init(
 
 
 //=======================================================================================
-// Input functions 
+// Device update 
 
 /**
  * @brief Button status update 
  */
 void ui_status_update(void); 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// User buttons & RX mode 
 
 /**
  * @brief Button press check 
@@ -108,6 +129,32 @@ ui_btn_num_t ui_button_press(void);
  * @brief Button release check 
  */
 void ui_button_release(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// LEDs, screen & TX mode 
+
+// Change the state of the LED 
+void ui_led_state_update(ws2812_led_index_t led); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Setters 
+
+// Store the LED colour to use 
+void ui_led_colour_set(
+    ws2812_led_index_t led_num, 
+    uint32_t colour); 
+
+
+// Change the LED colour to write next 
+void ui_led_colour_change(
+    ws2812_led_index_t led_num, 
+    uint32_t colour); 
 
 //=======================================================================================
 

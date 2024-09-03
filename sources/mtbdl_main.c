@@ -885,8 +885,8 @@ void mtbdl_init_state_entry(void)
     hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
 
     // Turn on the init state LED 
-    // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_3); 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led2_3); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led2_3); 
 
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
@@ -1712,7 +1712,7 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
     //===================================================
     // LED update 
 
-    // 
+    // LED update 
     ui_led_state_update(WS2812_LED_2); 
 
     // Update the state of the LED 
@@ -1774,6 +1774,8 @@ void mtbdl_dev_search_state_entry(void)
 
     // Take the HC-05 out of low power mode 
     hc05_on(); 
+
+    // Set the Bluetooth LED colour and blink rate 
 
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 

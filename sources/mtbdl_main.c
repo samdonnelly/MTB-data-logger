@@ -893,6 +893,11 @@ void mtbdl_init_state_entry(void)
     ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
     ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
     ui_led_colour_set(WS2812_LED_4, mtbdl_led4_1); 
+
+    // Set the other LED colours 
+    ui_led_colour_set(WS2812_LED_0, mtbdl_led0_1);   // Data logging 
+    ui_led_colour_set(WS2812_LED_1, mtbdl_led1_1);   // GPS position lock 
+    ui_led_colour_set(WS2812_LED_3, mtbdl_led3_1);   // Fault / low power 
 }
 
 
@@ -930,8 +935,8 @@ void mtbdl_init_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Turn off the init state LED 
-    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1124,8 +1129,8 @@ void mtbdl_idle_state_exit(void)
     hd44780u_clear_pwr_save_flag(); 
 
     // Turn off the GPS LED 
-    // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
     ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1316,10 +1321,10 @@ void mtbdl_run_prep_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Make sure the data logging and GPS LEDs are off 
-    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
-    // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
     ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_1, mtbdl_led_clear); 
 }
 
 //=======================================================================================

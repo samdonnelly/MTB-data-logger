@@ -42,9 +42,6 @@ void mtbdl_init()
 
     // Initialize GPIO ports 
     gpio_port_init(); 
-
-    // Initialize interrupt handler flags 
-    int_handler_init(); 
     
     //===================================================
 
@@ -59,7 +56,8 @@ void mtbdl_init()
         TIM_UP_INT_DISABLE); 
     tim_enable(TIM9); 
 
-    // Periodic (counter update) interrupt timer for user button status checks 
+    // Periodic (counter update) interrupt timer for user button status checks and LED 
+    // updates. The interrupt is enabled at the end of the setup. 
     tim_9_to_11_counter_init(
         TIM10, 
         TIM_84MHZ_100US_PSC, 
@@ -67,20 +65,14 @@ void mtbdl_init()
         TIM_UP_INT_ENABLE); 
     tim_enable(TIM10); 
 
-    // Enable the interrupt handlers 
-    nvic_config(TIM1_UP_TIM10_IRQn, EXTI_PRIORITY_2); 
-
-    // Periodic (counter update) interrupt timer for data log timing 
+    // Periodic (counter update) interrupt timer for data log timing. The interrupt is 
+    // further configured at the end of the setup. 
     tim_9_to_11_counter_init(
         TIM11, 
         TIM_84MHZ_100US_PSC, 
         0x0064,  // ARR=100, (100 counts)*(100us/count) = 10ms 
         TIM_UP_INT_ENABLE); 
     tim_enable(TIM11); 
-
-    // Set the interrupt priority and disable until data logging starts 
-    NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, EXTI_PRIORITY_1); 
-    NVIC_DisableIRQ(TIM1_TRG_COM_TIM11_IRQn); 
 
     //===================================================
 
@@ -123,7 +115,7 @@ void mtbdl_init()
     //===================================================
     // UART setup 
 
-    // Serial terminal output 
+    // Serial terminal 
     uart_init(
         USART2, 
         GPIOA, 
@@ -134,7 +126,7 @@ void mtbdl_init()
         UART_DMA_DISABLE, 
         UART_DMA_ENABLE); 
 
-    // For HC-05 
+    // HC-05 
     uart_init(
         USART1, 
         GPIOA, 
@@ -293,45 +285,6 @@ void mtbdl_init()
     //===================================================
 
     //===================================================
-    // User button setup 
-
-    // // Configure the GPIO inputs for each user button 
-    // gpio_pin_init(GPIOC, PIN_0, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    // gpio_pin_init(GPIOC, PIN_1, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    // gpio_pin_init(GPIOC, PIN_2, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    // gpio_pin_init(GPIOC, PIN_3, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-
-    // // Initialize the button debouncer 
-    // debounce_init(GPIOX_PIN_0 | GPIOX_PIN_1 | GPIOX_PIN_2 | GPIOX_PIN_3); 
-
-    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3); 
-
-    //===================================================
-
-    //===================================================
-    // Wheel speed sensor setup (external interrupt) 
-
-    // Enable external interrupts 
-    exti_init(); 
-
-    exti_config(
-        GPIOC, 
-        EXTI_PC, 
-        PIN_4, 
-        PUPDR_PU, 
-        EXTI_L4, 
-        EXTI_INT_NOT_MASKED, 
-        EXTI_EVENT_MASKED, 
-        EXTI_RISE_TRIG_DISABLE, 
-        EXTI_FALL_TRIG_ENABLE); 
-
-    // Set the interrupt priority and disable until data logging starts 
-    NVIC_SetPriority(EXTI4_IRQn, EXTI_PRIORITY_0); 
-    NVIC_DisableIRQ(EXTI4_IRQn); 
-
-    //===================================================
-
-    //===================================================
     // LED setup 
 
     // WS2812 (Neopixels) 
@@ -345,7 +298,7 @@ void mtbdl_init()
     //===================================================
 
     //===================================================
-    // System setup 
+    // Main setup 
 
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
@@ -373,12 +326,78 @@ void mtbdl_init()
     // State flags 
     mtbdl_trackers.init = SET_BIT; 
 
+    //===================================================
+
+    //===================================================
+    // User interface setup (button & LEDs) 
+
+    // // Configure the GPIO inputs for each user button 
+    // gpio_pin_init(GPIOC, PIN_0, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    // gpio_pin_init(GPIOC, PIN_1, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    // gpio_pin_init(GPIOC, PIN_2, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    // gpio_pin_init(GPIOC, PIN_3, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+
+    // // Initialize the button debouncer 
+    // debounce_init(GPIOX_PIN_0 | GPIOX_PIN_1 | GPIOX_PIN_2 | GPIOX_PIN_3); 
+
+    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3); 
+
+    //===================================================
+
+    //===================================================
+    // Data logging setup 
 
     // Data record init 
     mtbdl_data_init(
         EXTI4_IRQn, 
         TIM1_TRG_COM_TIM11_IRQn, 
         ADC1); 
+    
+    //===================================================
+
+    //===================================================
+    // System parameter setup 
+    //===================================================
+
+    //===================================================
+    // Wheel speed sensor setup (external interrupt) 
+
+    // Enable external interrupts 
+    exti_init(); 
+
+    // Configure the external interrupt. Further interrupt setup is done at the end 
+    // of the setup. 
+    exti_config(
+        GPIOC, 
+        EXTI_PC, 
+        PIN_4, 
+        PUPDR_PU, 
+        EXTI_L4, 
+        EXTI_INT_NOT_MASKED, 
+        EXTI_EVENT_MASKED, 
+        EXTI_RISE_TRIG_DISABLE, 
+        EXTI_FALL_TRIG_ENABLE); 
+
+    //===================================================
+
+    //===================================================
+    // Interrupt setup 
+
+    // Initialize interrupt handler flags 
+    int_handler_init(); 
+
+    // Periodic interrupt (button and LED updates): Enable the interrupt handlers 
+    nvic_config(TIM1_UP_TIM10_IRQn, EXTI_PRIORITY_2); 
+
+    // Periodic interrupt (data logging): Set the interrupt priority and disable until 
+    // data logging starts 
+    NVIC_SetPriority(TIM1_TRG_COM_TIM11_IRQn, EXTI_PRIORITY_1); 
+    NVIC_DisableIRQ(TIM1_TRG_COM_TIM11_IRQn); 
+
+    // External interrupt (wheel speed sensor): Set the interrupt priority and disable 
+    // until data logging starts 
+    NVIC_SetPriority(EXTI4_IRQn, EXTI_PRIORITY_0); 
+    NVIC_DisableIRQ(EXTI4_IRQn); 
 
     //===================================================
 }

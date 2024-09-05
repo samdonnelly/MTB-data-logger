@@ -257,6 +257,48 @@ void ui_led_state_update(ws2812_led_index_t led_num)
     }
 }
 
+
+// Update GPS position status 
+void ui_gps_status_update(void)
+{
+    static uint8_t gps_status_block = CLEAR_BIT; 
+
+    // Notes: 
+    // - Make sure to refresh/update the navstat for each screen message that requires it. 
+    // - How do we specify a screen message to update? What if we don't want to update 
+    //   a screen message at all? 
+
+    // Monitor the GPS position lock status and update the LED and screen message 
+    // for feedback. 
+    if (m8q_get_position_navstat_lock())
+    {
+        ui_led_state_update(WS2812_LED_1); 
+
+        if (!gps_status_block)
+        {
+            gps_status_block = SET_BIT; 
+
+            // Update the screen message 
+        }
+    }
+    else if (gps_status_block)
+    {
+        gps_status_block = CLEAR_BIT; 
+
+        // Update the screen message 
+        
+        // Turn the GPS LED off 
+        ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
+    }
+}
+
+
+// Update screen message 
+// - Kind of like a refresh function where each message function will retrieve updated 
+//   data. 
+// - Have a way to ignore message update requests (for example if the GPS status changes 
+//   but we're in data logging mode where the screen is off). 
+
 //=======================================================================================
 
 

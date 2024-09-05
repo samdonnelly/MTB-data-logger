@@ -145,8 +145,18 @@ void ui_button_release(void);
 //=======================================================================================
 // LEDs, screen & TX mode 
 
-// Change the state of the LED 
+/**
+ * @brief Change the state of the LED 
+ * 
+ * @param led 
+ */
 void ui_led_state_update(ws2812_led_index_t led); 
+
+
+/**
+ * @brief Update GPS position status 
+ */
+void ui_gps_status_update(void); 
 
 //=======================================================================================
 
@@ -154,16 +164,37 @@ void ui_led_state_update(ws2812_led_index_t led);
 //=======================================================================================
 // Setters 
 
-// Store the LED colour to use 
+/**
+ * @brief Store the LED colour to use 
+ * 
+ * @param led_num 
+ * @param colour 
+ */
 void ui_led_colour_set(
     ws2812_led_index_t led_num, 
     uint32_t colour); 
 
 
-// Change the LED colour to write next 
+/**
+ * @brief Change the LED colour to write next 
+ * 
+ * @param led_num 
+ * @param colour 
+ */
 void ui_led_colour_change(
     ws2812_led_index_t led_num, 
     uint32_t colour); 
+
+
+/**
+ * @brief Update the blinking LED duty cycle 
+ * 
+ * @param led_num 
+ * @param duty_cycle 
+ */
+void ui_led_duty_set(
+    ws2812_led_index_t led_num, 
+    uint8_t duty_cycle); 
 
 //=======================================================================================
 

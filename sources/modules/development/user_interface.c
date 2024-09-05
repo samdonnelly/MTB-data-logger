@@ -28,9 +28,6 @@
 #define UI_LED_COUNTER_PERIOD 200   // 5ms interrupt * 200 == 1s counter period 
 #define UI_LED_WRITE_PERIOD 10      // 5ms interrupt * 10 == 50ms write period 
 
-#define UI_LED_DUTY_SHORT 20        // 5ms interrupt * 20 == 100ms duty cycle 
-#define UI_LED_DUTY_LONG 100        // 5ms interrupt * 100 == 500ms duty cycle 
-
 //=======================================================================================
 
 

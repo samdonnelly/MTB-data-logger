@@ -1371,15 +1371,15 @@ void mtbdl_run_countdown_state_entry(void)
     // Display the run countdown state message 
     hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
 
-    // Turn on the data logging LED 
-    // mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
-    ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
-
     // SD card will be written to constantly so no need for the check state 
     hw125_clear_check_flag(); 
 
     // Take the MPU-6050 out of low power mode 
     mpu6050_clear_low_power(DEVICE_ONE); 
+
+    // Turn on the data logging LED 
+    ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
 
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
@@ -1396,8 +1396,8 @@ void mtbdl_run_countdown_state_exit(void)
     hd44780u_set_low_pwr_flag(); 
 
     // Turn off the data logging LED 
-    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
 
     // Prep the logging data 
     mtbdl_log_data_prep(); 
@@ -1423,6 +1423,8 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
 
     // Log the system data 
     mtbdl_logging(); 
+
+    // Update LEDs 
 
     // State exit 
     if (mtbdl->run || mtbdl->fault_code)
@@ -1486,6 +1488,10 @@ void mtbdl_run_state_exit(void)
 {
     // Take the screen out of low power mode 
     hd44780u_clear_low_pwr_flag(); 
+
+    // Turn off the data logging and GPS LEDs 
+    ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1556,16 +1562,12 @@ void mtbdl_postrun_state_exit(void)
     // Clear the post run state message 
     hd44780u_set_clear_flag(); 
 
-    // Turn off the data logging LED 
-    // mtbdl_led_update(WS2812_LED_0, mtbdl_led0_1); 
-    ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
-
     // Set the SD card controller check flag 
     hw125_set_check_flag(); 
 
-    // Turn off the data logging LED 
-    // mtbdl_led_update(WS2812_LED_0, mtbdl_led_clear); 
+    // Turn off the data logging and GPS LEDs 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
+    ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1781,6 +1783,8 @@ void mtbdl_dev_search_state_entry(void)
     hc05_on(); 
 
     // Set the Bluetooth LED colour and blink rate 
+    ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
+    ui_led_duty_set(WS2812_LED_2, UI_LED_DUTY_LONG); 
 
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
@@ -1821,8 +1825,9 @@ void mtbdl_dev_search_state_exit(void)
     hd44780u_set_clear_flag(); 
 
     // Make sure Bluetooth LED is off 
-    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
+    ui_led_colour_set(WS2812_LED_2, mtbdl_led_clear); 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
+    // mtbdl_led_update(WS2812_LED_2, mtbdl_led_clear); 
 }
 
 //=======================================================================================
@@ -1841,7 +1846,7 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
         mtbdl_prerx_state_entry(); 
     }
 
-    // Check for user buttob input 
+    // Check for user button input 
     mtbdl_prerx_user_input_check(mtbdl); 
 
     //==================================================
@@ -1917,6 +1922,9 @@ void mtbdl_prerx_state_entry(void)
 {
     // Display the pre rx state message 
     hd44780u_set_msg(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
+
+    // Set the Bluetooth LED colour and blink rate 
+    ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
 
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 

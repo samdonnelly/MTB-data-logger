@@ -53,7 +53,7 @@ typedef enum {
 typedef struct mtbdl_ui_led_blink_s 
 {
     ws2812_led_index_t led_num; 
-    uint8_t duty_cycle; 
+    uint16_t duty_cycle; 
     uint8_t update_blocker; 
 }
 mtbdl_ui_led_blink_t; 
@@ -117,38 +117,21 @@ void ui_init(
 
 /**
  * @brief Button status update 
- */
-void ui_status_update(void); 
-
-//=======================================================================================
-
-
-//=======================================================================================
-// User buttons & RX mode 
-
-/**
- * @brief Button press check 
  * 
- * @return ui_btn_num_t 
+ * @return ui_btn_num_t : button currently being pressed 
  */
-ui_btn_num_t ui_button_press(void); 
-
-
-/**
- * @brief Button release check 
- */
-void ui_button_release(void); 
+ui_btn_num_t ui_status_update(void); 
 
 //=======================================================================================
 
 
 //=======================================================================================
-// LEDs, screen & TX mode 
+// LED control 
 
 /**
  * @brief Change the state of the LED 
  * 
- * @param led 
+ * @param led : LED to update 
  */
 void ui_led_state_update(ws2812_led_index_t led); 
 
@@ -156,8 +139,23 @@ void ui_led_state_update(ws2812_led_index_t led);
 /**
  * @brief Update GPS position status 
  */
-void ui_gps_status_update(void); 
+void ui_gps_led_status_update(void); 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// Screen control 
+//=======================================================================================
+
+
+//=======================================================================================
+// RX mode 
+//=======================================================================================
+
+
+//=======================================================================================
+// TX mode 
 //=======================================================================================
 
 

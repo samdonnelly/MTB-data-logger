@@ -27,9 +27,7 @@
 //=======================================================================================
 // Enums 
 
-/**
- * @brief MTB data logger controller states 
- */
+// MTB data logger controller states 
 typedef enum {
     MTBDL_INIT_STATE,            // State 0  : Startup 
     MTBDL_IDLE_STATE,            // State 1  : Idle 
@@ -81,17 +79,8 @@ typedef struct mtbdl_trackers_s
     mtbdl_data_t data_logging; 
     mtbdl_params_t sys_params; 
 
-    // // User buttons 
-    // uint8_t user_btn_1;                         // User button 1 pin number 
-    // uint8_t user_btn_2;                         // User button 2 pin number 
-    // uint8_t user_btn_3;                         // User button 3 pin number 
-    // uint8_t user_btn_4;                         // User button 4 pin number 
-    // uint8_t user_btn_1_block : 1;               // Stops repeated actions on btn 1 press 
-    // uint8_t user_btn_2_block : 1;               // Stops repeated actions on btn 2 press 
-    // uint8_t user_btn_3_block : 1;               // Stops repeated actions on btn 3 press 
-    // uint8_t user_btn_4_block : 1;               // Stops repeated actions on btn 4 press 
-
-    ui_btn_num_t btn_press; 
+    // User buttons 
+    ui_btn_num_t btn_press;                     // Button press status 
 
     // State flags 
     uint8_t init          : 1;                  // Ensures the init state is run 

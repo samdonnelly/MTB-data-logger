@@ -43,9 +43,35 @@ static mtbdl_ui_t mtbdl_ui;
 // Prototypes 
 
 /**
+ * @brief Button press check 
+ * 
+ * @return ui_btn_num_t 
+ */
+ui_btn_num_t ui_button_press(void); 
+
+
+/**
+ * @brief Button release check 
+ */
+void ui_button_release(void); 
+
+
+/**
  * @brief Update the LED output 
  */
 void ui_led_update(void); 
+
+
+/**
+ * @brief Update the SOC calculation 
+ */
+void ui_soc_update(void); 
+
+
+/**
+ * @brief Update the screen output 
+ */
+void ui_screen_update(void); 
 
 //=======================================================================================
 
@@ -112,9 +138,11 @@ void ui_init(
 //=======================================================================================
 // Device update 
 
-// User interface update 
-void ui_status_update(void)
+// Periodic UI update 
+ui_btn_num_t ui_status_update(void)
 {
+    ui_btn_num_t btn_num = UI_BTN_NONE; 
+
     // 5ms interrupt 
     if (handler_flags.tim1_up_tim10_glbl_flag)
     {
@@ -122,17 +150,22 @@ void ui_status_update(void)
 
         // Update user button input status 
         debounce((uint8_t)gpio_port_read(mtbdl_ui.user_btn_port)); 
+        btn_num = ui_button_press(); 
+        ui_button_release(); 
 
         // Update LED timing and output 
         ui_led_update(); 
+
+        // Update the battery SOC 
+        ui_soc_update(); 
+
+        // Update screen message 
+        ui_screen_update(); 
     }
+
+    return btn_num; 
 }
 
-//=======================================================================================
-
-
-//=======================================================================================
-// Input - buttons, RX mode 
 
 // Button press check 
 ui_btn_num_t ui_button_press(void)
@@ -183,37 +216,32 @@ void ui_button_release(void)
     // Button 1 
     if (debounce_released(mtbdl_ui.user_btn_1) && mtbdl_ui.user_btn_1_block)
     {
-        mtbdl_ui.user_btn_1_block = CLEAR; 
+        mtbdl_ui.user_btn_1_block = CLEAR_BIT; 
         ui_led_colour_change(WS2812_LED_7, mtbdl_led_clear); 
     }
     
     // Button 2 
     if (debounce_released(mtbdl_ui.user_btn_2) && mtbdl_ui.user_btn_2_block)
     {
-        mtbdl_ui.user_btn_2_block = CLEAR; 
+        mtbdl_ui.user_btn_2_block = CLEAR_BIT; 
         ui_led_colour_change(WS2812_LED_6, mtbdl_led_clear); 
     }
     
     // Button 3 
     if (debounce_released(mtbdl_ui.user_btn_3) && mtbdl_ui.user_btn_3_block)
     {
-        mtbdl_ui.user_btn_3_block = CLEAR; 
+        mtbdl_ui.user_btn_3_block = CLEAR_BIT; 
         ui_led_colour_change(WS2812_LED_5, mtbdl_led_clear); 
     }
     
     // Button 4 
     if (debounce_released(mtbdl_ui.user_btn_4) && mtbdl_ui.user_btn_4_block)
     {
-        mtbdl_ui.user_btn_4_block = CLEAR; 
+        mtbdl_ui.user_btn_4_block = CLEAR_BIT; 
         ui_led_colour_change(WS2812_LED_4, mtbdl_led_clear); 
     }
 }
 
-//=======================================================================================
-
-
-//=======================================================================================
-// Output - LEDs, screen, TX mode 
 
 // Update the LED output 
 void ui_led_update(void)
@@ -235,6 +263,30 @@ void ui_led_update(void)
 }
 
 
+// Update the SOC calculation 
+void ui_soc_update(void)
+{
+    // 
+}
+
+
+// Update screen message 
+// - Kind of like a refresh function where each message function will retrieve updated 
+//   data. 
+// - Have a way to ignore message update requests (for example if the GPS status changes 
+//   but we're in data logging mode where the screen is off). 
+// Update the screen output 
+void ui_screen_update(void)
+{
+    // 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// LED control 
+
 // Change the state of the LED 
 void ui_led_state_update(ws2812_led_index_t led_num)
 {
@@ -243,25 +295,25 @@ void ui_led_state_update(ws2812_led_index_t led_num)
         return; 
     }
 
-    mtbdl_ui_led_blink_t led = mtbdl_ui.led_state[led_num]; 
+    mtbdl_ui_led_blink_t *led = &(mtbdl_ui.led_state[led_num]); 
 
-    if ((mtbdl_ui.led_counter < led.duty_cycle) && !led.update_blocker)
+    if ((mtbdl_ui.led_counter < led->duty_cycle) && !led->update_blocker)
     {
         // Set the LED colour 
-        ui_led_colour_change(led.led_num, mtbdl_ui.led_colours[led.led_num]); 
-        led.update_blocker = SET_BIT; 
+        ui_led_colour_change(led->led_num, mtbdl_ui.led_colours[led->led_num]); 
+        led->update_blocker = SET_BIT; 
     }
-    else if ((mtbdl_ui.led_counter >= led.duty_cycle) && led.update_blocker)
+    else if ((mtbdl_ui.led_counter >= led->duty_cycle) && led->update_blocker)
     {
         // Clear the LED colour 
-        ui_led_colour_change(led.led_num, mtbdl_led_clear); 
-        led.update_blocker = CLEAR_BIT; 
+        ui_led_colour_change(led->led_num, mtbdl_led_clear); 
+        led->update_blocker = CLEAR_BIT; 
     }
 }
 
 
 // Update GPS position status 
-void ui_gps_status_update(void)
+void ui_gps_led_status_update(void)
 {
     static uint8_t gps_status_block = CLEAR_BIT; 
 
@@ -279,28 +331,35 @@ void ui_gps_status_update(void)
         if (!gps_status_block)
         {
             gps_status_block = SET_BIT; 
-
-            // Update the screen message 
         }
     }
     else if (gps_status_block)
     {
         gps_status_block = CLEAR_BIT; 
-
-        // Update the screen message 
         
         // Turn the GPS LED off 
         ui_led_colour_change(WS2812_LED_1, mtbdl_led_clear); 
     }
 }
 
+//=======================================================================================
 
-// Update screen message 
-// - Kind of like a refresh function where each message function will retrieve updated 
-//   data. 
-// - Have a way to ignore message update requests (for example if the GPS status changes 
-//   but we're in data logging mode where the screen is off). 
 
+//=======================================================================================
+// Screen control 
+
+// State message updates 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// RX mode 
+//=======================================================================================
+
+
+//=======================================================================================
+// TX mode 
 //=======================================================================================
 
 

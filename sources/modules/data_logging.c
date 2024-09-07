@@ -1171,7 +1171,6 @@ void mtbdl_cal_calc(void)
 // Format the idle state message 
 void mtbdl_set_idle_msg(void)
 {
-    // Local variables 
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
     // Create an editable copy of the message 
@@ -1215,7 +1214,6 @@ void mtbdl_set_idle_msg(void)
 // Format the run prep state message 
 void mtbdl_set_run_prep_msg(void)
 {
-    // Local variables 
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
 
     // Create an editable copy of the message 
@@ -1242,7 +1240,6 @@ void mtbdl_set_run_prep_msg(void)
 // Format the pre TX state message 
 void mtbdl_set_pretx_msg(void)
 {
-    // Local variables 
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
     // Create an editable copy of the message 

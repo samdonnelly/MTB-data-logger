@@ -278,7 +278,10 @@ void ui_soc_update(void)
 // Update the screen output 
 void ui_screen_update(void)
 {
-    // 
+    // - Counter to control how often to write the screen message. 
+    // - Message gets updated by a setter? 
+    // - Messages that require formatting will need continuous calling like the LED blink 
+    //   function. 
 }
 
 //=======================================================================================
@@ -349,6 +352,99 @@ void ui_gps_led_status_update(void)
 // Screen control 
 
 // State message updates 
+
+// // Format the idle state message 
+// void mtbdl_set_idle_msg(void)
+// {
+//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+
+//     // Create an editable copy of the message 
+//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
+//     {
+//         msg[i] = mtbdl_idle_msg[i]; 
+//     }
+
+//     // Format the message with data 
+//     // snprintf will NULL terminate the string at the screen line length so in order to use 
+//     // the last spot on the screen line the message length must be indexed up by one 
+//     snprintf(
+//         msg[HD44780U_L1].msg, 
+//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+//         mtbdl_idle_msg[HD44780U_L1].msg, 
+//         mtbdl_data.fork_psi, 
+//         mtbdl_data.fork_comp, 
+//         mtbdl_data.fork_reb); 
+    
+//     snprintf(
+//         msg[HD44780U_L2].msg, 
+//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+//         mtbdl_idle_msg[HD44780U_L2].msg, 
+//         mtbdl_data.shock_psi, 
+//         mtbdl_data.shock_lock, 
+//         mtbdl_data.shock_reb); 
+    
+//     snprintf(
+//         msg[HD44780U_L3].msg, 
+//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+//         mtbdl_idle_msg[HD44780U_L3].msg, 
+//         mtbdl_data.adc_buff[MTBDL_ADC_SOC], 
+//         (char)(mtbdl_data.navstat >> SHIFT_8), 
+//         (char)mtbdl_data.navstat); 
+
+//     // Set the screen message 
+//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
+// }
+
+
+// // Format the run prep state message 
+// void mtbdl_set_run_prep_msg(void)
+// {
+//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
+
+//     // Create an editable copy of the message 
+//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_3_LINE; i++) 
+//     {
+//         msg[i] = mtbdl_run_prep_msg[i]; 
+//     }
+
+//     // Convert the NAVSTAT code to an easily readable value 
+
+//     // Format the message with data 
+//     snprintf(
+//         msg[HD44780U_L1].msg, 
+//         HD44780U_LINE_LEN, 
+//         mtbdl_run_prep_msg[HD44780U_L1].msg, 
+//         (char)(mtbdl_data.navstat >> SHIFT_8), 
+//         (char)mtbdl_data.navstat); 
+
+//     // Set the screen message 
+//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_3_LINE); 
+// }
+
+
+// // Format the pre TX state message 
+// void mtbdl_set_pretx_msg(void)
+// {
+//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+
+//     // Create an editable copy of the message 
+//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
+//     {
+//         msg[i] = mtbdl_pretx_msg[i]; 
+//     }
+
+//     // Format the message with data 
+//     // The log index is adjusted because it will be one ahead of the most recent log 
+//     // file number after the most recent log has been created 
+//     snprintf(
+//         msg[HD44780U_L2].msg, 
+//         HD44780U_LINE_LEN, 
+//         mtbdl_pretx_msg[HD44780U_L2].msg, 
+//         (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+
+//     // Set the screen message 
+//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
+// }
 
 //=======================================================================================
 

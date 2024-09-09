@@ -451,11 +451,158 @@ void ui_gps_led_status_update(void)
 
 //=======================================================================================
 // RX mode 
+
+// // RX user interface start 
+// void mtbdl_rx_prep(void)
+// {
+//     hc05_send(mtbdl_rx_prompt); 
+//     hc05_clear(); 
+// }
+
+
+// // Read user input 
+// void mtbdl_rx(void)
+// {
+//     unsigned int param_index, temp_data; 
+
+//     // Read Bluetooth data if available 
+//     if (hc05_data_status())
+//     {
+//         // Read and parse the data from the HC-05 
+//         hc05_read(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+//         sscanf(
+//             mtbdl_data.data_buff, 
+//             mtbdl_rx_input, 
+//             &param_index, 
+//             &temp_data); 
+
+//         // Check for a data match 
+//         switch (param_index)
+//         {
+//             case MTBDL_PARM_FPSI:
+//                 mtbdl_data.fork_psi = temp_data; 
+//                 break;
+
+//             case MTBDL_PARM_FC:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.fork_comp = temp_data; 
+//                 }
+//                 break;
+
+//             case MTBDL_PARM_FR:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.fork_reb = temp_data; 
+//                 }
+//                 break;
+
+//             case MTBDL_PARM_SPSI:
+//                 mtbdl_data.shock_psi = temp_data; 
+//                 break;
+
+//             case MTBDL_PARM_SL:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.shock_lock = temp_data; 
+//                 }
+//                 break;
+
+//             case MTBDL_PARM_SR:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.shock_reb = temp_data; 
+//                 }
+//                 break;
+            
+//             default: 
+//                 break;
+//         }
+
+//         // Provide a user prompt 
+//         mtbdl_rx_prep(); 
+//     }
+// }
+
 //=======================================================================================
 
 
 //=======================================================================================
 // TX mode 
+
+// // Check log file count 
+// uint8_t mtbdl_tx_check(void)
+// {
+//     return mtbdl_data.log_index; 
+// }
+
+
+// // Prepare to send a data log file 
+// uint8_t mtbdl_tx_prep(void)
+// {
+//     // Check if there are no log files 
+//     if (!mtbdl_tx_check())
+//     {
+//         return FALSE; 
+//     }
+
+//     // Log files exist. Move to the data directory. 
+//     hw125_set_dir(mtbdl_data_dir); 
+
+//     // Generate a log file name. The log index is adjusted because it will be one ahead 
+//     // of the most recent log file number after the most recent log has been created 
+//     snprintf(
+//         mtbdl_data.filename, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_log_file, 
+//         (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+
+//     // Check for the existance of the specified file number 
+//     if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
+//     {
+//         return FALSE; 
+//     }
+
+//     // Open the file 
+//     hw125_open(mtbdl_data.filename, HW125_MODE_OAWR); 
+
+//     return TRUE; 
+// }
+
+
+// // Transfer data log contents 
+// uint8_t mtbdl_tx(void)
+// {
+//     // Read a line from the data log and send it out via the Bluetooth module. 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+//     hc05_send(mtbdl_data.data_buff); 
+
+//     // Check for end of file - if true we can stop the transaction 
+//     if (hw125_eof())
+//     {
+//         mtbdl_data.tx_status = SET_BIT; 
+//         return TRUE; 
+//     }
+
+//     return FALSE; 
+// }
+
+
+// // End the transmission 
+// void mtbdl_tx_end(void)
+// {
+//     hw125_close(); 
+
+//     if (mtbdl_data.tx_status)
+//     {
+//         // Transaction completed - delete the file and update the log index 
+//         hw125_unlink(mtbdl_data.filename); 
+//         mtbdl_data.tx_status = CLEAR_BIT; 
+//         mtbdl_data.log_index--; 
+//         mtbdl_write_sys_params(HW125_MODE_OAWR); 
+//     }
+// }
+
 //=======================================================================================
 
 

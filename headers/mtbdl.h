@@ -76,8 +76,8 @@ typedef struct mtbdl_trackers_s
     uint8_t msg_len;                            // Message length (number of lines) 
 
     // Modules 
-    mtbdl_data_t data_logging; 
-    mtbdl_params_t sys_params; 
+    // mtbdl_data_t data_logging; 
+    // mtbdl_params_t sys_params; 
 
     // User buttons 
     ui_btn_num_t btn_press;                     // Button press status 

@@ -32,12 +32,24 @@
 
 
 //=======================================================================================
+// Enums 
+
+// 
+typedef enum {
+    PARAM_LOG_INDEX_DEC, 
+    PARAM_LOG_INDEX_INC 
+} param_log_index_change_t; 
+
+//=======================================================================================   
+
+
+//=======================================================================================
 // Structures 
 
 // Parameters data record 
 typedef struct mtbdl_param_s 
 {
-    // Bike parameters 
+    // Bike settings 
     uint8_t fork_psi;                           // Fork pressure (psi) 
     uint8_t fork_comp;                          // Fork compression setting 
     uint8_t fork_reb;                           // Fork rebound setting 
@@ -45,8 +57,7 @@ typedef struct mtbdl_param_s
     uint8_t shock_lock;                         // Shock lockout setting 
     uint8_t shock_reb;                          // Shock rebound setting 
 
-    // System parameters 
-    uint8_t log_index;                          // Data log index 
+    // System settings 
     int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
     int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
     int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
@@ -55,6 +66,7 @@ typedef struct mtbdl_param_s
 
     // SD card 
     char param_buff[PARAM_MAX_STR_LEN];         // Buffer for reading and writing 
+    uint8_t log_index;                          // Data log index 
 }
 mtbdl_param_t; 
 
@@ -62,7 +74,32 @@ mtbdl_param_t;
 
 
 //=======================================================================================
-// Dev 
+// Initialization 
+
+/**
+ * @brief System parameters init 
+ */
+void param_init(void); 
+
+
+/**
+ * @brief File system setup 
+ * 
+ * @details Creates directories on the SD card for storing system and bike parameters 
+ *          as well data logs if the directories do not already exist. After establishing 
+ *          directories, checks for existance of system and bike parameter files. If they 
+ *          exist then they will be read and stored into the data handling record. If not 
+ *          then they will be created and intialized to default values. 
+ *          
+ *          This function should only be called after the SD card has been mounted. 
+ */
+void param_file_sys_setup(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Parameter read and write 
 
 /**
  * @brief Write bike parameters to file 
@@ -94,6 +131,32 @@ void param_write_sys_params(uint8_t mode);
  * @param mode 
  */
 void param_read_sys_params(uint8_t mode); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Setters 
+
+/**
+ * @brief Increment/decrement log file index 
+ * 
+ * @param log_index_change 
+ */
+void param_update_log_index(param_log_index_change_t log_index_change); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Getters 
+
+/**
+ * @brief Get log file index 
+ * 
+ * @return uint8_t 
+ */
+uint8_t param_get_log_index(void); 
 
 //=======================================================================================
 

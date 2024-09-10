@@ -173,18 +173,18 @@ void mtbdl_data_init(
     ADC_TypeDef *adc); 
 
 
-/**
- * @brief Bike parameter setup 
- * 
- * @details Creates directories on the SD card for storing system and bike parameters 
- *          as well data logs if the directories do not already exist. After establishing 
- *          directories, checks for existance of system and bike parameter files. If they 
- *          exist then they will be read and stored into the data handling record. If not 
- *          then they will be created and intialized to default values. 
- *          
- *          This function should be called during the setup code. 
- */
-void mtbdl_file_sys_setup(void); 
+// /**
+//  * @brief Bike parameter setup 
+//  * 
+//  * @details Creates directories on the SD card for storing system and bike parameters 
+//  *          as well data logs if the directories do not already exist. After establishing 
+//  *          directories, checks for existance of system and bike parameter files. If they 
+//  *          exist then they will be read and stored into the data handling record. If not 
+//  *          then they will be created and intialized to default values. 
+//  *          
+//  *          This function should be called during the setup code. 
+//  */
+// void mtbdl_file_sys_setup(void); 
 
 
 /**
@@ -208,60 +208,60 @@ void mtbdl_adc_dma_init(
 //==================================================
 // Parameters 
 
-/**
- * @brief Write bike parameters to file 
- * 
- * @details Writes the bike parameters currently stored in the data record to the bike 
- *          parameters file on the SD card. Saving this data allows for the system to 
- *          remember info after reboot. Bike parameters include the fork and shock 
- *          settings such as psi and rebound settings. These can be updated in the RX 
- *          mode. 
- * 
- * @param mode : file open mode flag - see hw125 driver 
- */
-void mtbdl_write_bike_params(uint8_t mode); 
+// /**
+//  * @brief Write bike parameters to file 
+//  * 
+//  * @details Writes the bike parameters currently stored in the data record to the bike 
+//  *          parameters file on the SD card. Saving this data allows for the system to 
+//  *          remember info after reboot. Bike parameters include the fork and shock 
+//  *          settings such as psi and rebound settings. These can be updated in the RX 
+//  *          mode. 
+//  * 
+//  * @param mode : file open mode flag - see hw125 driver 
+//  */
+// void mtbdl_write_bike_params(uint8_t mode); 
 
 
-/**
- * @brief Read bike parameters on file 
- * 
- * @details Reads the bike parameters file on the SD card and stores the info in the data 
- *          record. This function is called on startup if a bike parameters file already 
- *          exists. This allows the system to use parameters previously saved before a 
- *          reboot. Bike parameters include the fork and shock settings such as psi and 
- *          rebound settings. 
- * 
- * @param mode : file open mode flag - see hw125 driver 
- */
-void mtbdl_read_bike_params(uint8_t mode); 
+// /**
+//  * @brief Read bike parameters on file 
+//  * 
+//  * @details Reads the bike parameters file on the SD card and stores the info in the data 
+//  *          record. This function is called on startup if a bike parameters file already 
+//  *          exists. This allows the system to use parameters previously saved before a 
+//  *          reboot. Bike parameters include the fork and shock settings such as psi and 
+//  *          rebound settings. 
+//  * 
+//  * @param mode : file open mode flag - see hw125 driver 
+//  */
+// void mtbdl_read_bike_params(uint8_t mode); 
 
 
-/**
- * @brief Write system parameters to file 
- * 
- * @details Writes the system parameters currently stored in the data record to the 
- *          system parameters file on the SD card. Saving this data allows for the system 
- *          to remember info after reboot. System parameters include the IMU and 
- *          potentiometer calibration data and the log index. These can be updated after 
- *          calibration, data logging or TX mode. 
- * 
- * @param mode : file open mode flag - see hw125 driver 
- */
-void mtbdl_write_sys_params(uint8_t mode); 
+// /**
+//  * @brief Write system parameters to file 
+//  * 
+//  * @details Writes the system parameters currently stored in the data record to the 
+//  *          system parameters file on the SD card. Saving this data allows for the system 
+//  *          to remember info after reboot. System parameters include the IMU and 
+//  *          potentiometer calibration data and the log index. These can be updated after 
+//  *          calibration, data logging or TX mode. 
+//  * 
+//  * @param mode : file open mode flag - see hw125 driver 
+//  */
+// void mtbdl_write_sys_params(uint8_t mode); 
 
 
-/**
- * @brief Read system parameters on file 
- * 
- * @details Reads the system parameters file on the SD card and stores the info in the 
- *          data record. This function is called on startup if a system parameters file 
- *          already exists. This allows the system to use parameters previously saved 
- *          before a reboot. System parameters include the IMU and potentiometer 
- *          calibration data and the log index. 
- * 
- * @param mode : file open mode flag - see hw125 driver 
- */
-void mtbdl_read_sys_params(uint8_t mode); 
+// /**
+//  * @brief Read system parameters on file 
+//  * 
+//  * @details Reads the system parameters file on the SD card and stores the info in the 
+//  *          data record. This function is called on startup if a system parameters file 
+//  *          already exists. This allows the system to use parameters previously saved 
+//  *          before a reboot. System parameters include the IMU and potentiometer 
+//  *          calibration data and the log index. 
+//  * 
+//  * @param mode : file open mode flag - see hw125 driver 
+//  */
+// void mtbdl_read_sys_params(uint8_t mode); 
 
 //==================================================
 

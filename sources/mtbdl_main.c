@@ -851,11 +851,12 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
 
     mtbdl_init_user_input_check(mtbdl); 
 
-    // if (hw125_get_state() == HW125_ACCESS_STATE)
-    // {
-    //     hw125_set_check_flag(); 
-    //     mtbdl_file_sys_setup(); 
-    // }
+    if (hw125_get_state() == HW125_ACCESS_STATE)
+    {
+        hw125_set_check_flag(); 
+        // mtbdl_file_sys_setup(); 
+        param_file_sys_setup(); 
+    }
 
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
@@ -1382,7 +1383,8 @@ void mtbdl_data_select_user_input_check(mtbdl_trackers_t *mtbdl)
             // files saved in the system. If there are none then the data select bit is not set 
             // which will ultimately abort the TX state and tell the user there are no files 
             // available for sending. 
-            if (mtbdl_tx_check())
+            // if (mtbdl_tx_check())
+            if (param_get_log_index())
             {
                 // Files exist - go to the device search state 
                 mtbdl->data_select = SET_BIT; 
@@ -1713,6 +1715,7 @@ void mtbdl_postrx_state_entry(void)
 {
     // Save the parameters to file and update tracking info 
     // mtbdl_write_bike_params(HW125_MODE_OEW); 
+    param_write_bike_params(HW125_MODE_OEW); 
 
     // Set the Bluetooth LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
@@ -2186,6 +2189,7 @@ void mtbdl_postcalibrate_state_entry(void)
     // Display the post calibration message and record the calibration data
     hd44780u_set_msg(mtbdl_postcal_msg, MTBDL_MSG_LEN_1_LINE); 
     // mtbdl_write_sys_params(HW125_MODE_OEW); 
+    param_write_sys_params(HW125_MODE_OEW); 
 
     // Set the calibration LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_2); 

@@ -300,37 +300,37 @@ void mtbdl_data_init(
 }
 
 
-// File system setup 
-void mtbdl_file_sys_setup(void)
-{
-    // Create "parameters" and "data" directories if they do not already exist 
-    hw125_mkdir(mtbdl_data_dir); 
-    hw125_mkdir(mtbdl_param_dir); 
+// // File system setup 
+// void mtbdl_file_sys_setup(void)
+// {
+//     // Create "parameters" and "data" directories if they do not already exist 
+//     hw125_mkdir(mtbdl_data_dir); 
+//     hw125_mkdir(mtbdl_param_dir); 
 
-    // Check for the existance of the bike parameters file 
-    if (hw125_get_exists(mtbdl_bike_param_file) == FR_NO_FILE)
-    {
-        // No file - create one and write default parameter data to it 
-        mtbdl_write_bike_params(HW125_MODE_WW); 
-    }
-    else 
-    {
-        // File already exists - open the file for reading 
-        mtbdl_read_bike_params(HW125_MODE_OEWR); 
-    }
+//     // Check for the existance of the bike parameters file 
+//     if (hw125_get_exists(mtbdl_bike_param_file) == FR_NO_FILE)
+//     {
+//         // No file - create one and write default parameter data to it 
+//         mtbdl_write_bike_params(HW125_MODE_WW); 
+//     }
+//     else 
+//     {
+//         // File already exists - open the file for reading 
+//         mtbdl_read_bike_params(HW125_MODE_OEWR); 
+//     }
 
-    // Check for the existance of the system parameters file 
-    if (hw125_get_exists(mtbdl_sys_param_file) == FR_NO_FILE)
-    {
-        // No file - create one and write default parameter data to it 
-        mtbdl_write_sys_params(HW125_MODE_WW); 
-    }
-    else 
-    {
-        // File already exists - open the file for reading 
-        mtbdl_read_sys_params(HW125_MODE_OEWR); 
-    }
-}
+//     // Check for the existance of the system parameters file 
+//     if (hw125_get_exists(mtbdl_sys_param_file) == FR_NO_FILE)
+//     {
+//         // No file - create one and write default parameter data to it 
+//         mtbdl_write_sys_params(HW125_MODE_WW); 
+//     }
+//     else 
+//     {
+//         // File already exists - open the file for reading 
+//         mtbdl_read_sys_params(HW125_MODE_OEWR); 
+//     }
+// }
 
 
 // ADC DMA setup 
@@ -352,173 +352,173 @@ void mtbdl_adc_dma_init(
 //=======================================================================================
 // Parameters 
 
-// Write bike parameters to file 
-void mtbdl_write_bike_params(uint8_t mode)
-{
-    // Move to the parameters directory, open the bike parameters file for writing, 
-    // format and write the bike parameters from the data record to the file, then close 
-    // the file. 
-    hw125_set_dir(mtbdl_param_dir); 
-    hw125_open(mtbdl_bike_param_file, mode); 
-    mtbdl_format_write_bike_params(); 
-    hw125_close(); 
-}
+// // Write bike parameters to file 
+// void mtbdl_write_bike_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the bike parameters file for writing, 
+//     // format and write the bike parameters from the data record to the file, then close 
+//     // the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_bike_param_file, mode); 
+//     mtbdl_format_write_bike_params(); 
+//     hw125_close(); 
+// }
 
 
-// Read bike parameter on file 
-void mtbdl_read_bike_params(uint8_t mode)
-{
-    // Move to the parameters directory, open the bike parameters file for reading, 
-    // read the parameters and store them in the data record, then close the file. 
-    hw125_set_dir(mtbdl_param_dir); 
-    hw125_open(mtbdl_bike_param_file, mode); 
-    mtbdl_format_read_bike_params(); 
-    hw125_close(); 
-}
+// // Read bike parameter on file 
+// void mtbdl_read_bike_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the bike parameters file for reading, 
+//     // read the parameters and store them in the data record, then close the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_bike_param_file, mode); 
+//     mtbdl_format_read_bike_params(); 
+//     hw125_close(); 
+// }
 
 
-// Write system parameters to file 
-void mtbdl_write_sys_params(uint8_t mode)
-{
-    // Move to the parameters directory, open the system parameters file for writing, 
-    // format and write the system parameters from the data record to the file, then 
-    // close the file. 
-    hw125_set_dir(mtbdl_param_dir); 
-    hw125_open(mtbdl_sys_param_file, mode); 
-    mtbdl_format_write_sys_params(); 
-    hw125_close(); 
-}
+// // Write system parameters to file 
+// void mtbdl_write_sys_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the system parameters file for writing, 
+//     // format and write the system parameters from the data record to the file, then 
+//     // close the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_sys_param_file, mode); 
+//     mtbdl_format_write_sys_params(); 
+//     hw125_close(); 
+// }
 
 
-// Read system parameters on file 
-void mtbdl_read_sys_params(uint8_t mode)
-{
-    // Move to the parameters directory, open the system parameters file for reading, 
-    // read the parameters and store them in the data record, then close the file. 
-    hw125_set_dir(mtbdl_param_dir); 
-    hw125_open(mtbdl_sys_param_file, mode); 
-    mtbdl_format_read_sys_params(); 
-    hw125_close(); 
-}
+// // Read system parameters on file 
+// void mtbdl_read_sys_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the system parameters file for reading, 
+//     // read the parameters and store them in the data record, then close the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_sys_param_file, mode); 
+//     mtbdl_format_read_sys_params(); 
+//     hw125_close(); 
+// }
 
 
-// Format and write the bike parameters 
-void mtbdl_format_write_bike_params(void)
-{
-    // Write fork parameters 
-    snprintf(
-        mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
-        mtbdl_param_fork_info, 
-        mtbdl_data.fork_psi, 
-        mtbdl_data.fork_comp, 
-        mtbdl_data.fork_reb); 
+// // Format and write the bike parameters 
+// void mtbdl_format_write_bike_params(void)
+// {
+//     // Write fork parameters 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_fork_info, 
+//         mtbdl_data.fork_psi, 
+//         mtbdl_data.fork_comp, 
+//         mtbdl_data.fork_reb); 
     
-    hw125_puts(mtbdl_data.data_buff); 
+//     hw125_puts(mtbdl_data.data_buff); 
 
-    // Write shock parameters 
-    snprintf(
-        mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
-        mtbdl_param_shock_info, 
-        mtbdl_data.shock_psi, 
-        mtbdl_data.shock_lock, 
-        mtbdl_data.shock_reb); 
+//     // Write shock parameters 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_shock_info, 
+//         mtbdl_data.shock_psi, 
+//         mtbdl_data.shock_lock, 
+//         mtbdl_data.shock_reb); 
     
-    hw125_puts(mtbdl_data.data_buff); 
-}
+//     hw125_puts(mtbdl_data.data_buff); 
+// }
 
 
-// Read and format the bike parameters 
-void mtbdl_format_read_bike_params(void)
-{
-    // Read fork parameters 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+// // Read and format the bike parameters 
+// void mtbdl_format_read_bike_params(void)
+// {
+//     // Read fork parameters 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(
-        mtbdl_data.data_buff, 
-        mtbdl_param_fork_info, 
-        &mtbdl_data.fork_psi, 
-        &mtbdl_data.fork_comp, 
-        &mtbdl_data.fork_reb); 
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_fork_info, 
+//         &mtbdl_data.fork_psi, 
+//         &mtbdl_data.fork_comp, 
+//         &mtbdl_data.fork_reb); 
 
-    // Read shock parameters 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+//     // Read shock parameters 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(
-        mtbdl_data.data_buff, 
-        mtbdl_param_shock_info, 
-        &mtbdl_data.shock_psi, 
-        &mtbdl_data.shock_lock, 
-        &mtbdl_data.shock_reb); 
-}
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_shock_info, 
+//         &mtbdl_data.shock_psi, 
+//         &mtbdl_data.shock_lock, 
+//         &mtbdl_data.shock_reb); 
+// }
 
 
-// Format and write the system parameters 
-void mtbdl_format_write_sys_params(void)
-{
-    // Write logging parameters 
-    snprintf(
-        mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
-        mtbdl_param_index, 
-        mtbdl_data.log_index); 
+// // Format and write the system parameters 
+// void mtbdl_format_write_sys_params(void)
+// {
+//     // Write logging parameters 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_index, 
+//         mtbdl_data.log_index); 
 
-    hw125_puts(mtbdl_data.data_buff); 
+//     hw125_puts(mtbdl_data.data_buff); 
     
-    // Write accelerometer calibration data 
-    snprintf(
-        mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
-        mtbdl_param_accel_rest, 
-        mtbdl_data.accel_x_rest, 
-        mtbdl_data.accel_y_rest, 
-        mtbdl_data.accel_z_rest); 
+//     // Write accelerometer calibration data 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_accel_rest, 
+//         mtbdl_data.accel_x_rest, 
+//         mtbdl_data.accel_y_rest, 
+//         mtbdl_data.accel_z_rest); 
     
-    hw125_puts(mtbdl_data.data_buff); 
+//     hw125_puts(mtbdl_data.data_buff); 
 
-    // Write potentiometer calibrated starting points 
-    snprintf(
-        mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
-        mtbdl_param_pot_rest, 
-        mtbdl_data.pot_fork_rest, 
-        mtbdl_data.pot_shock_rest); 
+//     // Write potentiometer calibrated starting points 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_pot_rest, 
+//         mtbdl_data.pot_fork_rest, 
+//         mtbdl_data.pot_shock_rest); 
     
-    hw125_puts(mtbdl_data.data_buff); 
-}
+//     hw125_puts(mtbdl_data.data_buff); 
+// }
 
 
-// Read and format the system parameters 
-void mtbdl_format_read_sys_params(void)
-{
-    // Read logging parameters 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+// // Read and format the system parameters 
+// void mtbdl_format_read_sys_params(void)
+// {
+//     // Read logging parameters 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(
-        mtbdl_data.data_buff, 
-        mtbdl_param_index, 
-        &mtbdl_data.log_index); 
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_index, 
+//         &mtbdl_data.log_index); 
 
-    // Read accelerometer calibration data 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+//     // Read accelerometer calibration data 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(
-        mtbdl_data.data_buff, 
-        mtbdl_param_accel_rest, 
-        &mtbdl_data.accel_x_rest, 
-        &mtbdl_data.accel_y_rest, 
-        &mtbdl_data.accel_z_rest); 
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_accel_rest, 
+//         &mtbdl_data.accel_x_rest, 
+//         &mtbdl_data.accel_y_rest, 
+//         &mtbdl_data.accel_z_rest); 
 
-    // Read potentiometer starting points 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+//     // Read potentiometer starting points 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
 
-    sscanf(
-        mtbdl_data.data_buff, 
-        mtbdl_param_pot_rest, 
-        &mtbdl_data.pot_fork_rest, 
-        &mtbdl_data.pot_shock_rest); 
-}
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_pot_rest, 
+//         &mtbdl_data.pot_fork_rest, 
+//         &mtbdl_data.pot_shock_rest); 
+// }
 
 //=======================================================================================
 
@@ -529,19 +529,22 @@ void mtbdl_format_read_sys_params(void)
 // Log name preparation 
 uint8_t mtbdl_log_name_prep(void)
 {
+    uint8_t log_index = param_get_log_index(); 
+
     // Check the data log index is within bounds 
-    if (mtbdl_data.log_index > MTBDL_LOG_NUM_MAX)
+    // if (mtbdl_data.log_index > MTBDL_LOG_NUM_MAX)
+    if (log_index > MTBDL_LOG_NUM_MAX)
     {
         // Too many log files on drive - don't create a new file name 
         return FALSE; 
     }
 
     // Number of log files is within the limit - generate a new log file name 
-    snprintf(
-        mtbdl_data.filename, 
-        MTBDL_MAX_DATA_STR_LEN, 
-        mtbdl_log_file, 
-        mtbdl_data.log_index); 
+    snprintf(mtbdl_data.filename, 
+             MTBDL_MAX_DATA_STR_LEN, 
+             mtbdl_log_file, 
+             log_index); 
+             // mtbdl_data.log_index); 
 
     return TRUE; 
 }
@@ -595,7 +598,9 @@ void mtbdl_log_file_prep(void)
         hw125_puts(mtbdl_data.data_buff); 
         
         hw125_puts(mtbdl_data_log_start); 
-        mtbdl_data.log_index++; 
+
+        // Log index gets incremented when closing the log file. 
+        // mtbdl_data.log_index++; 
     }
 }
 
@@ -924,7 +929,8 @@ void mtbdl_log_end(void)
     hw125_close(); 
 
     // Update the log index 
-    mtbdl_write_sys_params(HW125_MODE_OAWR); 
+    // mtbdl_write_sys_params(HW125_MODE_OAWR); 
+    param_update_log_index(PARAM_LOG_INDEX_INC); 
 
     // GPS - put back into a continuous read state 
     m8q_set_read_flag(); 
@@ -1017,7 +1023,8 @@ void mtbdl_rx(void)
 // Check log file count 
 uint8_t mtbdl_tx_check(void)
 {
-    return mtbdl_data.log_index; 
+    // return mtbdl_data.log_index; 
+    return param_get_log_index(); 
 }
 
 
@@ -1039,7 +1046,8 @@ uint8_t mtbdl_tx_prep(void)
         mtbdl_data.filename, 
         MTBDL_MAX_DATA_STR_LEN, 
         mtbdl_log_file, 
-        (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+        // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+        (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
 
     // Check for the existance of the specified file number 
     if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
@@ -1082,8 +1090,9 @@ void mtbdl_tx_end(void)
         // Transaction completed - delete the file and update the log index 
         hw125_unlink(mtbdl_data.filename); 
         mtbdl_data.tx_status = CLEAR_BIT; 
-        mtbdl_data.log_index--; 
-        mtbdl_write_sys_params(HW125_MODE_OAWR); 
+        // mtbdl_data.log_index--; 
+        // mtbdl_write_sys_params(HW125_MODE_OAWR); 
+        param_update_log_index(PARAM_LOG_INDEX_DEC); 
     }
 }
 
@@ -1255,7 +1264,8 @@ void mtbdl_set_pretx_msg(void)
         msg[HD44780U_L2].msg, 
         HD44780U_LINE_LEN, 
         mtbdl_pretx_msg[HD44780U_L2].msg, 
-        (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+        // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+        (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
 
     // Set the screen message 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 

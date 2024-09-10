@@ -440,7 +440,8 @@ void ui_gps_led_status_update(void)
 //         msg[HD44780U_L2].msg, 
 //         HD44780U_LINE_LEN, 
 //         mtbdl_pretx_msg[HD44780U_L2].msg, 
-//         (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+//         // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+//         (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
 
 //     // Set the screen message 
 //     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
@@ -530,6 +531,7 @@ void ui_gps_led_status_update(void)
 //=======================================================================================
 // TX mode 
 
+// TODO Get rid of this getter and use the one in the parameters module. 
 // // Check log file count 
 // uint8_t mtbdl_tx_check(void)
 // {
@@ -541,7 +543,8 @@ void ui_gps_led_status_update(void)
 // uint8_t mtbdl_tx_prep(void)
 // {
 //     // Check if there are no log files 
-//     if (!mtbdl_tx_check())
+//     // if (!mtbdl_tx_check())
+//     if (!param_get_log_index())
 //     {
 //         return FALSE; 
 //     }
@@ -555,7 +558,8 @@ void ui_gps_led_status_update(void)
 //         mtbdl_data.filename, 
 //         MTBDL_MAX_DATA_STR_LEN, 
 //         mtbdl_log_file, 
-//         (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+//         // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+//         (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
 
 //     // Check for the existance of the specified file number 
 //     if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
@@ -598,8 +602,9 @@ void ui_gps_led_status_update(void)
 //         // Transaction completed - delete the file and update the log index 
 //         hw125_unlink(mtbdl_data.filename); 
 //         mtbdl_data.tx_status = CLEAR_BIT; 
-//         mtbdl_data.log_index--; 
-//         mtbdl_write_sys_params(HW125_MODE_OAWR); 
+//         // mtbdl_data.log_index--; 
+//         // mtbdl_write_sys_params(HW125_MODE_OAWR); 
+//         param_update_log_index(PARAM_LOG_INDEX_DEC); 
 //     }
 // }
 

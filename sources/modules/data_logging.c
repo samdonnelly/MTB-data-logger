@@ -23,17 +23,17 @@
 //=======================================================================================
 // Enums 
 
-/**
- * @brief User parameter index --> for RX state 
- */
-typedef enum {
-    MTBDL_PARM_FPSI,   // Fork PSI 
-    MTBDL_PARM_FC,     // Fork compression setting 
-    MTBDL_PARM_FR,     // Fork rebound setting 
-    MTBDL_PARM_SPSI,   // Shock SPI 
-    MTBDL_PARM_SL,     // Shock lockout setting 
-    MTBDL_PARM_SR      // Shock rebound setting 
-} mtbdl_rx_param_index_t; 
+// /**
+//  * @brief User parameter index --> for RX state 
+//  */
+// typedef enum {
+//     MTBDL_PARM_FPSI,   // Fork PSI 
+//     MTBDL_PARM_FC,     // Fork compression setting 
+//     MTBDL_PARM_FR,     // Fork rebound setting 
+//     MTBDL_PARM_SPSI,   // Shock SPI 
+//     MTBDL_PARM_SL,     // Shock lockout setting 
+//     MTBDL_PARM_SR      // Shock rebound setting 
+// } mtbdl_rx_param_index_t; 
 
 
 /**
@@ -77,7 +77,7 @@ typedef enum {
 // Structures 
 
 // Data record instance 
-mtbdl_data_t mtbdl_data; 
+static mtbdl_data_t mtbdl_data; 
 
 
 // Logging schedule data 
@@ -105,49 +105,49 @@ typedef void (*mtbdl_log_stream)(void);
 //=======================================================================================
 // Function prototypes 
 
-/**
- * @brief Format and write the bike parameters 
- * 
- * @details Formats bike parameters (such as fork and shock settings) from the data 
- *          record into strings and writes the strings to the SD card. This function is 
- *          used when writing settings to both the bike parameters file and to newly 
- *          created log files. The bike parameters file is written upon creation and 
- *          when saving new settings. 
- */
-void mtbdl_format_write_bike_params(void); 
+// /**
+//  * @brief Format and write the bike parameters 
+//  * 
+//  * @details Formats bike parameters (such as fork and shock settings) from the data 
+//  *          record into strings and writes the strings to the SD card. This function is 
+//  *          used when writing settings to both the bike parameters file and to newly 
+//  *          created log files. The bike parameters file is written upon creation and 
+//  *          when saving new settings. 
+//  */
+// void mtbdl_format_write_bike_params(void); 
 
 
-/**
- * @brief Read and format the bike parameters 
- * 
- * @details Reads the bike settings/configuration from the SD card and saves the data 
- *          into the data record. These settings are stored in the bike parameters file 
- *          and this function is only called during startup if the file already exists. 
- */
-void mtbdl_format_read_bike_params(void); 
+// /**
+//  * @brief Read and format the bike parameters 
+//  * 
+//  * @details Reads the bike settings/configuration from the SD card and saves the data 
+//  *          into the data record. These settings are stored in the bike parameters file 
+//  *          and this function is only called during startup if the file already exists. 
+//  */
+// void mtbdl_format_read_bike_params(void); 
 
 
-/**
- * @brief Format and write the system parameters 
- * 
- * @details Formats system parameters (such as IMU and potentiometer calibration data) 
- *          from the data record into strings and writes the strings to the SD card. 
- *          This function is used when writing settings to both the system parameters 
- *          file and to newly created log files. The system parameters file is written 
- *          upon creation, when saving new settings and keeping track of the log file 
- *          number/index. 
- */
-void mtbdl_format_write_sys_params(void); 
+// /**
+//  * @brief Format and write the system parameters 
+//  * 
+//  * @details Formats system parameters (such as IMU and potentiometer calibration data) 
+//  *          from the data record into strings and writes the strings to the SD card. 
+//  *          This function is used when writing settings to both the system parameters 
+//  *          file and to newly created log files. The system parameters file is written 
+//  *          upon creation, when saving new settings and keeping track of the log file 
+//  *          number/index. 
+//  */
+// void mtbdl_format_write_sys_params(void); 
 
 
-/**
- * @brief Read and format the system parameters 
- * 
- * @details Reads the system settings from the SD card and saves the data into the data 
- *          record. These settings are stored in the system parameters file and this 
- *          function is only called during startup if the file already exists. 
- */
-void mtbdl_format_read_sys_params(void); 
+// /**
+//  * @brief Read and format the system parameters 
+//  * 
+//  * @details Reads the system settings from the SD card and saves the data into the data 
+//  *          record. These settings are stored in the system parameters file and this 
+//  *          function is only called during startup if the file already exists. 
+//  */
+// void mtbdl_format_read_sys_params(void); 
 
 
 /**
@@ -541,7 +541,7 @@ uint8_t mtbdl_log_name_prep(void)
 
     // Number of log files is within the limit - generate a new log file name 
     snprintf(mtbdl_data.filename, 
-             MTBDL_MAX_DATA_STR_LEN, 
+             MTBDL_MAX_STR_LEN, 
              mtbdl_log_file, 
              log_index); 
              // mtbdl_data.log_index); 
@@ -573,15 +573,17 @@ void mtbdl_log_file_prep(void)
         // track of the number of log files that have been created. 
         
         // Bike and system parameters 
-        mtbdl_format_write_bike_params(); 
-        mtbdl_format_write_sys_params(); 
+        // mtbdl_format_write_bike_params(); 
+        // mtbdl_format_write_sys_params(); 
+        param_bike_format_write(); 
+        param_sys_format_write(); 
 
         // UTC time stamp 
         m8q_get_time_utc_time(mtbdl_data.utc_time, MTBDL_TIME_BUFF_LEN); 
         m8q_get_time_utc_date(mtbdl_data.utc_date, MTBDL_DATE_BUFF_LEN); 
         snprintf(
             mtbdl_data.data_buff, 
-            MTBDL_MAX_DATA_STR_LEN, 
+            MTBDL_MAX_STR_LEN, 
             mtbdl_param_time, 
             (char *)mtbdl_data.utc_time, 
             (char *)mtbdl_data.utc_date); 
@@ -590,7 +592,7 @@ void mtbdl_log_file_prep(void)
         // Logging info 
         snprintf(
             mtbdl_data.data_buff, 
-            MTBDL_MAX_DATA_STR_LEN, 
+            MTBDL_MAX_STR_LEN, 
             mtbdl_param_data, 
             MTBDL_LOG_PERIOD, 
             MTBDL_REV_LOG_FREQ, 
@@ -751,7 +753,7 @@ void mtbdl_log_stream_standard(void)
     // Format standard log string 
     snprintf(
         mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
+        MTBDL_MAX_STR_LEN, 
         mtbdl_data_log_1, 
         mtbdl_data.trailmark, 
         mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
@@ -814,7 +816,7 @@ void mtbdl_log_stream_speed(void)
     // Format wheel speed data log string 
     snprintf(
         mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
+        MTBDL_MAX_STR_LEN, 
         mtbdl_data_log_2, 
         mtbdl_data.trailmark, 
         mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
@@ -845,7 +847,7 @@ void mtbdl_log_stream_accel(void)
         // Format accel data log string 
         snprintf(
             mtbdl_data.data_buff, 
-            MTBDL_MAX_DATA_STR_LEN, 
+            MTBDL_MAX_STR_LEN, 
             mtbdl_data_log_3, 
             mtbdl_data.trailmark, 
             mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
@@ -884,7 +886,7 @@ void mtbdl_log_stream_gps(void)
     // Format GPS data log string 
     snprintf(
         mtbdl_data.data_buff, 
-        MTBDL_MAX_DATA_STR_LEN, 
+        MTBDL_MAX_STR_LEN, 
         mtbdl_data_log_4, 
         mtbdl_data.trailmark, 
         mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
@@ -942,77 +944,77 @@ void mtbdl_log_end(void)
 //=======================================================================================
 // RX state functions 
 
-// RX user interface start 
-void mtbdl_rx_prep(void)
-{
-    hc05_send(mtbdl_rx_prompt); 
-    hc05_clear(); 
-}
+// // RX user interface start 
+// void mtbdl_rx_prep(void)
+// {
+//     hc05_send(mtbdl_rx_prompt); 
+//     hc05_clear(); 
+// }
 
 
-// Read user input 
-void mtbdl_rx(void)
-{
-    unsigned int param_index, temp_data; 
+// // Read user input 
+// void mtbdl_rx(void)
+// {
+//     unsigned int param_index, temp_data; 
 
-    // Read Bluetooth data if available 
-    if (hc05_data_status())
-    {
-        // Read and parse the data from the HC-05 
-        hc05_read(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-        sscanf(
-            mtbdl_data.data_buff, 
-            mtbdl_rx_input, 
-            &param_index, 
-            &temp_data); 
+//     // Read Bluetooth data if available 
+//     if (hc05_data_status())
+//     {
+//         // Read and parse the data from the HC-05 
+//         hc05_read(mtbdl_data.data_buff, MTBDL_MAX_STR_LEN); 
+//         sscanf(
+//             mtbdl_data.data_buff, 
+//             mtbdl_rx_input, 
+//             &param_index, 
+//             &temp_data); 
 
-        // Check for a data match 
-        switch (param_index)
-        {
-            case MTBDL_PARM_FPSI:
-                mtbdl_data.fork_psi = temp_data; 
-                break;
+//         // Check for a data match 
+//         switch (param_index)
+//         {
+//             case MTBDL_PARM_FPSI:
+//                 mtbdl_data.fork_psi = temp_data; 
+//                 break;
 
-            case MTBDL_PARM_FC:
-                if (temp_data <= MTBDL_MAX_SUS_SETTING)
-                {
-                    mtbdl_data.fork_comp = temp_data; 
-                }
-                break;
+//             case MTBDL_PARM_FC:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.fork_comp = temp_data; 
+//                 }
+//                 break;
 
-            case MTBDL_PARM_FR:
-                if (temp_data <= MTBDL_MAX_SUS_SETTING)
-                {
-                    mtbdl_data.fork_reb = temp_data; 
-                }
-                break;
+//             case MTBDL_PARM_FR:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.fork_reb = temp_data; 
+//                 }
+//                 break;
 
-            case MTBDL_PARM_SPSI:
-                mtbdl_data.shock_psi = temp_data; 
-                break;
+//             case MTBDL_PARM_SPSI:
+//                 mtbdl_data.shock_psi = temp_data; 
+//                 break;
 
-            case MTBDL_PARM_SL:
-                if (temp_data <= MTBDL_MAX_SUS_SETTING)
-                {
-                    mtbdl_data.shock_lock = temp_data; 
-                }
-                break;
+//             case MTBDL_PARM_SL:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.shock_lock = temp_data; 
+//                 }
+//                 break;
 
-            case MTBDL_PARM_SR:
-                if (temp_data <= MTBDL_MAX_SUS_SETTING)
-                {
-                    mtbdl_data.shock_reb = temp_data; 
-                }
-                break;
+//             case MTBDL_PARM_SR:
+//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
+//                 {
+//                     mtbdl_data.shock_reb = temp_data; 
+//                 }
+//                 break;
             
-            default: 
-                break;
-        }
+//             default: 
+//                 break;
+//         }
 
-        // Provide a user prompt 
-        mtbdl_rx_prep(); 
-    }
-}
+//         // Provide a user prompt 
+//         mtbdl_rx_prep(); 
+//     }
+// }
 
 //=======================================================================================
 
@@ -1020,81 +1022,82 @@ void mtbdl_rx(void)
 //=======================================================================================
 // TX state functions 
 
-// Check log file count 
-uint8_t mtbdl_tx_check(void)
-{
-    // return mtbdl_data.log_index; 
-    return param_get_log_index(); 
-}
+// // Check log file count 
+// uint8_t mtbdl_tx_check(void)
+// {
+//     // return mtbdl_data.log_index; 
+//     return param_get_log_index(); 
+// }
 
 
-// Prepare to send a data log file 
-uint8_t mtbdl_tx_prep(void)
-{
-    // Check if there are no log files 
-    if (!mtbdl_tx_check())
-    {
-        return FALSE; 
-    }
+// // Prepare to send a data log file 
+// uint8_t mtbdl_tx_prep(void)
+// {
+//     // Check if there are no log files 
+//     // if (!mtbdl_tx_check())
+//     if (!param_get_log_index())
+//     {
+//         return FALSE; 
+//     }
 
-    // Log files exist. Move to the data directory. 
-    hw125_set_dir(mtbdl_data_dir); 
+//     // Log files exist. Move to the data directory. 
+//     hw125_set_dir(mtbdl_data_dir); 
 
-    // Generate a log file name. The log index is adjusted because it will be one ahead 
-    // of the most recent log file number after the most recent log has been created 
-    snprintf(
-        mtbdl_data.filename, 
-        MTBDL_MAX_DATA_STR_LEN, 
-        mtbdl_log_file, 
-        // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
-        (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
+//     // Generate a log file name. The log index is adjusted because it will be one ahead 
+//     // of the most recent log file number after the most recent log has been created 
+//     snprintf(
+//         mtbdl_data.filename, 
+//         MTBDL_MAX_STR_LEN, 
+//         mtbdl_log_file, 
+//         // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+//         (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
 
-    // Check for the existance of the specified file number 
-    if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
-    {
-        return FALSE; 
-    }
+//     // Check for the existance of the specified file number 
+//     if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
+//     {
+//         return FALSE; 
+//     }
 
-    // Open the file 
-    hw125_open(mtbdl_data.filename, HW125_MODE_OAWR); 
+//     // Open the file 
+//     hw125_open(mtbdl_data.filename, HW125_MODE_OAWR); 
 
-    return TRUE; 
-}
-
-
-// Transfer data log contents 
-uint8_t mtbdl_tx(void)
-{
-    // Read a line from the data log and send it out via the Bluetooth module. 
-    hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-    hc05_send(mtbdl_data.data_buff); 
-
-    // Check for end of file - if true we can stop the transaction 
-    if (hw125_eof())
-    {
-        mtbdl_data.tx_status = SET_BIT; 
-        return TRUE; 
-    }
-
-    return FALSE; 
-}
+//     return TRUE; 
+// }
 
 
-// End the transmission 
-void mtbdl_tx_end(void)
-{
-    hw125_close(); 
+// // Transfer data log contents 
+// uint8_t mtbdl_tx(void)
+// {
+//     // Read a line from the data log and send it out via the Bluetooth module. 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_STR_LEN); 
+//     hc05_send(mtbdl_data.data_buff); 
 
-    if (mtbdl_data.tx_status)
-    {
-        // Transaction completed - delete the file and update the log index 
-        hw125_unlink(mtbdl_data.filename); 
-        mtbdl_data.tx_status = CLEAR_BIT; 
-        // mtbdl_data.log_index--; 
-        // mtbdl_write_sys_params(HW125_MODE_OAWR); 
-        param_update_log_index(PARAM_LOG_INDEX_DEC); 
-    }
-}
+//     // Check for end of file - if true we can stop the transaction 
+//     if (hw125_eof())
+//     {
+//         mtbdl_data.tx_status = SET_BIT; 
+//         return TRUE; 
+//     }
+
+//     return FALSE; 
+// }
+
+
+// // End the transmission 
+// void mtbdl_tx_end(void)
+// {
+//     hw125_close(); 
+
+//     if (mtbdl_data.tx_status)
+//     {
+//         // Transaction completed - delete the file and update the log index 
+//         hw125_unlink(mtbdl_data.filename); 
+//         mtbdl_data.tx_status = CLEAR_BIT; 
+//         // mtbdl_data.log_index--; 
+//         // mtbdl_write_sys_params(HW125_MODE_OAWR); 
+//         param_update_log_index(PARAM_LOG_INDEX_DEC); 
+//     }
+// }
 
 //=======================================================================================
 
@@ -1169,6 +1172,8 @@ void mtbdl_cal_calc(void)
         (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] / mtbdl_data.cal_index); 
     mtbdl_data.pot_shock_rest = 
         (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] / mtbdl_data.cal_index); 
+
+    // TODO update the parameter files? 
 }
 
 //=======================================================================================
@@ -1277,20 +1282,44 @@ void mtbdl_set_pretx_msg(void)
 //=======================================================================================
 // Data checks and updates 
 
-// Update LED colours 
-void mtbdl_led_update(
-    ws2812_led_index_t led_index, 
-    uint32_t led_code)
-{
-    mtbdl_data.led_colour_data[led_index] = led_code; 
-    ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
-}
+// // Update LED colours 
+// void mtbdl_led_update(
+//     ws2812_led_index_t led_index, 
+//     uint32_t led_code)
+// {
+//     mtbdl_data.led_colour_data[led_index] = led_code; 
+//     ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
+// }
 
 // Set trail marker flag 
 void mtbdl_set_trailmark(void)
 {
     mtbdl_data.trailmark = SET_BIT; 
     mtbdl_data.user_input = SET_BIT; 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Getters 
+
+// Get battery voltage 
+uint16_t log_get_bat_voltage(void)
+{
+    // A DMA transfer is used here to get the current battery voltage. ADC + DMA is set 
+    // up for the fork and shocks voltages as well as the battery voltage. It may be 
+    // easier to do a single ADC read of just the battery voltage but then the ADC port 
+    // and channel would need to be stored. In addition, since DMA is already configured, 
+    // it makes for less setup to just use the existing DMA method. The ADC DMA transfer 
+    // is started and the code waits for the DMA transfer to complete before returning 
+    // the battery voltage. 
+
+    // adc_start(mtbdl_data.adc); 
+
+    // return mtbdl_data.adc_buff[MTBDL_ADC_SOC]; 
+
+    return FALSE; 
 }
 
 //=======================================================================================

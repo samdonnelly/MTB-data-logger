@@ -19,6 +19,7 @@
 // Includes 
 
 #include "includes_drivers.h" 
+#include "string_config.h" 
 
 //=======================================================================================
 
@@ -79,6 +80,14 @@ typedef struct mtbdl_ui_s
     uint32_t led_write_data[WS2812_LED_NUM];    // LED write buffer 
     uint16_t led_counter; 
     mtbdl_ui_led_blink_t led_state[WS2812_LED_NUM]; 
+
+    // System info 
+    uint16_t navstat;                           // Navigation status of GPS module 
+
+    // SD Card 
+    char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
+    char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
+    uint8_t tx_status;                          // TX transaction status 
 }
 mtbdl_ui_t; 
 
@@ -146,16 +155,114 @@ void ui_gps_led_status_update(void);
 
 //=======================================================================================
 // Screen control 
+
+/**
+ * @brief Format the idle state message 
+ * 
+ * @details The idle state message contains system values that are relevant to the user 
+ *          and these values can change, This function updates the values of the idle 
+ *          state message and triggers a write of this message to the screen. A list of 
+ *          the values that the message contains are listed in the parameters below. 
+ */
+void ui_set_idle_msg(void); 
+
+
+/**
+ * @brief Format the run prep state message 
+ * 
+ * @details The run prep state message contains the GPS position lock status. This 
+ *          information is displayed to the user before entering the run mode and allows 
+ *          the user to know if they have GPS lock before beginning to record data. This 
+ *          function updates GPS status information and triggers a write of this message 
+ *          to the screen. 
+ */
+void ui_set_run_prep_msg(void); 
+
+
+/**
+ * @brief Format the pre TX state message 
+ * 
+ * @details The pre TX state message contains the current log file index which tells the 
+ *          user how many log files are available to be sent. This function adds the log 
+ *          index to the message before writing it to the screen. 
+ */
+void ui_set_pretx_msg(void); 
+
 //=======================================================================================
 
 
 //=======================================================================================
 // RX mode 
+
+/**
+ * @brief RX user interface start 
+ * 
+ * @details Passes a user prompt to the Bluetooth module which gets sent to an external 
+ *          device. Note that the Bluetooth module must be connected to a device that can 
+ *          display the sent messages for this to have an effect. The prompt tells the 
+ *          user that the system is ready to receive its input. 
+ */
+void ui_rx_prep(void); 
+
+
+/**
+ * @brief Read user input 
+ * 
+ * @details Poles the Bluetooth module for new data, then once new data is available it's 
+ *          read and checked against valid commands. If a match is found then system 
+ *          settings/parameters are updated. If the user input does not match one of the 
+ *          available commands then nothing will change. This function should be called 
+ *          continuously to check for data and provide a new user prompt after data is 
+ *          input. 
+ */
+void ui_rx(void); 
+
 //=======================================================================================
 
 
 //=======================================================================================
 // TX mode 
+
+/**
+ * @brief Prepare to send a data log file 
+ * 
+ * @details If a log file exists that matches the most recent data log index then this 
+ *          function will open that file and return true. Otherwise it will return false. 
+ * 
+ * @return uint8_t : status of the file check 
+ */
+uint8_t ui_tx_prep(void); 
+
+
+/**
+ * @brief Transfer data log contents 
+ * 
+ * @details Reads a single line from an open data log file and passes the info to the 
+ *          Bluetooth module for sending out to an external device. The end of the file 
+ *          is checked for after each line. Once the end of the file is seen the function 
+ *          will return false. This function does not loop so it needs to be repeatedly 
+ *          called. 
+ * 
+ *          Note that this function does not check for a valid open file. The TX prep 
+ *          function should be called before this function to make sure there is a file 
+ *          open before trying to read from the SD card. 
+ * 
+ * @see ui_tx_prep 
+ * 
+ * @return uint8_t : end of file status 
+ */
+uint8_t ui_tx(void); 
+
+
+/**
+ * @brief Close the log file and delete it 
+ * 
+ * @details Closes the open data log file, and if the transaction completed successfully 
+ *          then the log file will be deleted and the log index updated. Note that this 
+ *          function should only be called after 'ui_tx' is done being called. 
+ */
+void ui_tx_end(void); 
+
 //=======================================================================================
 
 

@@ -1,9 +1,9 @@
 /**
- * @file data_logging_config.h 
+ * @file string_config.h 
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB data logging configuration interface 
+ * @brief MTBDL string configuration interface 
  * 
  * @version 0.1
  * @date 2023-05-21
@@ -12,8 +12,15 @@
  * 
  */
 
-#ifndef _DATA_LOGGING_CONFIG_H_ 
-#define _DATA_LOGGING_CONFIG_H_ 
+#ifndef _STRING_CONFIG_H_ 
+#define _STRING_CONFIG_H_ 
+
+//=======================================================================================
+// Macros 
+
+#define MTBDL_MAX_STR_LEN 60 
+
+//=======================================================================================
 
 //=======================================================================================
 // Directories 
@@ -66,4 +73,4 @@ mtbdl_rx_input[];            // User input during the RX state
 
 //=======================================================================================
 
-#endif   // _DATA_LOGGING_CONFIG_H_ 
+#endif   // _STRING_CONFIG_H_ 

@@ -16,7 +16,10 @@
 // Includes 
 
 #include "user_interface.h" 
+#include "system_parameters.h" 
+
 #include "ws2812_config.h" 
+#include "hd44780u_config.h" 
 #include "stm32f4xx_it.h" 
 
 //=======================================================================================
@@ -25,8 +28,11 @@
 //=======================================================================================
 // Macros 
 
-#define UI_LED_COUNTER_PERIOD 200   // 5ms interrupt * 200 == 1s counter period 
-#define UI_LED_WRITE_PERIOD 10      // 5ms interrupt * 10 == 50ms write period 
+#define UI_LED_COUNTER_PERIOD 200      // 5ms interrupt * 200 == 1s counter period 
+#define UI_LED_WRITE_PERIOD 10         // 5ms interrupt * 10 == 50ms write period 
+
+#define UI_LOG_INDEX_OFFSET 1 
+#define UI_SCREEN_LINE_CHAR_OFFSET 1   // Prevents NULL from being the last line character 
 
 //=======================================================================================
 
@@ -102,6 +108,20 @@ void ui_init(
     mtbdl_ui.user_btn_3_block = CLEAR_BIT; 
     mtbdl_ui.user_btn_4_block = CLEAR_BIT; 
 
+    // Configure the GPIO inputs for each user button 
+    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_1, 
+                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_2, 
+                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_3, 
+                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_4, 
+                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+
+    // Initialize the button debouncer 
+    debounce_init(mtbdl_ui.user_btn_1 | mtbdl_ui.user_btn_2 | 
+                  mtbdl_ui.user_btn_3 | mtbdl_ui.user_btn_4); 
+
     // LED colour data 
     memset((void *)mtbdl_ui.led_colours, CLEAR, sizeof(mtbdl_ui.led_colours)); 
     memset((void *)mtbdl_ui.led_write_data, CLEAR, sizeof(mtbdl_ui.led_write_data)); 
@@ -117,19 +137,13 @@ void ui_init(
     mtbdl_ui.led_state[WS2812_LED_3] = 
         (mtbdl_ui_led_blink_t){ WS2812_LED_3, UI_LED_DUTY_SHORT, CLEAR }; 
 
-    // Configure the GPIO inputs for each user button 
-    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_1, 
-                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_2, 
-                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_3, 
-                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    gpio_pin_init(mtbdl_ui.user_btn_port, mtbdl_ui.user_btn_4, 
-                  MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
+    // Initialize system info 
+    mtbdl_ui.navstat = M8Q_NAVSTAT_NF; 
 
-    // Initialize the button debouncer 
-    debounce_init(mtbdl_ui.user_btn_1 | mtbdl_ui.user_btn_2 | 
-                  mtbdl_ui.user_btn_3 | mtbdl_ui.user_btn_4); 
+    // Initialize SD card info 
+    memset((void *)mtbdl_ui.data_buff, CLEAR, sizeof(mtbdl_ui.data_buff)); 
+    memset((void *)mtbdl_ui.filename, CLEAR, sizeof(mtbdl_ui.filename)); 
+    mtbdl_ui.tx_status = CLEAR; 
 }
 
 //=======================================================================================
@@ -351,101 +365,94 @@ void ui_gps_led_status_update(void)
 //=======================================================================================
 // Screen control 
 
-// State message updates 
+// Format the idle state message 
+void ui_set_idle_msg(void)
+{
+    hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
-// // Format the idle state message 
-// void mtbdl_set_idle_msg(void)
-// {
-//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+    // Create an editable copy of the message 
+    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
+    {
+        msg[i] = mtbdl_idle_msg[i]; 
+    }
 
-//     // Create an editable copy of the message 
-//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
-//     {
-//         msg[i] = mtbdl_idle_msg[i]; 
-//     }
+    mtbdl_ui.navstat = m8q_get_position_navstat(); 
 
-//     // Format the message with data 
-//     // snprintf will NULL terminate the string at the screen line length so in order to use 
-//     // the last spot on the screen line the message length must be indexed up by one 
-//     snprintf(
-//         msg[HD44780U_L1].msg, 
-//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
-//         mtbdl_idle_msg[HD44780U_L1].msg, 
-//         mtbdl_data.fork_psi, 
-//         mtbdl_data.fork_comp, 
-//         mtbdl_data.fork_reb); 
+    // Format the messages with data 
+    // snprintf will NULL terminate the string at the screen line length so in order to use 
+    // the last spot on the screen line the message length must be indexed up by one 
+
+    snprintf(msg[HD44780U_L1].msg, 
+             (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+             mtbdl_idle_msg[HD44780U_L1].msg, 
+             param_get_bike_setting(PARAM_BIKE_SET_FPSI), 
+             param_get_bike_setting(PARAM_BIKE_SET_FC), 
+             param_get_bike_setting(PARAM_BIKE_SET_FR)); 
     
-//     snprintf(
-//         msg[HD44780U_L2].msg, 
-//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
-//         mtbdl_idle_msg[HD44780U_L2].msg, 
-//         mtbdl_data.shock_psi, 
-//         mtbdl_data.shock_lock, 
-//         mtbdl_data.shock_reb); 
+    snprintf(msg[HD44780U_L2].msg, 
+             (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+             mtbdl_idle_msg[HD44780U_L2].msg, 
+             param_get_bike_setting(PARAM_BIKE_SET_SPSI), 
+             param_get_bike_setting(PARAM_BIKE_SET_SL), 
+             param_get_bike_setting(PARAM_BIKE_SET_SR)); 
     
-//     snprintf(
-//         msg[HD44780U_L3].msg, 
-//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
-//         mtbdl_idle_msg[HD44780U_L3].msg, 
-//         mtbdl_data.adc_buff[MTBDL_ADC_SOC], 
-//         (char)(mtbdl_data.navstat >> SHIFT_8), 
-//         (char)mtbdl_data.navstat); 
+    snprintf(msg[HD44780U_L3].msg, 
+             (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+             mtbdl_idle_msg[HD44780U_L3].msg, 
+             // mtbdl_data.adc_buff[MTBDL_ADC_SOC], 
+             1, 
+             (char)(mtbdl_ui.navstat >> SHIFT_8), 
+             (char)(mtbdl_ui.navstat)); 
 
-//     // Set the screen message 
-//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
-// }
-
-
-// // Format the run prep state message 
-// void mtbdl_set_run_prep_msg(void)
-// {
-//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
-
-//     // Create an editable copy of the message 
-//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_3_LINE; i++) 
-//     {
-//         msg[i] = mtbdl_run_prep_msg[i]; 
-//     }
-
-//     // Convert the NAVSTAT code to an easily readable value 
-
-//     // Format the message with data 
-//     snprintf(
-//         msg[HD44780U_L1].msg, 
-//         HD44780U_LINE_LEN, 
-//         mtbdl_run_prep_msg[HD44780U_L1].msg, 
-//         (char)(mtbdl_data.navstat >> SHIFT_8), 
-//         (char)mtbdl_data.navstat); 
-
-//     // Set the screen message 
-//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_3_LINE); 
-// }
+    hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
+}
 
 
-// // Format the pre TX state message 
-// void mtbdl_set_pretx_msg(void)
-// {
-//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+// Format the run prep state message 
+void ui_set_run_prep_msg(void)
+{
+    hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
 
-//     // Create an editable copy of the message 
-//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
-//     {
-//         msg[i] = mtbdl_pretx_msg[i]; 
-//     }
+    // Create an editable copy of the message 
+    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_3_LINE; i++) 
+    {
+        msg[i] = mtbdl_run_prep_msg[i]; 
+    }
 
-//     // Format the message with data 
-//     // The log index is adjusted because it will be one ahead of the most recent log 
-//     // file number after the most recent log has been created 
-//     snprintf(
-//         msg[HD44780U_L2].msg, 
-//         HD44780U_LINE_LEN, 
-//         mtbdl_pretx_msg[HD44780U_L2].msg, 
-//         // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
-//         (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
+    mtbdl_ui.navstat = m8q_get_position_navstat(); 
 
-//     // Set the screen message 
-//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
-// }
+    // Format the message with data 
+    snprintf(msg[HD44780U_L1].msg, 
+             HD44780U_LINE_LEN, 
+             mtbdl_run_prep_msg[HD44780U_L1].msg, 
+             (char)(mtbdl_ui.navstat >> SHIFT_8), 
+             (char)(mtbdl_ui.navstat)); 
+
+    hd44780u_set_msg(msg, MTBDL_MSG_LEN_3_LINE); 
+}
+
+
+// Format the pre TX state message 
+void ui_set_pretx_msg(void)
+{
+    hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+
+    // Create an editable copy of the message 
+    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
+    {
+        msg[i] = mtbdl_pretx_msg[i]; 
+    }
+
+    // Format the message with data 
+    // The log index is adjusted because it will be one ahead of the most recent log 
+    // file number after the most recent log has been created 
+    snprintf(msg[HD44780U_L2].msg, 
+             HD44780U_LINE_LEN, 
+             mtbdl_pretx_msg[HD44780U_L2].msg, 
+             (param_get_log_index() - UI_LOG_INDEX_OFFSET)); 
+
+    hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
+}
 
 //=======================================================================================
 
@@ -453,77 +460,39 @@ void ui_gps_led_status_update(void)
 //=======================================================================================
 // RX mode 
 
-// // RX user interface start 
-// void mtbdl_rx_prep(void)
-// {
-//     hc05_send(mtbdl_rx_prompt); 
-//     hc05_clear(); 
-// }
+// RX user interface start 
+void ui_rx_prep(void)
+{
+    hc05_send(mtbdl_rx_prompt); 
+    hc05_clear(); 
+}
 
 
-// // Read user input 
-// void mtbdl_rx(void)
-// {
-//     unsigned int param_index, temp_data; 
+// Read user input 
+void ui_rx(void)
+{
+    unsigned int param_index, setting_data; 
 
-//     // Read Bluetooth data if available 
-//     if (hc05_data_status())
-//     {
-//         // Read and parse the data from the HC-05 
-//         hc05_read(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-//         sscanf(
-//             mtbdl_data.data_buff, 
-//             mtbdl_rx_input, 
-//             &param_index, 
-//             &temp_data); 
+    // Read Bluetooth data if available 
+    if (hc05_data_status())
+    {
+        // Read and parse the data from the HC-05 
+        hc05_read(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
+        sscanf(mtbdl_ui.data_buff, 
+               mtbdl_rx_input, 
+               &param_index, 
+               &setting_data); 
 
-//         // Check for a data match 
-//         switch (param_index)
-//         {
-//             case MTBDL_PARM_FPSI:
-//                 mtbdl_data.fork_psi = temp_data; 
-//                 break;
+        // Check for a data match if a valid parameter index is provided 
+        if (param_index < PARAM_BIKE_SET_SR)
+        {
+            param_update_bike_setting((param_bike_set_index_t)param_index, setting_data); 
+        }
 
-//             case MTBDL_PARM_FC:
-//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
-//                 {
-//                     mtbdl_data.fork_comp = temp_data; 
-//                 }
-//                 break;
-
-//             case MTBDL_PARM_FR:
-//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
-//                 {
-//                     mtbdl_data.fork_reb = temp_data; 
-//                 }
-//                 break;
-
-//             case MTBDL_PARM_SPSI:
-//                 mtbdl_data.shock_psi = temp_data; 
-//                 break;
-
-//             case MTBDL_PARM_SL:
-//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
-//                 {
-//                     mtbdl_data.shock_lock = temp_data; 
-//                 }
-//                 break;
-
-//             case MTBDL_PARM_SR:
-//                 if (temp_data <= MTBDL_MAX_SUS_SETTING)
-//                 {
-//                     mtbdl_data.shock_reb = temp_data; 
-//                 }
-//                 break;
-            
-//             default: 
-//                 break;
-//         }
-
-//         // Provide a user prompt 
-//         mtbdl_rx_prep(); 
-//     }
-// }
+        // Provide a user prompt 
+        ui_rx_prep(); 
+    }
+}
 
 //=======================================================================================
 
@@ -531,82 +500,69 @@ void ui_gps_led_status_update(void)
 //=======================================================================================
 // TX mode 
 
-// TODO Get rid of this getter and use the one in the parameters module. 
-// // Check log file count 
-// uint8_t mtbdl_tx_check(void)
-// {
-//     return mtbdl_data.log_index; 
-// }
+// Prepare to send a data log file 
+uint8_t ui_tx_prep(void)
+{
+    // Check if there are no log files 
+    if (!param_get_log_index())
+    {
+        return FALSE; 
+    }
+
+    // Log files exist. Move to the data directory. 
+    hw125_set_dir(mtbdl_data_dir); 
+
+    // Generate a log file name. The log index is adjusted because it will be one ahead 
+    // of the most recent log file number after the most recent log has been created 
+    snprintf(mtbdl_ui.filename, 
+             MTBDL_MAX_STR_LEN, 
+             mtbdl_log_file, 
+             (param_get_log_index() - UI_LOG_INDEX_OFFSET)); 
+
+    // Check for the existance of the specified file number 
+    if (hw125_get_exists(mtbdl_ui.filename) == FR_NO_FILE)
+    {
+        return FALSE; 
+    }
+
+    // Open the file 
+    hw125_open(mtbdl_ui.filename, HW125_MODE_OAWR); 
+
+    return TRUE; 
+}
 
 
-// // Prepare to send a data log file 
-// uint8_t mtbdl_tx_prep(void)
-// {
-//     // Check if there are no log files 
-//     // if (!mtbdl_tx_check())
-//     if (!param_get_log_index())
-//     {
-//         return FALSE; 
-//     }
+// Transfer data log contents 
+uint8_t ui_tx(void)
+{
+    // Read a line from the data log and send it out via the Bluetooth module. 
+    hw125_gets(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
+    hc05_send(mtbdl_ui.data_buff); 
 
-//     // Log files exist. Move to the data directory. 
-//     hw125_set_dir(mtbdl_data_dir); 
+    // Check for end of file - if true we can stop the transaction 
+    if (hw125_eof())
+    {
+        mtbdl_ui.tx_status = SET_BIT; 
+        return TRUE; 
+    }
 
-//     // Generate a log file name. The log index is adjusted because it will be one ahead 
-//     // of the most recent log file number after the most recent log has been created 
-//     snprintf(
-//         mtbdl_data.filename, 
-//         MTBDL_MAX_DATA_STR_LEN, 
-//         mtbdl_log_file, 
-//         // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
-//         (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
-
-//     // Check for the existance of the specified file number 
-//     if (hw125_get_exists(mtbdl_data.filename) == FR_NO_FILE)
-//     {
-//         return FALSE; 
-//     }
-
-//     // Open the file 
-//     hw125_open(mtbdl_data.filename, HW125_MODE_OAWR); 
-
-//     return TRUE; 
-// }
+    return FALSE; 
+}
 
 
-// // Transfer data log contents 
-// uint8_t mtbdl_tx(void)
-// {
-//     // Read a line from the data log and send it out via the Bluetooth module. 
-//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-//     hc05_send(mtbdl_data.data_buff); 
+// End the transmission 
+void ui_tx_end(void)
+{
+    hw125_close(); 
 
-//     // Check for end of file - if true we can stop the transaction 
-//     if (hw125_eof())
-//     {
-//         mtbdl_data.tx_status = SET_BIT; 
-//         return TRUE; 
-//     }
-
-//     return FALSE; 
-// }
-
-
-// // End the transmission 
-// void mtbdl_tx_end(void)
-// {
-//     hw125_close(); 
-
-//     if (mtbdl_data.tx_status)
-//     {
-//         // Transaction completed - delete the file and update the log index 
-//         hw125_unlink(mtbdl_data.filename); 
-//         mtbdl_data.tx_status = CLEAR_BIT; 
-//         // mtbdl_data.log_index--; 
-//         // mtbdl_write_sys_params(HW125_MODE_OAWR); 
-//         param_update_log_index(PARAM_LOG_INDEX_DEC); 
-//     }
-// }
+    if (mtbdl_ui.tx_status)
+    {
+        // Transaction completed - delete the file and update the log index 
+        hw125_unlink(mtbdl_ui.filename); 
+        mtbdl_ui.tx_status = CLEAR_BIT; 
+        param_update_log_index(PARAM_LOG_INDEX_DEC); 
+    }
+}
 
 //=======================================================================================
 

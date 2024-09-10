@@ -26,7 +26,7 @@
 #include "user_interface.h" 
 
 // Config files 
-#include "data_logging_config.h" 
+#include "string_config.h" 
 #include "ws2812_config.h" 
 #include "hd44780u_config.h" 
 #include "m8q_config.h" 

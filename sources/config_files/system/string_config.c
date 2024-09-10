@@ -1,9 +1,9 @@
 /**
- * @file data_logging_config.c
+ * @file string_config.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB data logging configuration 
+ * @brief MTBDL string configuration 
  * 
  * @version 0.1
  * @date 2023-05-21
@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "data_logging_config.h" 
+#include "string_config.h" 
 
 //=======================================================================================
 

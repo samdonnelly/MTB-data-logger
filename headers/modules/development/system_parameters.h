@@ -19,14 +19,7 @@
 // Includes 
 
 #include "includes_drivers.h" 
-
-//=======================================================================================
-
-
-//=======================================================================================
-// Macros 
-
-#define PARAM_MAX_STR_LEN 60 
+#include "string_config.h" 
 
 //=======================================================================================
 
@@ -34,11 +27,23 @@
 //=======================================================================================
 // Enums 
 
-// 
+// Log index change type 
 typedef enum {
     PARAM_LOG_INDEX_DEC, 
     PARAM_LOG_INDEX_INC 
 } param_log_index_change_t; 
+
+
+// User bike setting index 
+typedef enum {
+    PARAM_BIKE_SET_FPSI,   // Fork PSI 
+    PARAM_BIKE_SET_FC,     // Fork compression setting 
+    PARAM_BIKE_SET_FR,     // Fork rebound setting 
+    PARAM_BIKE_SET_SPSI,   // Shock SPI 
+    PARAM_BIKE_SET_SL,     // Shock lockout setting 
+    PARAM_BIKE_SET_SR,     // Shock rebound setting 
+    PARAM_BIKE_SET_NONE    // No setting 
+} param_bike_set_index_t; 
 
 //=======================================================================================   
 
@@ -65,7 +70,7 @@ typedef struct mtbdl_param_s
     uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
     // SD card 
-    char param_buff[PARAM_MAX_STR_LEN];         // Buffer for reading and writing 
+    char param_buff[MTBDL_MAX_STR_LEN];         // Buffer for reading and writing 
     uint8_t log_index;                          // Data log index 
 }
 mtbdl_param_t; 
@@ -132,6 +137,51 @@ void param_write_sys_params(uint8_t mode);
  */
 void param_read_sys_params(uint8_t mode); 
 
+
+/**
+ * @brief Format and write the bike parameters 
+ * 
+ * @details Formats bike parameters (such as fork and shock settings) from the data 
+ *          record into strings and writes the strings to the SD card. This function is 
+ *          used when writing settings to both the bike parameters file and to newly 
+ *          created log files. The bike parameters file is written upon creation and 
+ *          when saving new settings. 
+ */
+void param_bike_format_write(void); 
+
+
+/**
+ * @brief Read and format the bike parameters 
+ * 
+ * @details Reads the bike settings/configuration from the SD card and saves the data 
+ *          into the data record. These settings are stored in the bike parameters file 
+ *          and this function is only called during startup if the file already exists. 
+ */
+void param_bike_read_format(void); 
+
+
+/**
+ * @brief Format and write the system parameters 
+ * 
+ * @details Formats system parameters (such as IMU and potentiometer calibration data) 
+ *          from the data record into strings and writes the strings to the SD card. 
+ *          This function is used when writing settings to both the system parameters 
+ *          file and to newly created log files. The system parameters file is written 
+ *          upon creation, when saving new settings and keeping track of the log file 
+ *          number/index. 
+ */
+void param_sys_format_write(void); 
+
+
+/**
+ * @brief Read and format the system parameters 
+ * 
+ * @details Reads the system settings from the SD card and saves the data into the data 
+ *          record. These settings are stored in the system parameters file and this 
+ *          function is only called during startup if the file already exists. 
+ */
+void param_sys_read_format(void); 
+
 //=======================================================================================
 
 
@@ -145,6 +195,17 @@ void param_read_sys_params(uint8_t mode);
  */
 void param_update_log_index(param_log_index_change_t log_index_change); 
 
+
+/**
+ * @brief Update bike setting 
+ * 
+ * @param setting_index 
+ * @param setting 
+ */
+void param_update_bike_setting(
+    param_bike_set_index_t setting_index, 
+    uint8_t setting); 
+
 //=======================================================================================
 
 
@@ -157,6 +218,15 @@ void param_update_log_index(param_log_index_change_t log_index_change);
  * @return uint8_t 
  */
 uint8_t param_get_log_index(void); 
+
+
+/**
+ * @brief Get bike settings 
+ * 
+ * @param setting_index 
+ * @return uint8_t 
+ */
+uint8_t param_get_bike_setting(param_bike_set_index_t setting_index); 
 
 //=======================================================================================
 

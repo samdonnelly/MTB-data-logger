@@ -16,7 +16,14 @@
 // Includes 
 
 #include "system_parameters.h" 
-#include "data_logging_config.h" 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Macros 
+
+#define PARAM_MAX_SUS_SETTING 20         // Max compression and rebound setting 
 
 //=======================================================================================
 
@@ -31,51 +38,6 @@ static mtbdl_param_t mtbdl_param;
 
 //=======================================================================================
 // Prototypes 
-
-/**
- * @brief Format and write the bike parameters 
- * 
- * @details Formats bike parameters (such as fork and shock settings) from the data 
- *          record into strings and writes the strings to the SD card. This function is 
- *          used when writing settings to both the bike parameters file and to newly 
- *          created log files. The bike parameters file is written upon creation and 
- *          when saving new settings. 
- */
-void param_bike_format_write(void); 
-
-
-/**
- * @brief Read and format the bike parameters 
- * 
- * @details Reads the bike settings/configuration from the SD card and saves the data 
- *          into the data record. These settings are stored in the bike parameters file 
- *          and this function is only called during startup if the file already exists. 
- */
-void param_bike_read_formats(void); 
-
-
-/**
- * @brief Format and write the system parameters 
- * 
- * @details Formats system parameters (such as IMU and potentiometer calibration data) 
- *          from the data record into strings and writes the strings to the SD card. 
- *          This function is used when writing settings to both the system parameters 
- *          file and to newly created log files. The system parameters file is written 
- *          upon creation, when saving new settings and keeping track of the log file 
- *          number/index. 
- */
-void param_sys_format_writes(void); 
-
-
-/**
- * @brief Read and format the system parameters 
- * 
- * @details Reads the system settings from the SD card and saves the data into the data 
- *          record. These settings are stored in the system parameters file and this 
- *          function is only called during startup if the file already exists. 
- */
-void param_sys_read_formats(void); 
-
 //=======================================================================================
 
 
@@ -163,7 +125,7 @@ void param_read_bike_params(uint8_t mode)
     // read the parameters and store them in the data record, then close the file. 
     hw125_set_dir(mtbdl_param_dir); 
     hw125_open(mtbdl_bike_param_file, mode); 
-    param_bike_read_formats(); 
+    param_bike_read_format(); 
     hw125_close(); 
 }
 
@@ -176,7 +138,7 @@ void param_write_sys_params(uint8_t mode)
     // close the file. 
     hw125_set_dir(mtbdl_param_dir); 
     hw125_open(mtbdl_sys_param_file, mode); 
-    param_sys_format_writes(); 
+    param_sys_format_write(); 
     hw125_close(); 
 }
 
@@ -188,7 +150,7 @@ void param_read_sys_params(uint8_t mode)
     // read the parameters and store them in the data record, then close the file. 
     hw125_set_dir(mtbdl_param_dir); 
     hw125_open(mtbdl_sys_param_file, mode); 
-    param_sys_read_formats(); 
+    param_sys_read_format(); 
     hw125_close(); 
 }
 
@@ -198,7 +160,7 @@ void param_bike_format_write(void)
 {
     // Write fork settings 
     snprintf(mtbdl_param.param_buff, 
-             PARAM_MAX_STR_LEN, 
+             MTBDL_MAX_STR_LEN, 
              mtbdl_param_fork_info, 
              mtbdl_param.fork_psi, 
              mtbdl_param.fork_comp, 
@@ -207,7 +169,7 @@ void param_bike_format_write(void)
 
     // Write shock settings 
     snprintf(mtbdl_param.param_buff, 
-             PARAM_MAX_STR_LEN, 
+             MTBDL_MAX_STR_LEN, 
              mtbdl_param_shock_info, 
              mtbdl_param.shock_psi, 
              mtbdl_param.shock_lock, 
@@ -217,10 +179,10 @@ void param_bike_format_write(void)
 
 
 // Read and format the bike parameters 
-void param_bike_read_formats(void)
+void param_bike_read_format(void)
 {
     // Read fork settings 
-    hw125_gets(mtbdl_param.param_buff, PARAM_MAX_STR_LEN); 
+    hw125_gets(mtbdl_param.param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(mtbdl_param.param_buff, 
            mtbdl_param_fork_info, 
            &mtbdl_param.fork_psi, 
@@ -228,7 +190,7 @@ void param_bike_read_formats(void)
            &mtbdl_param.fork_reb); 
 
     // Read shock settings 
-    hw125_gets(mtbdl_param.param_buff, PARAM_MAX_STR_LEN); 
+    hw125_gets(mtbdl_param.param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(mtbdl_param.param_buff, 
            mtbdl_param_shock_info, 
            &mtbdl_param.shock_psi, 
@@ -238,18 +200,18 @@ void param_bike_read_formats(void)
 
 
 // Format and write the system parameters 
-void param_sys_format_writes(void)
+void param_sys_format_write(void)
 {
     // Write logging parameters 
     snprintf(mtbdl_param.param_buff, 
-             PARAM_MAX_STR_LEN, 
+             MTBDL_MAX_STR_LEN, 
              mtbdl_param_index, 
              mtbdl_param.log_index); 
     hw125_puts(mtbdl_param.param_buff); 
     
     // Write accelerometer calibration data 
     snprintf(mtbdl_param.param_buff, 
-             PARAM_MAX_STR_LEN, 
+             MTBDL_MAX_STR_LEN, 
              mtbdl_param_accel_rest, 
              mtbdl_param.accel_x_rest, 
              mtbdl_param.accel_y_rest, 
@@ -258,7 +220,7 @@ void param_sys_format_writes(void)
 
     // Write potentiometer calibrated starting points 
     snprintf(mtbdl_param.param_buff, 
-             PARAM_MAX_STR_LEN, 
+             MTBDL_MAX_STR_LEN, 
              mtbdl_param_pot_rest, 
              mtbdl_param.pot_fork_rest, 
              mtbdl_param.pot_shock_rest); 
@@ -267,16 +229,16 @@ void param_sys_format_writes(void)
 
 
 // Read and format the system parameters 
-void param_sys_read_formats(void)
+void param_sys_read_format(void)
 {
     // Read logging parameters 
-    hw125_gets(mtbdl_param.param_buff, PARAM_MAX_STR_LEN); 
+    hw125_gets(mtbdl_param.param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(mtbdl_param.param_buff, 
            mtbdl_param_index, 
            &mtbdl_param.log_index); 
 
     // Read accelerometer calibration data 
-    hw125_gets(mtbdl_param.param_buff, PARAM_MAX_STR_LEN); 
+    hw125_gets(mtbdl_param.param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(mtbdl_param.param_buff, 
            mtbdl_param_accel_rest, 
            &mtbdl_param.accel_x_rest, 
@@ -284,7 +246,7 @@ void param_sys_read_formats(void)
            &mtbdl_param.accel_z_rest); 
 
     // Read potentiometer starting points 
-    hw125_gets(mtbdl_param.param_buff, PARAM_MAX_STR_LEN); 
+    hw125_gets(mtbdl_param.param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(mtbdl_param.param_buff, 
            mtbdl_param_pot_rest, 
            &mtbdl_param.pot_fork_rest, 
@@ -317,6 +279,55 @@ void param_update_log_index(param_log_index_change_t log_index_change)
     param_write_sys_params(HW125_MODE_OAWR); 
 }
 
+
+// Update bike setting 
+void param_update_bike_setting(
+    param_bike_set_index_t setting_index, 
+    uint8_t setting)
+{
+    switch (setting_index)
+    {
+        case PARAM_BIKE_SET_FPSI:
+            mtbdl_param.fork_psi = setting; 
+            break;
+
+        case PARAM_BIKE_SET_FC:
+            if (setting <= PARAM_MAX_SUS_SETTING)
+            {
+                mtbdl_param.fork_comp = setting; 
+            }
+            break;
+
+        case PARAM_BIKE_SET_FR:
+            if (setting <= PARAM_MAX_SUS_SETTING)
+            {
+                mtbdl_param.fork_reb = setting; 
+            }
+            break;
+
+        case PARAM_BIKE_SET_SPSI:
+            mtbdl_param.shock_psi = setting; 
+            break;
+
+        case PARAM_BIKE_SET_SL:
+            if (setting <= PARAM_MAX_SUS_SETTING)
+            {
+                mtbdl_param.shock_lock = setting; 
+            }
+            break;
+
+        case PARAM_BIKE_SET_SR:
+            if (setting <= PARAM_MAX_SUS_SETTING)
+            {
+                mtbdl_param.shock_reb = setting; 
+            }
+            break;
+        
+        default: 
+            break;
+    }
+}
+
 //=======================================================================================
 
 
@@ -327,6 +338,45 @@ void param_update_log_index(param_log_index_change_t log_index_change)
 uint8_t param_get_log_index(void)
 {
     return mtbdl_param.log_index; 
+}
+
+
+// Get bike settings 
+uint8_t param_get_bike_setting(param_bike_set_index_t setting_index)
+{
+    uint8_t setting = (uint8_t)PARAM_BIKE_SET_NONE; 
+
+    switch (setting_index)
+    {
+        case PARAM_BIKE_SET_FPSI: 
+            setting = mtbdl_param.fork_psi; 
+            break;
+
+        case PARAM_BIKE_SET_FC:
+            setting = mtbdl_param.fork_comp; 
+            break;
+
+        case PARAM_BIKE_SET_FR:
+            setting = mtbdl_param.fork_reb; 
+            break;
+
+        case PARAM_BIKE_SET_SPSI:
+            setting = mtbdl_param.shock_psi; 
+            break;
+
+        case PARAM_BIKE_SET_SL:
+            setting = mtbdl_param.shock_lock; 
+            break;
+
+        case PARAM_BIKE_SET_SR:
+            setting = mtbdl_param.shock_reb; 
+            break;
+        
+        default: 
+            break;
+    }
+
+    return setting; 
 }
 
 //=======================================================================================

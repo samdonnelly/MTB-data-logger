@@ -42,7 +42,8 @@
 			"data_logging.h": "c",
 			"system_parameters.h": "c",
 			"switch_debounce.h": "c",
-			"user_interface.h": "c"
+			"user_interface.h": "c",
+			"analog_driver.h": "c"
 		}
 	}
 }

@@ -19,6 +19,7 @@
 // Includes 
 
 #include "includes_drivers.h" 
+#include "string_config.h" 
 
 //=======================================================================================
 
@@ -28,7 +29,7 @@
 
 #define MTBDL_ADC_BUFF_SIZE 3            // Size according to the number of ADCs used 
 
-#define MTBDL_MAX_DATA_STR_LEN 60        // Max string length containing data 
+// #define MTBDL_MAX_DATA_STR_LEN 60        // Max string length containing data 
 #define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
 #define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
 
@@ -75,8 +76,8 @@ typedef struct mtbdl_data_s
     uint8_t shock_lock;                         // Shock lockout setting 
     uint8_t shock_reb;                          // Shock rebound setting 
 
-    // System parameters 
-    uint8_t log_index;                          // Data log index 
+    // // System parameters 
+    // uint8_t log_index;                          // Data log index 
     int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
     int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
     int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
@@ -105,8 +106,8 @@ typedef struct mtbdl_data_s
     int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
     int32_t cal_index;                          // Calibration sample index 
 
-    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
-    uint32_t led_colour_data[WS2812_LED_NUM]; 
+    // // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+    // uint32_t led_colour_data[WS2812_LED_NUM]; 
 
     // Wheel RPM info 
     uint8_t rev_count;                          // Wheel revolution counter 
@@ -114,8 +115,8 @@ typedef struct mtbdl_data_s
     uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
 
     // SD card 
-    char data_buff[MTBDL_MAX_DATA_STR_LEN];     // Buffer for reading and writing 
-    char filename[MTBDL_MAX_DATA_STR_LEN];      // Buffer for storing a file name 
+    char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
+    char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
     uint8_t tx_status : 1;                      // TX transaction status 
 
     // Log tracking 
@@ -143,9 +144,6 @@ typedef struct mtbdl_data_s
 #endif   // MTBDL_DEBUG 
 }
 mtbdl_data_t; 
-
-// Data record instance 
-extern mtbdl_data_t mtbdl_data; 
 
 //=======================================================================================
 
@@ -344,28 +342,28 @@ void mtbdl_log_end(void);
 //==================================================
 // RX state functions 
 
-/**
- * @brief RX user interface start 
- * 
- * @details Passes a user prompt to the Bluetooth module which gets sent to an external 
- *          device. Note that the Bluetooth module must be connected to a device that can 
- *          display the sent messages for this to have an effect. The prompt tells the 
- *          user that the system is ready to receive its input. 
- */
-void mtbdl_rx_prep(void); 
+// /**
+//  * @brief RX user interface start 
+//  * 
+//  * @details Passes a user prompt to the Bluetooth module which gets sent to an external 
+//  *          device. Note that the Bluetooth module must be connected to a device that can 
+//  *          display the sent messages for this to have an effect. The prompt tells the 
+//  *          user that the system is ready to receive its input. 
+//  */
+// void mtbdl_rx_prep(void); 
 
 
-/**
- * @brief Read user input 
- * 
- * @details Poles the Bluetooth module for new data, then once new data is available it's 
- *          read and checked against valid commands. If a match is found then system 
- *          settings/parameters are updated. If the user input does not match one of the 
- *          available commands then nothing will change. This function should be called 
- *          continuously to check for data and provide a new user prompt after data is 
- *          input. 
- */
-void mtbdl_rx(void); 
+// /**
+//  * @brief Read user input 
+//  * 
+//  * @details Poles the Bluetooth module for new data, then once new data is available it's 
+//  *          read and checked against valid commands. If a match is found then system 
+//  *          settings/parameters are updated. If the user input does not match one of the 
+//  *          available commands then nothing will change. This function should be called 
+//  *          continuously to check for data and provide a new user prompt after data is 
+//  *          input. 
+//  */
+// void mtbdl_rx(void); 
 
 //==================================================
 
@@ -373,53 +371,53 @@ void mtbdl_rx(void);
 //==================================================
 // TX state functions 
 
-/**
- * @brief Check log file count 
- * 
- * @return uint8_t : log file index 
- */
-uint8_t mtbdl_tx_check(void); 
+// /**
+//  * @brief Check log file count 
+//  * 
+//  * @return uint8_t : log file index 
+//  */
+// uint8_t mtbdl_tx_check(void); 
 
 
-/**
- * @brief Prepare to send a data log file 
- * 
- * @details If a log file exists that matches the most recent data log index then this 
- *          function will open that file and return true. Otherwise it will return false. 
- * 
- * @return uint8_t : status of the file check 
- */
-uint8_t mtbdl_tx_prep(void); 
+// /**
+//  * @brief Prepare to send a data log file 
+//  * 
+//  * @details If a log file exists that matches the most recent data log index then this 
+//  *          function will open that file and return true. Otherwise it will return false. 
+//  * 
+//  * @return uint8_t : status of the file check 
+//  */
+// uint8_t mtbdl_tx_prep(void); 
 
 
-/**
- * @brief Transfer data log contents 
- * 
- * @details Reads a single line from an open data log file and passes the info to the 
- *          Bluetooth module for sending out to an external device. The end of the file 
- *          is checked for after each line. Once the end of the file is seen the function 
- *          will return false. This function does not loop so it needs to be repeatedly 
- *          called. 
- * 
- *          Note that this function does not check for a valid open file. The TX prep 
- *          function should be called before this function to make sure there is a file 
- *          open before trying to read from the SD card. 
- * 
- * @see mtbdl_tx_prep 
- * 
- * @return uint8_t : end of file status 
- */
-uint8_t mtbdl_tx(void); 
+// /**
+//  * @brief Transfer data log contents 
+//  * 
+//  * @details Reads a single line from an open data log file and passes the info to the 
+//  *          Bluetooth module for sending out to an external device. The end of the file 
+//  *          is checked for after each line. Once the end of the file is seen the function 
+//  *          will return false. This function does not loop so it needs to be repeatedly 
+//  *          called. 
+//  * 
+//  *          Note that this function does not check for a valid open file. The TX prep 
+//  *          function should be called before this function to make sure there is a file 
+//  *          open before trying to read from the SD card. 
+//  * 
+//  * @see mtbdl_tx_prep 
+//  * 
+//  * @return uint8_t : end of file status 
+//  */
+// uint8_t mtbdl_tx(void); 
 
 
-/**
- * @brief Close the log file and delete it 
- * 
- * @details Closes the open data log file, and if the transaction completed successfully 
- *          then the log file will be deleted and the log index updated. Note that this 
- *          function should only be called after 'mtbdl_tx' is done being called. 
- */
-void mtbdl_tx_end(void); 
+// /**
+//  * @brief Close the log file and delete it 
+//  * 
+//  * @details Closes the open data log file, and if the transaction completed successfully 
+//  *          then the log file will be deleted and the log index updated. Note that this 
+//  *          function should only be called after 'mtbdl_tx' is done being called. 
+//  */
+// void mtbdl_tx_end(void); 
 
 //==================================================
 

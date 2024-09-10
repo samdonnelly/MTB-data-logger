@@ -538,9 +538,6 @@ void mtbdl_app(void)
     // UI update 
     mtbdl_trackers.btn_press = ui_status_update(); 
 
-    // Read the battery ADC and calculate the SOC periodically. Update the screen 
-    // message if needed. 
-
     //===================================================
     // System state machine 
 
@@ -921,8 +918,6 @@ void mtbdl_init_state_exit(void)
 
 void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
 {
-    // static uint32_t time_count = CLEAR; 
-
     // State entry 
     if (mtbdl->idle)
     {
@@ -941,7 +936,6 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
     if (mtbdl->run || mtbdl->data_select || mtbdl->calibrate || mtbdl->fault_code)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
-        // time_count = CLEAR; 
         mtbdl_idle_state_exit(); 
     }
 }
@@ -1092,7 +1086,7 @@ void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl)
         // Button 1 - triggers the run state 
         case UI_BTN_1: 
             mtbdl->run = SET_BIT; 
-            // mtbdl_log_file_prep();   // Prepare the log file 
+            mtbdl_log_file_prep(); 
             break; 
 
         // Button 2 - cancels the run state --> triggers idle state 
@@ -1174,8 +1168,8 @@ void mtbdl_run_countdown_state_exit(void)
     // Turn off the data logging LED 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
 
-    // // Prep the logging data 
-    // mtbdl_log_data_prep(); 
+    // Prep the logging data 
+    mtbdl_log_data_prep(); 
 }
 
 //=======================================================================================
@@ -1200,7 +1194,7 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
     // - Update the GPS status and feedback 
 
     mtbdl_run_user_input_check(mtbdl); 
-    // mtbdl_logging(); 
+    mtbdl_logging(); 
     ui_led_state_update(WS2812_LED_0); 
     ui_gps_led_status_update(); 
 
@@ -1277,7 +1271,7 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
         // Close the open data log file if there was no non-critical faults 
         if (!mtbdl->noncrit_fault)
         {
-            // mtbdl_log_end(); 
+            mtbdl_log_end(); 
         }
 
         hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
@@ -1383,7 +1377,6 @@ void mtbdl_data_select_user_input_check(mtbdl_trackers_t *mtbdl)
             // files saved in the system. If there are none then the data select bit is not set 
             // which will ultimately abort the TX state and tell the user there are no files 
             // available for sending. 
-            // if (mtbdl_tx_check())
             if (param_get_log_index())
             {
                 // Files exist - go to the device search state 
@@ -1617,7 +1610,7 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
         mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
     }
 
-    mtbdl_rx(); 
+    ui_rx(); 
 
     // State exit 
     if (mtbdl->rx || mtbdl->fault_code)
@@ -1636,7 +1629,7 @@ void mtbdl_rx_state_entry(void)
     hd44780u_set_msg(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
 
     // Begin the RX user interface 
-    mtbdl_rx_prep(); 
+    ui_rx_prep(); 
 
     // Turn the Bluetooth LED on 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
@@ -1751,8 +1744,7 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
     if (mtbdl->tx)
     {
         // Prepare the log file to send 
-        // if (mtbdl_tx_prep())
-        if (1)
+        if (ui_tx_prep())
         {
             // File ready - display the pre tx state message 
             mtbdl_set_pretx_msg(); 
@@ -1879,10 +1871,10 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
 
     mtbdl_tx_user_input_check(mtbdl); 
 
-    // if (mtbdl_tx())
-    // {
-    //     mtbdl->tx = SET_BIT; 
-    // }
+    if (ui_tx())
+    {
+        mtbdl->tx = SET_BIT; 
+    }
 
     if (!hc05_status())
     {
@@ -1988,8 +1980,8 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 // Post TX state entry 
 void mtbdl_posttx_state_entry(void)
 {
-    // // End the transaction 
-    // mtbdl_tx_end(); 
+    // End the transaction 
+    ui_tx_end(); 
 
     // Set the Bluetooth LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
@@ -2109,7 +2101,7 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
 
     // State operations: 
     // - Sample data that can be used for calculating the calibration values 
-    // mtbdl_calibrate(); 
+    mtbdl_calibrate(); 
 
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
@@ -2127,8 +2119,8 @@ void mtbdl_calibrate_state_entry(void)
     // Display the calibration state message 
     hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
 
-    // // Prepare to record data for calibration 
-    // mtbdl_cal_prep(); 
+    // Prepare to record data for calibration 
+    mtbdl_cal_prep(); 
 
     // Turn the calibration LED on 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led2_2); 
@@ -2144,8 +2136,8 @@ void mtbdl_calibrate_state_entry(void)
 // Calibration state exit 
 void mtbdl_calibrate_state_exit(void)
 {
-    // // Calculate the calibration values 
-    // mtbdl_cal_calc(); 
+    // Calculate the calibration values 
+    mtbdl_cal_calc(); 
 
     // Clear the calibration state message 
     hd44780u_set_clear_flag(); 
@@ -2231,7 +2223,7 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
 
     // State operations: 
     // - Check for user button input 
-    // = Update the low power LED 
+    // - Update the low power LED 
 
     mtbdl_lowpwr_user_input_check(mtbdl); 
     ui_led_state_update(WS2812_LED_3); 

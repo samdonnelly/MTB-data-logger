@@ -192,6 +192,7 @@ void mtbdl_init()
         DMA_DATA_SIZE_HALF); 
 
     // Configure the DMA stream 
+    // TODO add this to the data logging init function 
     mtbdl_adc_dma_init(DMA2_Stream0, ADC1); 
 
     // Enable the DMA stream 
@@ -317,12 +318,6 @@ void mtbdl_init()
     memset((void *)mtbdl_trackers.msg, CLEAR, sizeof(mtbdl_trackers.msg)); 
     mtbdl_trackers.msg_len = CLEAR; 
 
-    // // User buttons 
-    // mtbdl_trackers.user_btn_1 = (uint8_t)GPIOX_PIN_0; 
-    // mtbdl_trackers.user_btn_2 = (uint8_t)GPIOX_PIN_1; 
-    // mtbdl_trackers.user_btn_3 = (uint8_t)GPIOX_PIN_2; 
-    // mtbdl_trackers.user_btn_4 = (uint8_t)GPIOX_PIN_3; 
-
     // State flags 
     mtbdl_trackers.init = SET_BIT; 
 
@@ -330,15 +325,6 @@ void mtbdl_init()
 
     //===================================================
     // User interface setup (button & LEDs) 
-
-    // // Configure the GPIO inputs for each user button 
-    // gpio_pin_init(GPIOC, PIN_0, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    // gpio_pin_init(GPIOC, PIN_1, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    // gpio_pin_init(GPIOC, PIN_2, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-    // gpio_pin_init(GPIOC, PIN_3, MODER_INPUT, OTYPER_PP, OSPEEDR_HIGH, PUPDR_PU); 
-
-    // // Initialize the button debouncer 
-    // debounce_init(GPIOX_PIN_0 | GPIOX_PIN_1 | GPIOX_PIN_2 | GPIOX_PIN_3); 
 
     ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3); 
 
@@ -355,6 +341,7 @@ void mtbdl_init()
     // Data logging setup 
 
     // Data record init 
+    // TODO add the ADC DMA setup to this init function 
     mtbdl_data_init(
         EXTI4_IRQn, 
         TIM1_TRG_COM_TIM11_IRQn, 

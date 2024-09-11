@@ -149,9 +149,6 @@ mtbdl_data_t;
 
 
 //=======================================================================================
-// Prototypes 
-
-//==================================================
 // Initialization 
 
 /**
@@ -178,6 +175,163 @@ void data_log_init(
     ADC_TypeDef *adc, 
     DMA_Stream_TypeDef *dma_stream); 
 
+//=======================================================================================
+
+
+//=======================================================================================
+// Data logging 
+
+/**
+ * @brief Log name preparation 
+ * 
+ * @details Checks if there is room to create a new log file, and if so, generates a new 
+ *          log file name. If the number of log file is at its capacity then the function 
+ *          will return false. 
+ * 
+ * @return uint8_t : file availability status 
+ */
+uint8_t mtbdl_log_name_prep(void); 
+
+
+/**
+ * @brief Log file prep 
+ * 
+ * @details Moves to the log file directory on the SD card and attempts to create and 
+ *          open a new log file using the name generated in the name preparation function. 
+ *          If successful, the new log file will have all the system information written 
+ *          to it as a reference for the user when they go to view the file. 
+ *          
+ *          Note that the log file preparation function should be called before this 
+ *          function so a new file name can be created. 
+ * 
+ * @see mtbdl_log_name_prep 
+ */
+void mtbdl_log_file_prep(void); 
+
+
+/**
+ * @brief Log data prep 
+ * 
+ * @details Resets data logging info and enables interrupts, all of which are needed 
+ *          before beginning to log data correctly. Without a call to this function, no 
+ *          data will be logged in the logging function. 
+ */
+void mtbdl_log_data_prep(void); 
+
+
+/**
+ * @brief Logging data 
+ * 
+ * @details Logs bike data every sample period which is triggered by the sample period 
+ *          interrupt. When triggered, data will be logged based on a predefined schedule 
+ *          that samples data only as often as it's needed. Data includes trailmarkers 
+ *          set by a user button press, suspension position potentiometer readings, wheel 
+ *          speed calculations based on hall effect sensor frequency, IMU rates and GPS 
+ *          position. Trailmarkers and suspension position are the only pieces of data 
+ *          that get logged every interval/period. When data is read, it gets written to 
+ *          the open log file on the SD card. This function should be called continuously 
+ *          while in the data logging state. 
+ *          
+ *          Before calling this function, the log file and data need to be prepared. 
+ * 
+ * @see mtbdl_log_name_prep 
+ * @see mtbdl_log_file_prep 
+ * @see mtbdl_log_data_prep 
+ */
+void mtbdl_logging(void); 
+
+
+/**
+ * @brief End the data logging 
+ * 
+ * @details Disables interrupts, saves and closes the log file, and updates the log index. 
+ *          This function must be called after the logging function in order to finish 
+ *          the logging process. 
+ */
+void mtbdl_log_end(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Calibration 
+
+/**
+ * @brief Calibration data prep 
+ * 
+ * @details Prepare the calibration data, enables reading from the IMU and potentiometers 
+ *          and enables data sampling interrupt. This must be called before using the 
+ *          calibration function. 
+ *          
+ *          Calibration requires finding the resting values/offsets of the bike IMU and 
+ *          suspension potentiometers. These offsets are used "zero" the readings so 
+ *          data logs values are more accurate. 
+ * 
+ * @see mtbdl_calibrate 
+ */
+void mtbdl_cal_prep(void); 
+
+
+/**
+ * @brief Calibration 
+ * 
+ * @details Records IMU and suspension potentiometer values periodically (every time the 
+ *          data sampling interrupt runs) by summing each successive reading. The number 
+ *          of times the values are recorded is tracked. The sum of these values will be 
+ *          used to find the average reading over a period of time in the calibration 
+ *          calculation function. Note that since the values get summed together, the 
+ *          amount of time this function is continuously called should be considered. 
+ *          
+ *          Calibration requires finding the resting values/offsets of the bike IMU and 
+ *          suspension potentiometers. These offsets are used "zero" the readings so 
+ *          data logs values are more accurate. 
+ * 
+ * @see mtbdl_cal_prep 
+ * @see mtbdl_cal_calc 
+ */
+void mtbdl_calibrate(void); 
+
+
+/**
+ * @brief Calibration calculation 
+ * 
+ * @details Disables the data sampling interrupt and averages the sensor readings 
+ *          accumulated during the calibration function to provide new sensor calibration/
+ *          offset values. This function only provides new calibration data if the 
+ *          calibration function is called first. Note that this function does not update 
+ *          the parameters file. That should be done separately if values are to be saved. 
+ *          
+ *          Calibration requires finding the resting values/offsets of the bike IMU and 
+ *          suspension potentiometers. These offsets are used "zero" the readings so 
+ *          data logs values are more accurate. 
+ * 
+ * @see mtbdl_calibrate 
+ */
+void mtbdl_cal_calc(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Setters 
+
+/**
+ * @brief Set trail marker flag 
+ * 
+ * @details Used by the run state while data logging to set the trail marker flag when 
+ *          the marker button is pushed. The trail marker gets written to the log file 
+ *          so the used can identify points within the log. 
+ */
+void mtbdl_set_trailmark(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// To be deleted 
+
+//==================================================
+// Initialization 
 
 // /**
 //  * @brief Bike parameter setup 
@@ -273,81 +427,6 @@ void data_log_init(
 
 
 //==================================================
-// Data logging 
-
-/**
- * @brief Log name preparation 
- * 
- * @details Checks if there is room to create a new log file, and if so, generates a new 
- *          log file name. If the number of log file is at its capacity then the function 
- *          will return false. 
- * 
- * @return uint8_t : file availability status 
- */
-uint8_t mtbdl_log_name_prep(void); 
-
-
-/**
- * @brief Log file prep 
- * 
- * @details Moves to the log file directory on the SD card and attempts to create and 
- *          open a new log file using the name generated in the name preparation function. 
- *          If successful, the new log file will have all the system information written 
- *          to it as a reference for the user when they go to view the file. 
- *          
- *          Note that the log file preparation function should be called before this 
- *          function so a new file name can be created. 
- * 
- * @see mtbdl_log_name_prep 
- */
-void mtbdl_log_file_prep(void); 
-
-
-/**
- * @brief Log data prep 
- * 
- * @details Resets data logging info and enables interrupts, all of which are needed 
- *          before beginning to log data correctly. Without a call to this function, no 
- *          data will be logged in the logging function. 
- */
-void mtbdl_log_data_prep(void); 
-
-
-/**
- * @brief Logging data 
- * 
- * @details Logs bike data every sample period which is triggered by the sample period 
- *          interrupt. When triggered, data will be logged based on a predefined schedule 
- *          that samples data only as often as it's needed. Data includes trailmarkers 
- *          set by a user button press, suspension position potentiometer readings, wheel 
- *          speed calculations based on hall effect sensor frequency, IMU rates and GPS 
- *          position. Trailmarkers and suspension position are the only pieces of data 
- *          that get logged every interval/period. When data is read, it gets written to 
- *          the open log file on the SD card. This function should be called continuously 
- *          while in the data logging state. 
- *          
- *          Before calling this function, the log file and data need to be prepared. 
- * 
- * @see mtbdl_log_name_prep 
- * @see mtbdl_log_file_prep 
- * @see mtbdl_log_data_prep 
- */
-void mtbdl_logging(void); 
-
-
-/**
- * @brief End the data logging 
- * 
- * @details Disables interrupts, saves and closes the log file, and updates the log index. 
- *          This function must be called after the logging function in order to finish 
- *          the logging process. 
- */
-void mtbdl_log_end(void); 
-
-//==================================================
-
-
-//==================================================
 // RX state functions 
 
 // /**
@@ -431,65 +510,6 @@ void mtbdl_log_end(void);
 
 
 //==================================================
-// Calibration functions 
-
-/**
- * @brief Calibration data prep 
- * 
- * @details Prepare the calibration data, enables reading from the IMU and potentiometers 
- *          and enables data sampling interrupt. This must be called before using the 
- *          calibration function. 
- *          
- *          Calibration requires finding the resting values/offsets of the bike IMU and 
- *          suspension potentiometers. These offsets are used "zero" the readings so 
- *          data logs values are more accurate. 
- * 
- * @see mtbdl_calibrate 
- */
-void mtbdl_cal_prep(void); 
-
-
-/**
- * @brief Calibration 
- * 
- * @details Records IMU and suspension potentiometer values periodically (every time the 
- *          data sampling interrupt runs) by summing each successive reading. The number 
- *          of times the values are recorded is tracked. The sum of these values will be 
- *          used to find the average reading over a period of time in the calibration 
- *          calculation function. Note that since the values get summed together, the 
- *          amount of time this function is continuously called should be considered. 
- *          
- *          Calibration requires finding the resting values/offsets of the bike IMU and 
- *          suspension potentiometers. These offsets are used "zero" the readings so 
- *          data logs values are more accurate. 
- * 
- * @see mtbdl_cal_prep 
- * @see mtbdl_cal_calc 
- */
-void mtbdl_calibrate(void); 
-
-
-/**
- * @brief Calibration calculation 
- * 
- * @details Disables the data sampling interrupt and averages the sensor readings 
- *          accumulated during the calibration function to provide new sensor calibration/
- *          offset values. This function only provides new calibration data if the 
- *          calibration function is called first. Note that this function does not update 
- *          the parameters file. That should be done separately if values are to be saved. 
- *          
- *          Calibration requires finding the resting values/offsets of the bike IMU and 
- *          suspension potentiometers. These offsets are used "zero" the readings so 
- *          data logs values are more accurate. 
- * 
- * @see mtbdl_calibrate 
- */
-void mtbdl_cal_calc(void); 
-
-//==================================================
-
-
-//==================================================
 // Screen message formatting 
 
 // /**
@@ -543,16 +563,6 @@ void mtbdl_cal_calc(void);
 void mtbdl_led_update(
     ws2812_led_index_t led_index, 
     uint32_t led_code); 
-
-
-/**
- * @brief Set trail marker flag 
- * 
- * @details Used by the run state while data logging to set the trail marker flag when 
- *          the marker button is pushed. The trail marker gets written to the log file 
- *          so the used can identify points within the log. 
- */
-void mtbdl_set_trailmark(void); 
 
 //==================================================
 

@@ -37,11 +37,6 @@ static mtbdl_param_t mtbdl_param;
 
 
 //=======================================================================================
-// Prototypes 
-//=======================================================================================
-
-
-//=======================================================================================
 // Initialization 
 
 // System parameters init 
@@ -64,6 +59,7 @@ void param_init(void)
 
     // SD Card 
     memset((void *)mtbdl_param.param_buff, CLEAR, sizeof(mtbdl_param.param_buff)); 
+    mtbdl_param.log_index = CLEAR; 
 }
 
 

@@ -44,6 +44,14 @@ typedef enum {
     UI_BTN_4 
 } ui_btn_num_t; 
 
+
+// These screen messages contain data that changes (such as SOC and GPS position lock) 
+typedef enum {
+    UI_MSG_IDLE,       // Idle state message 
+    UI_MSG_RUN_PREP,   // Run prep state message 
+    UI_MSG_NUM         // Number of messages in the index list 
+} ui_msg_update_index_t; 
+
 //=======================================================================================
 
 
@@ -87,6 +95,9 @@ typedef struct mtbdl_ui_s
     uint32_t led_write_data[WS2812_LED_NUM];    // LED write buffer 
     uint16_t led_counter; 
     mtbdl_ui_led_blink_t led_state[WS2812_LED_NUM]; 
+
+    // Screen 
+    uint16_t msg_counter;                       // Screen message write counter 
 
     // SD Card 
     char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
@@ -163,6 +174,14 @@ void ui_gps_led_status_update(void);
 
 //=======================================================================================
 // Screen control 
+
+/**
+ * @brief Update screen message output 
+ * 
+ * @param msg_index 
+ */
+void ui_msg_update(ui_msg_update_index_t msg_index); 
+
 
 /**
  * @brief Format the idle state message 

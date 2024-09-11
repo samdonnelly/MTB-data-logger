@@ -92,62 +92,12 @@ mtbdl_log_stream_state_t;
 
 
 //=======================================================================================
-// Function pointers 
+// Prototypes 
 
 /**
  * @brief Logging state machine function pointer 
  */
 typedef void (*mtbdl_log_stream)(void); 
-
-//=======================================================================================
-
-
-//=======================================================================================
-// Function prototypes 
-
-// /**
-//  * @brief Format and write the bike parameters 
-//  * 
-//  * @details Formats bike parameters (such as fork and shock settings) from the data 
-//  *          record into strings and writes the strings to the SD card. This function is 
-//  *          used when writing settings to both the bike parameters file and to newly 
-//  *          created log files. The bike parameters file is written upon creation and 
-//  *          when saving new settings. 
-//  */
-// void mtbdl_format_write_bike_params(void); 
-
-
-// /**
-//  * @brief Read and format the bike parameters 
-//  * 
-//  * @details Reads the bike settings/configuration from the SD card and saves the data 
-//  *          into the data record. These settings are stored in the bike parameters file 
-//  *          and this function is only called during startup if the file already exists. 
-//  */
-// void mtbdl_format_read_bike_params(void); 
-
-
-// /**
-//  * @brief Format and write the system parameters 
-//  * 
-//  * @details Formats system parameters (such as IMU and potentiometer calibration data) 
-//  *          from the data record into strings and writes the strings to the SD card. 
-//  *          This function is used when writing settings to both the system parameters 
-//  *          file and to newly created log files. The system parameters file is written 
-//  *          upon creation, when saving new settings and keeping track of the log file 
-//  *          number/index. 
-//  */
-// void mtbdl_format_write_sys_params(void); 
-
-
-// /**
-//  * @brief Read and format the system parameters 
-//  * 
-//  * @details Reads the system settings from the SD card and saves the data into the data 
-//  *          record. These settings are stored in the system parameters file and this 
-//  *          function is only called during startup if the file already exists. 
-//  */
-// void mtbdl_format_read_sys_params(void); 
 
 
 /**
@@ -306,227 +256,6 @@ void data_log_init(
         (uint32_t)mtbdl_data.adc_buff, 
         (uint16_t)MTBDL_ADC_BUFF_SIZE); 
 }
-
-
-// // ADC DMA setup 
-// void mtbdl_adc_dma_init(
-//     DMA_Stream_TypeDef *dma_stream, 
-//     ADC_TypeDef *adc)
-// {
-//     // Configure the DMA stream 
-//     dma_stream_config(
-//         dma_stream, 
-//         (uint32_t)(&adc->DR), 
-//         (uint32_t)mtbdl_data.adc_buff, 
-//         (uint16_t)MTBDL_ADC_BUFF_SIZE); 
-// }
-
-
-// // File system setup 
-// void mtbdl_file_sys_setup(void)
-// {
-//     // Create "parameters" and "data" directories if they do not already exist 
-//     hw125_mkdir(mtbdl_data_dir); 
-//     hw125_mkdir(mtbdl_param_dir); 
-
-//     // Check for the existance of the bike parameters file 
-//     if (hw125_get_exists(mtbdl_bike_param_file) == FR_NO_FILE)
-//     {
-//         // No file - create one and write default parameter data to it 
-//         mtbdl_write_bike_params(HW125_MODE_WW); 
-//     }
-//     else 
-//     {
-//         // File already exists - open the file for reading 
-//         mtbdl_read_bike_params(HW125_MODE_OEWR); 
-//     }
-
-//     // Check for the existance of the system parameters file 
-//     if (hw125_get_exists(mtbdl_sys_param_file) == FR_NO_FILE)
-//     {
-//         // No file - create one and write default parameter data to it 
-//         mtbdl_write_sys_params(HW125_MODE_WW); 
-//     }
-//     else 
-//     {
-//         // File already exists - open the file for reading 
-//         mtbdl_read_sys_params(HW125_MODE_OEWR); 
-//     }
-// }
-
-//=======================================================================================
-
-
-//=======================================================================================
-// Parameters 
-
-// // Write bike parameters to file 
-// void mtbdl_write_bike_params(uint8_t mode)
-// {
-//     // Move to the parameters directory, open the bike parameters file for writing, 
-//     // format and write the bike parameters from the data record to the file, then close 
-//     // the file. 
-//     hw125_set_dir(mtbdl_param_dir); 
-//     hw125_open(mtbdl_bike_param_file, mode); 
-//     mtbdl_format_write_bike_params(); 
-//     hw125_close(); 
-// }
-
-
-// // Read bike parameter on file 
-// void mtbdl_read_bike_params(uint8_t mode)
-// {
-//     // Move to the parameters directory, open the bike parameters file for reading, 
-//     // read the parameters and store them in the data record, then close the file. 
-//     hw125_set_dir(mtbdl_param_dir); 
-//     hw125_open(mtbdl_bike_param_file, mode); 
-//     mtbdl_format_read_bike_params(); 
-//     hw125_close(); 
-// }
-
-
-// // Write system parameters to file 
-// void mtbdl_write_sys_params(uint8_t mode)
-// {
-//     // Move to the parameters directory, open the system parameters file for writing, 
-//     // format and write the system parameters from the data record to the file, then 
-//     // close the file. 
-//     hw125_set_dir(mtbdl_param_dir); 
-//     hw125_open(mtbdl_sys_param_file, mode); 
-//     mtbdl_format_write_sys_params(); 
-//     hw125_close(); 
-// }
-
-
-// // Read system parameters on file 
-// void mtbdl_read_sys_params(uint8_t mode)
-// {
-//     // Move to the parameters directory, open the system parameters file for reading, 
-//     // read the parameters and store them in the data record, then close the file. 
-//     hw125_set_dir(mtbdl_param_dir); 
-//     hw125_open(mtbdl_sys_param_file, mode); 
-//     mtbdl_format_read_sys_params(); 
-//     hw125_close(); 
-// }
-
-
-// // Format and write the bike parameters 
-// void mtbdl_format_write_bike_params(void)
-// {
-//     // Write fork parameters 
-//     snprintf(
-//         mtbdl_data.data_buff, 
-//         MTBDL_MAX_DATA_STR_LEN, 
-//         mtbdl_param_fork_info, 
-//         mtbdl_data.fork_psi, 
-//         mtbdl_data.fork_comp, 
-//         mtbdl_data.fork_reb); 
-    
-//     hw125_puts(mtbdl_data.data_buff); 
-
-//     // Write shock parameters 
-//     snprintf(
-//         mtbdl_data.data_buff, 
-//         MTBDL_MAX_DATA_STR_LEN, 
-//         mtbdl_param_shock_info, 
-//         mtbdl_data.shock_psi, 
-//         mtbdl_data.shock_lock, 
-//         mtbdl_data.shock_reb); 
-    
-//     hw125_puts(mtbdl_data.data_buff); 
-// }
-
-
-// // Read and format the bike parameters 
-// void mtbdl_format_read_bike_params(void)
-// {
-//     // Read fork parameters 
-//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-//     sscanf(
-//         mtbdl_data.data_buff, 
-//         mtbdl_param_fork_info, 
-//         &mtbdl_data.fork_psi, 
-//         &mtbdl_data.fork_comp, 
-//         &mtbdl_data.fork_reb); 
-
-//     // Read shock parameters 
-//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-//     sscanf(
-//         mtbdl_data.data_buff, 
-//         mtbdl_param_shock_info, 
-//         &mtbdl_data.shock_psi, 
-//         &mtbdl_data.shock_lock, 
-//         &mtbdl_data.shock_reb); 
-// }
-
-
-// // Format and write the system parameters 
-// void mtbdl_format_write_sys_params(void)
-// {
-//     // Write logging parameters 
-//     snprintf(
-//         mtbdl_data.data_buff, 
-//         MTBDL_MAX_DATA_STR_LEN, 
-//         mtbdl_param_index, 
-//         mtbdl_data.log_index); 
-
-//     hw125_puts(mtbdl_data.data_buff); 
-    
-//     // Write accelerometer calibration data 
-//     snprintf(
-//         mtbdl_data.data_buff, 
-//         MTBDL_MAX_DATA_STR_LEN, 
-//         mtbdl_param_accel_rest, 
-//         mtbdl_data.accel_x_rest, 
-//         mtbdl_data.accel_y_rest, 
-//         mtbdl_data.accel_z_rest); 
-    
-//     hw125_puts(mtbdl_data.data_buff); 
-
-//     // Write potentiometer calibrated starting points 
-//     snprintf(
-//         mtbdl_data.data_buff, 
-//         MTBDL_MAX_DATA_STR_LEN, 
-//         mtbdl_param_pot_rest, 
-//         mtbdl_data.pot_fork_rest, 
-//         mtbdl_data.pot_shock_rest); 
-    
-//     hw125_puts(mtbdl_data.data_buff); 
-// }
-
-
-// // Read and format the system parameters 
-// void mtbdl_format_read_sys_params(void)
-// {
-//     // Read logging parameters 
-//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-//     sscanf(
-//         mtbdl_data.data_buff, 
-//         mtbdl_param_index, 
-//         &mtbdl_data.log_index); 
-
-//     // Read accelerometer calibration data 
-//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-//     sscanf(
-//         mtbdl_data.data_buff, 
-//         mtbdl_param_accel_rest, 
-//         &mtbdl_data.accel_x_rest, 
-//         &mtbdl_data.accel_y_rest, 
-//         &mtbdl_data.accel_z_rest); 
-
-//     // Read potentiometer starting points 
-//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
-
-//     sscanf(
-//         mtbdl_data.data_buff, 
-//         mtbdl_param_pot_rest, 
-//         &mtbdl_data.pot_fork_rest, 
-//         &mtbdl_data.pot_shock_rest); 
-// }
 
 //=======================================================================================
 
@@ -950,6 +679,381 @@ void mtbdl_log_end(void)
 
 
 //=======================================================================================
+// Calibration functions 
+
+// Calibration data prep 
+void mtbdl_cal_prep(void)
+{
+    // Reset the calibration data 
+    memset((void *)mtbdl_data.cal_buff, CLEAR, sizeof(mtbdl_data.cal_buff)); 
+    mtbdl_data.cal_index = CLEAR; 
+
+    // Trigger an ADC and accelerometer read so the data is available for the first 
+    // time data is recorded 
+    adc_start(mtbdl_data.adc); 
+    mpu6050_set_read_flag(DEVICE_ONE); 
+
+    // Enable log sample period interrupts 
+    NVIC_EnableIRQ(mtbdl_data.log_irq); 
+}
+
+
+// Calibration 
+void mtbdl_calibrate(void)
+{
+    // Record new data periodically 
+    if (handler_flags.tim1_trg_tim11_glbl_flag)
+    {
+        handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+        mtbdl_data.cal_index++; 
+
+        // Record new accel data 
+        mpu6050_get_accel_raw(
+            DEVICE_ONE, 
+            &mtbdl_data.accel_x_rest, 
+            &mtbdl_data.accel_y_rest, 
+            &mtbdl_data.accel_z_rest); 
+
+        // Sum all the data into the calibration buffer. This data will be averaged once the 
+        // calibration state is left. 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] += (int32_t)mtbdl_data.accel_x_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] += (int32_t)mtbdl_data.accel_y_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] += (int32_t)mtbdl_data.accel_z_rest; 
+        mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
+        mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
+
+        // Trigger an ADC and accelerometer read so the data is available for the next 
+        // time data is recorded 
+        adc_start(mtbdl_data.adc); 
+        mpu6050_set_read_flag(DEVICE_ONE); 
+    }
+}
+
+
+// Calibration calculation 
+void mtbdl_cal_calc(void)
+{
+    // Disable log sample period interrupts 
+    NVIC_DisableIRQ(mtbdl_data.log_irq); 
+
+    // Calculate and record calibration data 
+    // This data is an average of all the samples taken during calibration 
+    mtbdl_data.accel_x_rest = 
+        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] / mtbdl_data.cal_index); 
+    mtbdl_data.accel_y_rest = 
+        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] / mtbdl_data.cal_index); 
+    mtbdl_data.accel_z_rest = 
+        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] / mtbdl_data.cal_index); 
+    mtbdl_data.pot_fork_rest = 
+        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] / mtbdl_data.cal_index); 
+    mtbdl_data.pot_shock_rest = 
+        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] / mtbdl_data.cal_index); 
+
+    // TODO update the parameter files? 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Data checks and updates 
+
+// Update LED colours 
+void mtbdl_led_update(
+    ws2812_led_index_t led_index, 
+    uint32_t led_code)
+{
+    mtbdl_data.led_colour_data[led_index] = led_code; 
+    ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
+}
+
+// Set trail marker flag 
+void mtbdl_set_trailmark(void)
+{
+    mtbdl_data.trailmark = SET_BIT; 
+    mtbdl_data.user_input = SET_BIT; 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Function prototypes 
+
+// /**
+//  * @brief Format and write the bike parameters 
+//  * 
+//  * @details Formats bike parameters (such as fork and shock settings) from the data 
+//  *          record into strings and writes the strings to the SD card. This function is 
+//  *          used when writing settings to both the bike parameters file and to newly 
+//  *          created log files. The bike parameters file is written upon creation and 
+//  *          when saving new settings. 
+//  */
+// void mtbdl_format_write_bike_params(void); 
+
+
+// /**
+//  * @brief Read and format the bike parameters 
+//  * 
+//  * @details Reads the bike settings/configuration from the SD card and saves the data 
+//  *          into the data record. These settings are stored in the bike parameters file 
+//  *          and this function is only called during startup if the file already exists. 
+//  */
+// void mtbdl_format_read_bike_params(void); 
+
+
+// /**
+//  * @brief Format and write the system parameters 
+//  * 
+//  * @details Formats system parameters (such as IMU and potentiometer calibration data) 
+//  *          from the data record into strings and writes the strings to the SD card. 
+//  *          This function is used when writing settings to both the system parameters 
+//  *          file and to newly created log files. The system parameters file is written 
+//  *          upon creation, when saving new settings and keeping track of the log file 
+//  *          number/index. 
+//  */
+// void mtbdl_format_write_sys_params(void); 
+
+
+// /**
+//  * @brief Read and format the system parameters 
+//  * 
+//  * @details Reads the system settings from the SD card and saves the data into the data 
+//  *          record. These settings are stored in the system parameters file and this 
+//  *          function is only called during startup if the file already exists. 
+//  */
+// void mtbdl_format_read_sys_params(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Initialization 
+
+// // ADC DMA setup 
+// void mtbdl_adc_dma_init(
+//     DMA_Stream_TypeDef *dma_stream, 
+//     ADC_TypeDef *adc)
+// {
+//     // Configure the DMA stream 
+//     dma_stream_config(
+//         dma_stream, 
+//         (uint32_t)(&adc->DR), 
+//         (uint32_t)mtbdl_data.adc_buff, 
+//         (uint16_t)MTBDL_ADC_BUFF_SIZE); 
+// }
+
+
+// // File system setup 
+// void mtbdl_file_sys_setup(void)
+// {
+//     // Create "parameters" and "data" directories if they do not already exist 
+//     hw125_mkdir(mtbdl_data_dir); 
+//     hw125_mkdir(mtbdl_param_dir); 
+
+//     // Check for the existance of the bike parameters file 
+//     if (hw125_get_exists(mtbdl_bike_param_file) == FR_NO_FILE)
+//     {
+//         // No file - create one and write default parameter data to it 
+//         mtbdl_write_bike_params(HW125_MODE_WW); 
+//     }
+//     else 
+//     {
+//         // File already exists - open the file for reading 
+//         mtbdl_read_bike_params(HW125_MODE_OEWR); 
+//     }
+
+//     // Check for the existance of the system parameters file 
+//     if (hw125_get_exists(mtbdl_sys_param_file) == FR_NO_FILE)
+//     {
+//         // No file - create one and write default parameter data to it 
+//         mtbdl_write_sys_params(HW125_MODE_WW); 
+//     }
+//     else 
+//     {
+//         // File already exists - open the file for reading 
+//         mtbdl_read_sys_params(HW125_MODE_OEWR); 
+//     }
+// }
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Parameters 
+
+// // Write bike parameters to file 
+// void mtbdl_write_bike_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the bike parameters file for writing, 
+//     // format and write the bike parameters from the data record to the file, then close 
+//     // the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_bike_param_file, mode); 
+//     mtbdl_format_write_bike_params(); 
+//     hw125_close(); 
+// }
+
+
+// // Read bike parameter on file 
+// void mtbdl_read_bike_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the bike parameters file for reading, 
+//     // read the parameters and store them in the data record, then close the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_bike_param_file, mode); 
+//     mtbdl_format_read_bike_params(); 
+//     hw125_close(); 
+// }
+
+
+// // Write system parameters to file 
+// void mtbdl_write_sys_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the system parameters file for writing, 
+//     // format and write the system parameters from the data record to the file, then 
+//     // close the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_sys_param_file, mode); 
+//     mtbdl_format_write_sys_params(); 
+//     hw125_close(); 
+// }
+
+
+// // Read system parameters on file 
+// void mtbdl_read_sys_params(uint8_t mode)
+// {
+//     // Move to the parameters directory, open the system parameters file for reading, 
+//     // read the parameters and store them in the data record, then close the file. 
+//     hw125_set_dir(mtbdl_param_dir); 
+//     hw125_open(mtbdl_sys_param_file, mode); 
+//     mtbdl_format_read_sys_params(); 
+//     hw125_close(); 
+// }
+
+
+// // Format and write the bike parameters 
+// void mtbdl_format_write_bike_params(void)
+// {
+//     // Write fork parameters 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_fork_info, 
+//         mtbdl_data.fork_psi, 
+//         mtbdl_data.fork_comp, 
+//         mtbdl_data.fork_reb); 
+    
+//     hw125_puts(mtbdl_data.data_buff); 
+
+//     // Write shock parameters 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_shock_info, 
+//         mtbdl_data.shock_psi, 
+//         mtbdl_data.shock_lock, 
+//         mtbdl_data.shock_reb); 
+    
+//     hw125_puts(mtbdl_data.data_buff); 
+// }
+
+
+// // Read and format the bike parameters 
+// void mtbdl_format_read_bike_params(void)
+// {
+//     // Read fork parameters 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_fork_info, 
+//         &mtbdl_data.fork_psi, 
+//         &mtbdl_data.fork_comp, 
+//         &mtbdl_data.fork_reb); 
+
+//     // Read shock parameters 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_shock_info, 
+//         &mtbdl_data.shock_psi, 
+//         &mtbdl_data.shock_lock, 
+//         &mtbdl_data.shock_reb); 
+// }
+
+
+// // Format and write the system parameters 
+// void mtbdl_format_write_sys_params(void)
+// {
+//     // Write logging parameters 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_index, 
+//         mtbdl_data.log_index); 
+
+//     hw125_puts(mtbdl_data.data_buff); 
+    
+//     // Write accelerometer calibration data 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_accel_rest, 
+//         mtbdl_data.accel_x_rest, 
+//         mtbdl_data.accel_y_rest, 
+//         mtbdl_data.accel_z_rest); 
+    
+//     hw125_puts(mtbdl_data.data_buff); 
+
+//     // Write potentiometer calibrated starting points 
+//     snprintf(
+//         mtbdl_data.data_buff, 
+//         MTBDL_MAX_DATA_STR_LEN, 
+//         mtbdl_param_pot_rest, 
+//         mtbdl_data.pot_fork_rest, 
+//         mtbdl_data.pot_shock_rest); 
+    
+//     hw125_puts(mtbdl_data.data_buff); 
+// }
+
+
+// // Read and format the system parameters 
+// void mtbdl_format_read_sys_params(void)
+// {
+//     // Read logging parameters 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_index, 
+//         &mtbdl_data.log_index); 
+
+//     // Read accelerometer calibration data 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_accel_rest, 
+//         &mtbdl_data.accel_x_rest, 
+//         &mtbdl_data.accel_y_rest, 
+//         &mtbdl_data.accel_z_rest); 
+
+//     // Read potentiometer starting points 
+//     hw125_gets(mtbdl_data.data_buff, MTBDL_MAX_DATA_STR_LEN); 
+
+//     sscanf(
+//         mtbdl_data.data_buff, 
+//         mtbdl_param_pot_rest, 
+//         &mtbdl_data.pot_fork_rest, 
+//         &mtbdl_data.pot_shock_rest); 
+// }
+
+//=======================================================================================
+
+
+//=======================================================================================
 // RX state functions 
 
 // // RX user interface start 
@@ -1111,83 +1215,6 @@ void mtbdl_log_end(void)
 
 
 //=======================================================================================
-// Calibration functions 
-
-// Calibration data prep 
-void mtbdl_cal_prep(void)
-{
-    // Reset the calibration data 
-    memset((void *)mtbdl_data.cal_buff, CLEAR, sizeof(mtbdl_data.cal_buff)); 
-    mtbdl_data.cal_index = CLEAR; 
-
-    // Trigger an ADC and accelerometer read so the data is available for the first 
-    // time data is recorded 
-    adc_start(mtbdl_data.adc); 
-    mpu6050_set_read_flag(DEVICE_ONE); 
-
-    // Enable log sample period interrupts 
-    NVIC_EnableIRQ(mtbdl_data.log_irq); 
-}
-
-
-// Calibration 
-void mtbdl_calibrate(void)
-{
-    // Record new data periodically 
-    if (handler_flags.tim1_trg_tim11_glbl_flag)
-    {
-        handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
-        mtbdl_data.cal_index++; 
-
-        // Record new accel data 
-        mpu6050_get_accel_raw(
-            DEVICE_ONE, 
-            &mtbdl_data.accel_x_rest, 
-            &mtbdl_data.accel_y_rest, 
-            &mtbdl_data.accel_z_rest); 
-
-        // Sum all the data into the calibration buffer. This data will be averaged once the 
-        // calibration state is left. 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] += (int32_t)mtbdl_data.accel_x_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] += (int32_t)mtbdl_data.accel_y_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] += (int32_t)mtbdl_data.accel_z_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
-        mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
-
-        // Trigger an ADC and accelerometer read so the data is available for the next 
-        // time data is recorded 
-        adc_start(mtbdl_data.adc); 
-        mpu6050_set_read_flag(DEVICE_ONE); 
-    }
-}
-
-
-// Calibration calculation 
-void mtbdl_cal_calc(void)
-{
-    // Disable log sample period interrupts 
-    NVIC_DisableIRQ(mtbdl_data.log_irq); 
-
-    // Calculate and record calibration data 
-    // This data is an average of all the samples taken during calibration 
-    mtbdl_data.accel_x_rest = 
-        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] / mtbdl_data.cal_index); 
-    mtbdl_data.accel_y_rest = 
-        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] / mtbdl_data.cal_index); 
-    mtbdl_data.accel_z_rest = 
-        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] / mtbdl_data.cal_index); 
-    mtbdl_data.pot_fork_rest = 
-        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] / mtbdl_data.cal_index); 
-    mtbdl_data.pot_shock_rest = 
-        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] / mtbdl_data.cal_index); 
-
-    // TODO update the parameter files? 
-}
-
-//=======================================================================================
-
-
-//=======================================================================================
 // Screen message formatting 
 
 // // Format the idle state message 
@@ -1283,55 +1310,5 @@ void mtbdl_cal_calc(void)
 //     // Set the screen message 
 //     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
 // }
-
-//=======================================================================================
-
-
-//=======================================================================================
-// Data checks and updates 
-
-// Update LED colours 
-void mtbdl_led_update(
-    ws2812_led_index_t led_index, 
-    uint32_t led_code)
-{
-    mtbdl_data.led_colour_data[led_index] = led_code; 
-    ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
-}
-
-// Set trail marker flag 
-void mtbdl_set_trailmark(void)
-{
-    mtbdl_data.trailmark = SET_BIT; 
-    mtbdl_data.user_input = SET_BIT; 
-}
-
-//=======================================================================================
-
-
-//=======================================================================================
-// Getters 
-
-// TODO remove this. We don't need to log battery voltage so move the battery voltage 
-//      reading to another module (or just main) and set up ADC DMA for just the fork 
-//      and shock voltages. 
-
-// Get battery voltage 
-uint16_t log_get_bat_voltage(void)
-{
-    // A DMA transfer is used here to get the current battery voltage. ADC + DMA is set 
-    // up for the fork and shocks voltages as well as the battery voltage. It may be 
-    // easier to do a single ADC read of just the battery voltage but then the ADC port 
-    // and channel would need to be stored. In addition, since DMA is already configured, 
-    // it makes for less setup to just use the existing DMA method. The ADC DMA transfer 
-    // is started and the code waits for the DMA transfer to complete before returning 
-    // the battery voltage. 
-
-    // adc_start(mtbdl_data.adc); 
-
-    // return mtbdl_data.adc_buff[MTBDL_ADC_SOC]; 
-
-    return FALSE; 
-}
 
 //=======================================================================================

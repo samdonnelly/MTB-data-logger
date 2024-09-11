@@ -975,9 +975,11 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
     // State operations: 
     // - Check for user button input 
     // - Update GPS status and feedback 
+    // - Update screen message contents 
 
     mtbdl_idle_user_input_check(mtbdl); 
     ui_gps_led_status_update(); 
+    ui_msg_update(UI_MSG_IDLE); 
 
     // State exit 
     if (mtbdl->run || mtbdl->data_select || mtbdl->calibrate || 
@@ -1097,10 +1099,12 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
     // - Check for user button input 
     // - Update the data logging LED 
     // - Update the GPS status and feedback 
+    // - Update screen message contents 
 
     mtbdl_run_prep_user_input_check(mtbdl); 
     ui_led_state_update(WS2812_LED_0); 
     ui_gps_led_status_update(); 
+    ui_msg_update(UI_MSG_RUN_PREP); 
 
     // State exit 
     if (mtbdl->run || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
@@ -1829,11 +1833,12 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
 
     // State operations: 
     // - Check for user button input 
+    // - Update the Bluetooth LED 
     // - Check for a loss of Bluetooth connection or the lack of a data log file to send - 
     //   if true then abort the transfer 
-    // - Update the Bluetooth LED 
 
     mtbdl_pretx_user_input_check(mtbdl); 
+    ui_led_state_update(WS2812_LED_2); 
 
     if (!hc05_status() && !mtbdl->tx)
     {
@@ -1847,8 +1852,6 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
         mtbdl->msg = mtbdl_ncf_bt_con_lost; 
         mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
     }
-
-    ui_led_state_update(WS2812_LED_2); 
 
     // State exit 
     if (mtbdl->tx || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)

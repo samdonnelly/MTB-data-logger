@@ -32,23 +32,22 @@
 #define UI_LED_COUNTER_PERIOD 200      // 5ms interrupt * 200 == 1s counter period 
 #define UI_LED_WRITE_PERIOD 10         // 5ms interrupt * 10 == 50ms write period 
 #define UI_SOC_CALC_PERIOD 2000        // 5ms interrupt * 2000 == 10s calculation period 
+#define UI_MSG_COUNTER_PERIOD 2000     // 5ms interrupt * 2000 == 10s counter period 
 
-#define UI_LOG_INDEX_OFFSET 1 
+#define UI_LOG_INDEX_OFFSET 1          // Difference between log index and number 
 #define UI_SCREEN_LINE_CHAR_OFFSET 1   // Prevents NULL from being the last line character 
 
 //=======================================================================================
 
 
 //=======================================================================================
-// Variables 
-
-static mtbdl_ui_t mtbdl_ui; 
-
-//=======================================================================================
-
-
-//=======================================================================================
 // Prototypes 
+
+/**
+ * @brief Screen message formatting function pointer 
+ */
+typedef void (*ui_screen_msg_func_ptr)(void); 
+
 
 /**
  * @brief Button press check 
@@ -77,9 +76,24 @@ void ui_soc_update(void);
 
 
 /**
- * @brief Update the screen output 
+ * @brief Update screen message timer 
  */
-void ui_screen_update(void); 
+void ui_msg_timer_update(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Variables 
+
+static mtbdl_ui_t mtbdl_ui; 
+
+// Function pointers to screen message formatting functions 
+static ui_screen_msg_func_ptr msg_table[UI_MSG_NUM] = 
+{
+    &ui_set_idle_msg,       // Idle state message 
+    &ui_set_run_prep_msg    // Run prep state message 
+}; 
 
 //=======================================================================================
 
@@ -147,6 +161,9 @@ void ui_init(
     mtbdl_ui.led_state[WS2812_LED_3] = 
         (mtbdl_ui_led_blink_t){ WS2812_LED_3, UI_LED_DUTY_SHORT, CLEAR }; 
 
+    // Initialize screen info 
+    mtbdl_ui.msg_counter = CLEAR; 
+
     // Initialize SD card info 
     memset((void *)mtbdl_ui.data_buff, CLEAR, sizeof(mtbdl_ui.data_buff)); 
     memset((void *)mtbdl_ui.filename, CLEAR, sizeof(mtbdl_ui.filename)); 
@@ -180,8 +197,8 @@ ui_btn_num_t ui_status_update(void)
         // Update the battery SOC 
         ui_soc_update(); 
 
-        // Update screen message 
-        ui_screen_update(); 
+        // Update screen message timer 
+        ui_msg_timer_update(); 
     }
 
     return btn_num; 
@@ -301,18 +318,10 @@ void ui_soc_update(void)
 }
 
 
-// Update screen message 
-// - Kind of like a refresh function where each message function will retrieve updated 
-//   data. 
-// - Have a way to ignore message update requests (for example if the GPS status changes 
-//   but we're in data logging mode where the screen is off). 
-// Update the screen output 
-void ui_screen_update(void)
+// Update screen message timer 
+void ui_msg_timer_update(void)
 {
-    // - Counter to control how often to write the screen message. 
-    // - Message gets updated by a setter? 
-    // - Messages that require formatting will need continuous calling like the LED blink 
-    //   function. 
+    mtbdl_ui.msg_counter++; 
 }
 
 //=======================================================================================
@@ -351,11 +360,6 @@ void ui_gps_led_status_update(void)
 {
     static uint8_t gps_status_block = CLEAR_BIT; 
 
-    // Notes: 
-    // - Make sure to refresh/update the navstat for each screen message that requires it. 
-    // - How do we specify a screen message to update? What if we don't want to update 
-    //   a screen message at all? 
-
     // Monitor the GPS position lock status and update the LED and screen message 
     // for feedback. 
     if (m8q_get_position_navstat_lock())
@@ -381,6 +385,17 @@ void ui_gps_led_status_update(void)
 
 //=======================================================================================
 // Screen control 
+
+// Update screen message output 
+void ui_msg_update(ui_msg_update_index_t msg_index)
+{
+    if (mtbdl_ui.msg_counter >= UI_MSG_COUNTER_PERIOD)
+    {
+        mtbdl_ui.msg_counter = CLEAR; 
+        msg_table[msg_index](); 
+    }
+}
+
 
 // Format the idle state message 
 void ui_set_idle_msg(void)
@@ -416,8 +431,7 @@ void ui_set_idle_msg(void)
     snprintf(msg[HD44780U_L3].msg, 
              (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
              mtbdl_idle_msg[HD44780U_L3].msg, 
-             // mtbdl_data.adc_buff[MTBDL_ADC_SOC], 
-             1, 
+             mtbdl_ui.soc, 
              (char)(mtbdl_ui.navstat >> SHIFT_8), 
              (char)(mtbdl_ui.navstat)); 
 

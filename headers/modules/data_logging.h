@@ -155,20 +155,28 @@ mtbdl_data_t;
 // Initialization 
 
 /**
- * @brief Initialize data record 
+ * @brief Initialize data logging module 
  * 
  * @details Sets all the data handling info to its default value. This should be called 
  *          during the setup code. The arguments are saved into the data handling record 
  *          so they can be used where needed. 
+ *          
+ *          ADC DMA setup: 
+ *          Called during system setup to configure the DMA stream. This function is 
+ *          called instead of doing the initialization directly in the setup so that 
+ *          the ADC buffer, used to store ADC values and exists in the scope of the 
+ *          data handling file, can be associated with the setup. 
  * 
  * @param rpm_irqn : wheel speed periodic interrupt index 
  * @param log_irqn : data sample periodic interrupt index 
  * @param adc : pointer to ADC port used 
+ * @param dma_stream : pointer to DMA stream being used 
  */
-void mtbdl_data_init(
+void data_log_init(
     IRQn_Type rpm_irqn, 
     IRQn_Type log_irqn, 
-    ADC_TypeDef *adc); 
+    ADC_TypeDef *adc, 
+    DMA_Stream_TypeDef *dma_stream); 
 
 
 // /**
@@ -185,20 +193,20 @@ void mtbdl_data_init(
 // void mtbdl_file_sys_setup(void); 
 
 
-/**
- * @brief ADC DMA setup 
- * 
- * @details Called during system setup to configure the DMA stream. This function is 
- *          called instead of doing the initialization directly in the setup so that 
- *          the ADC buffer, used to store ADC values and exists in the scope of the 
- *          data handling file, can be associated with the setup. 
- * 
- * @param dma_stream : pointer to DMA stream being used 
- * @param adc : pointer to ADC port used 
- */
-void mtbdl_adc_dma_init(
-    DMA_Stream_TypeDef *dma_stream, 
-    ADC_TypeDef *adc); 
+// /**
+//  * @brief ADC DMA setup 
+//  * 
+//  * @details Called during system setup to configure the DMA stream. This function is 
+//  *          called instead of doing the initialization directly in the setup so that 
+//  *          the ADC buffer, used to store ADC values and exists in the scope of the 
+//  *          data handling file, can be associated with the setup. 
+//  * 
+//  * @param dma_stream : pointer to DMA stream being used 
+//  * @param adc : pointer to ADC port used 
+//  */
+// void mtbdl_adc_dma_init(
+//     DMA_Stream_TypeDef *dma_stream, 
+//     ADC_TypeDef *adc); 
 
 //==================================================
 

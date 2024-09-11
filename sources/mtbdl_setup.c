@@ -37,15 +37,15 @@
 // User init function 
 void mtbdl_init()
 {
-    //===================================================
+    //==================================================
     // General setup 
 
     // Initialize GPIO ports 
     gpio_port_init(); 
     
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // Timers 
 
     // General purpose 1us counter 
@@ -74,9 +74,9 @@ void mtbdl_init()
         TIM_UP_INT_ENABLE); 
     tim_enable(TIM11); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // I2C setup 
 
     // For MPU-6050, LCD screen and M8Q GPS 
@@ -91,9 +91,9 @@ void mtbdl_init()
         I2C_CCR_SM_42_100,
         I2C_TRISE_1000_42);
     
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // SPI setup 
 
     // For SD card 
@@ -110,9 +110,9 @@ void mtbdl_init()
     // SD card slave select pin setup 
     spi_ss_init(GPIOB, PIN_12); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // UART setup 
 
     // Serial terminal 
@@ -137,9 +137,9 @@ void mtbdl_init()
         UART_DMA_DISABLE, 
         UART_DMA_DISABLE); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // ADC setup 
 
     // Initialize the ADC port (called once) 
@@ -173,34 +173,9 @@ void mtbdl_init()
     // Turn the ADC on 
     adc_on(ADC1); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
-    // DMA setup 
-
-    // Initialize the DMA stream 
-    dma_stream_init(
-        DMA2, 
-        DMA2_Stream0, 
-        DMA_CHNL_0, 
-        DMA_DIR_PM, 
-        DMA_CM_ENABLE,
-        DMA_PRIOR_VHI, 
-        DMA_ADDR_INCREMENT, 
-        DMA_ADDR_FIXED, 
-        DMA_DATA_SIZE_HALF, 
-        DMA_DATA_SIZE_HALF); 
-
-    // Configure the DMA stream 
-    // TODO add this to the data logging init function 
-    mtbdl_adc_dma_init(DMA2_Stream0, ADC1); 
-
-    // Enable the DMA stream 
-    dma_stream_enable(DMA2_Stream0); 
-
-    //===================================================
-
-    //===================================================
+    //==================================================
     // HD44780U LCD setup 
 
     // Must come before setup of other devices on the same I2C bus 
@@ -211,9 +186,9 @@ void mtbdl_init()
     // Contoller 
     hd44780u_controller_init(TIM9); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // MPU-6050 IMU setup 
 
     // Driver 
@@ -236,9 +211,9 @@ void mtbdl_init()
     mpu6050_set_smpl_type(DEVICE_ONE, MPU6050_READ_A); 
     mpu6050_set_read_state(DEVICE_ONE, MPU6050_READ_READY); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // M8Q GPS setup 
 
     // M8Q device setup 
@@ -256,9 +231,9 @@ void mtbdl_init()
     // Controller 
     m8q_controller_init(TIM9); 
     
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // HC-05 Bluetooth setup 
 
     // HC-05 driver 
@@ -272,9 +247,9 @@ void mtbdl_init()
         GPIOA,          // STATE pin GPIO 
         PIN_11);        // STATE pin 
     
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // SD card setup 
 
     // User initialization 
@@ -283,9 +258,9 @@ void mtbdl_init()
     // Controller init 
     hw125_controller_init(mtbdl_dir); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // LED setup 
 
     // WS2812 (Neopixels) 
@@ -296,15 +271,15 @@ void mtbdl_init()
         GPIOC, 
         PIN_6); 
     
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // Main setup 
 
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
     mtbdl_trackers.fault_code = CLEAR; 
-    mtbdl_trackers.user_btn_port = GPIOC; 
+    // mtbdl_trackers.user_btn_port = GPIOC; 
 
     // Timing information 
     mtbdl_trackers.timer_nonblocking = TIM9; 
@@ -321,14 +296,14 @@ void mtbdl_init()
     // State flags 
     mtbdl_trackers.init = SET_BIT; 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // User interface setup (button & LEDs) 
 
     ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3); 
 
-    //===================================================
+    //==================================================
 
     //==================================================
     // System parameters setup 
@@ -337,23 +312,44 @@ void mtbdl_init()
     
     //==================================================
 
-    //===================================================
+    //==================================================
     // Data logging setup 
 
-    // Data record init 
-    // TODO add the ADC DMA setup to this init function 
-    mtbdl_data_init(
+    // This function handles DMA stream init so that the correct ADC buffer can be used. 
+    data_log_init(
         EXTI4_IRQn, 
         TIM1_TRG_COM_TIM11_IRQn, 
-        ADC1); 
+        ADC1, 
+        DMA2_Stream0); 
     
-    //===================================================
+    //==================================================
 
-    //===================================================
-    // System parameter setup 
-    //===================================================
+    //==================================================
+    // DMA setup 
 
-    //===================================================
+    // Initialize the DMA stream 
+    dma_stream_init(
+        DMA2, 
+        DMA2_Stream0, 
+        DMA_CHNL_0, 
+        DMA_DIR_PM, 
+        DMA_CM_ENABLE,
+        DMA_PRIOR_VHI, 
+        DMA_ADDR_INCREMENT, 
+        DMA_ADDR_FIXED, 
+        DMA_DATA_SIZE_HALF, 
+        DMA_DATA_SIZE_HALF); 
+
+    // Configure the DMA stream 
+    // The ADC DMA stream is configured in the data logging module init function called 
+    // above. This is done so the ADC buffer in the data logging module can be used. 
+
+    // Enable the DMA stream 
+    dma_stream_enable(DMA2_Stream0); 
+
+    //==================================================
+
+    //==================================================
     // Wheel speed sensor setup (external interrupt) 
 
     // Enable external interrupts 
@@ -372,9 +368,9 @@ void mtbdl_init()
         EXTI_RISE_TRIG_DISABLE, 
         EXTI_FALL_TRIG_ENABLE); 
 
-    //===================================================
+    //==================================================
 
-    //===================================================
+    //==================================================
     // Interrupt setup 
 
     // Initialize interrupt handler flags 
@@ -393,7 +389,7 @@ void mtbdl_init()
     NVIC_SetPriority(EXTI4_IRQn, EXTI_PRIORITY_0); 
     NVIC_DisableIRQ(EXTI4_IRQn); 
 
-    //===================================================
+    //==================================================
 }
 
 //=======================================================================================

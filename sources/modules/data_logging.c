@@ -282,10 +282,11 @@ static const mtbdl_log_stream_state_t stream_schedule[MTBDL_NUM_LOG_SEQ] =
 // Initialization 
 
 // Initialize data record 
-void mtbdl_data_init(
+void data_log_init(
     IRQn_Type rpm_irqn, 
     IRQn_Type log_irqn, 
-    ADC_TypeDef *adc)
+    ADC_TypeDef *adc, 
+    DMA_Stream_TypeDef *dma_stream)
 {
     // Reset the whole data record 
     memset((void *)&mtbdl_data, CLEAR, sizeof(mtbdl_data_t)); 
@@ -296,8 +297,29 @@ void mtbdl_data_init(
     mtbdl_data.adc = adc; 
 
     // System data 
-    mtbdl_data.navstat = M8Q_NAVSTAT_NF; 
+    // mtbdl_data.navstat = M8Q_NAVSTAT_NF; 
+
+    // Configure the DMA stream 
+    dma_stream_config(
+        dma_stream, 
+        (uint32_t)(&adc->DR), 
+        (uint32_t)mtbdl_data.adc_buff, 
+        (uint16_t)MTBDL_ADC_BUFF_SIZE); 
 }
+
+
+// // ADC DMA setup 
+// void mtbdl_adc_dma_init(
+//     DMA_Stream_TypeDef *dma_stream, 
+//     ADC_TypeDef *adc)
+// {
+//     // Configure the DMA stream 
+//     dma_stream_config(
+//         dma_stream, 
+//         (uint32_t)(&adc->DR), 
+//         (uint32_t)mtbdl_data.adc_buff, 
+//         (uint16_t)MTBDL_ADC_BUFF_SIZE); 
+// }
 
 
 // // File system setup 
@@ -331,20 +353,6 @@ void mtbdl_data_init(
 //         mtbdl_read_sys_params(HW125_MODE_OEWR); 
 //     }
 // }
-
-
-// ADC DMA setup 
-void mtbdl_adc_dma_init(
-    DMA_Stream_TypeDef *dma_stream, 
-    ADC_TypeDef *adc)
-{
-    // Configure the DMA stream 
-    dma_stream_config(
-        dma_stream, 
-        (uint32_t)(&adc->DR), 
-        (uint32_t)mtbdl_data.adc_buff, 
-        (uint16_t)MTBDL_ADC_BUFF_SIZE); 
-}
 
 //=======================================================================================
 
@@ -1182,99 +1190,99 @@ void mtbdl_cal_calc(void)
 //=======================================================================================
 // Screen message formatting 
 
-// Format the idle state message 
-void mtbdl_set_idle_msg(void)
-{
-    hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+// // Format the idle state message 
+// void mtbdl_set_idle_msg(void)
+// {
+//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
 
-    // Create an editable copy of the message 
-    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
-    {
-        msg[i] = mtbdl_idle_msg[i]; 
-    }
+//     // Create an editable copy of the message 
+//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
+//     {
+//         msg[i] = mtbdl_idle_msg[i]; 
+//     }
 
-    // Format the message with data 
-    // snprintf will NULL terminate the string at the screen line length so in order to use 
-    // the last spot on the screen line the message length must be indexed up by one 
-    snprintf(
-        msg[HD44780U_L1].msg, 
-        (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
-        mtbdl_idle_msg[HD44780U_L1].msg, 
-        mtbdl_data.fork_psi, 
-        mtbdl_data.fork_comp, 
-        mtbdl_data.fork_reb); 
+//     // Format the message with data 
+//     // snprintf will NULL terminate the string at the screen line length so in order to use 
+//     // the last spot on the screen line the message length must be indexed up by one 
+//     snprintf(
+//         msg[HD44780U_L1].msg, 
+//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+//         mtbdl_idle_msg[HD44780U_L1].msg, 
+//         mtbdl_data.fork_psi, 
+//         mtbdl_data.fork_comp, 
+//         mtbdl_data.fork_reb); 
     
-    snprintf(
-        msg[HD44780U_L2].msg, 
-        (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
-        mtbdl_idle_msg[HD44780U_L2].msg, 
-        mtbdl_data.shock_psi, 
-        mtbdl_data.shock_lock, 
-        mtbdl_data.shock_reb); 
+//     snprintf(
+//         msg[HD44780U_L2].msg, 
+//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+//         mtbdl_idle_msg[HD44780U_L2].msg, 
+//         mtbdl_data.shock_psi, 
+//         mtbdl_data.shock_lock, 
+//         mtbdl_data.shock_reb); 
     
-    snprintf(
-        msg[HD44780U_L3].msg, 
-        (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
-        mtbdl_idle_msg[HD44780U_L3].msg, 
-        mtbdl_data.adc_buff[MTBDL_ADC_SOC], 
-        (char)(mtbdl_data.navstat >> SHIFT_8), 
-        (char)mtbdl_data.navstat); 
+//     snprintf(
+//         msg[HD44780U_L3].msg, 
+//         (HD44780U_LINE_LEN + MTBDL_DATA_INDEX_OFFSET), 
+//         mtbdl_idle_msg[HD44780U_L3].msg, 
+//         mtbdl_data.adc_buff[MTBDL_ADC_SOC], 
+//         (char)(mtbdl_data.navstat >> SHIFT_8), 
+//         (char)mtbdl_data.navstat); 
 
-    // Set the screen message 
-    hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
-}
-
-
-// Format the run prep state message 
-void mtbdl_set_run_prep_msg(void)
-{
-    hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
-
-    // Create an editable copy of the message 
-    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_3_LINE; i++) 
-    {
-        msg[i] = mtbdl_run_prep_msg[i]; 
-    }
-
-    // Convert the NAVSTAT code to an easily readable value 
-
-    // Format the message with data 
-    snprintf(
-        msg[HD44780U_L1].msg, 
-        HD44780U_LINE_LEN, 
-        mtbdl_run_prep_msg[HD44780U_L1].msg, 
-        (char)(mtbdl_data.navstat >> SHIFT_8), 
-        (char)mtbdl_data.navstat); 
-
-    // Set the screen message 
-    hd44780u_set_msg(msg, MTBDL_MSG_LEN_3_LINE); 
-}
+//     // Set the screen message 
+//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
+// }
 
 
-// Format the pre TX state message 
-void mtbdl_set_pretx_msg(void)
-{
-    hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+// // Format the run prep state message 
+// void mtbdl_set_run_prep_msg(void)
+// {
+//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_3_LINE]; 
 
-    // Create an editable copy of the message 
-    for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
-    {
-        msg[i] = mtbdl_pretx_msg[i]; 
-    }
+//     // Create an editable copy of the message 
+//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_3_LINE; i++) 
+//     {
+//         msg[i] = mtbdl_run_prep_msg[i]; 
+//     }
 
-    // Format the message with data 
-    // The log index is adjusted because it will be one ahead of the most recent log 
-    // file number after the most recent log has been created 
-    snprintf(
-        msg[HD44780U_L2].msg, 
-        HD44780U_LINE_LEN, 
-        mtbdl_pretx_msg[HD44780U_L2].msg, 
-        // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
-        (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
+//     // Convert the NAVSTAT code to an easily readable value 
 
-    // Set the screen message 
-    hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
-}
+//     // Format the message with data 
+//     snprintf(
+//         msg[HD44780U_L1].msg, 
+//         HD44780U_LINE_LEN, 
+//         mtbdl_run_prep_msg[HD44780U_L1].msg, 
+//         (char)(mtbdl_data.navstat >> SHIFT_8), 
+//         (char)mtbdl_data.navstat); 
+
+//     // Set the screen message 
+//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_3_LINE); 
+// }
+
+
+// // Format the pre TX state message 
+// void mtbdl_set_pretx_msg(void)
+// {
+//     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+
+//     // Create an editable copy of the message 
+//     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
+//     {
+//         msg[i] = mtbdl_pretx_msg[i]; 
+//     }
+
+//     // Format the message with data 
+//     // The log index is adjusted because it will be one ahead of the most recent log 
+//     // file number after the most recent log has been created 
+//     snprintf(
+//         msg[HD44780U_L2].msg, 
+//         HD44780U_LINE_LEN, 
+//         mtbdl_pretx_msg[HD44780U_L2].msg, 
+//         // (mtbdl_data.log_index - MTBDL_DATA_INDEX_OFFSET)); 
+//         (param_get_log_index() - MTBDL_DATA_INDEX_OFFSET)); 
+
+//     // Set the screen message 
+//     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
+// }
 
 //=======================================================================================
 
@@ -1303,6 +1311,10 @@ void mtbdl_set_trailmark(void)
 
 //=======================================================================================
 // Getters 
+
+// TODO remove this. We don't need to log battery voltage so move the battery voltage 
+//      reading to another module (or just main) and set up ADC DMA for just the fork 
+//      and shock voltages. 
 
 // Get battery voltage 
 uint16_t log_get_bat_voltage(void)

@@ -64,7 +64,7 @@ typedef struct mtbdl_trackers_s
     // System information 
     mtbdl_states_t state;                       // State of the system controller 
     uint16_t fault_code;                        // System fault code 
-    GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
+    // GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
 
     // Timing information 
     TIM_TypeDef *timer_nonblocking;             // Timer used for non-blocking delays 
@@ -74,10 +74,6 @@ typedef struct mtbdl_trackers_s
     // Screen message 
     hd44780u_msgs_t *msg;                       // Message content 
     uint8_t msg_len;                            // Message length (number of lines) 
-
-    // Modules 
-    // mtbdl_data_t data_logging; 
-    // mtbdl_params_t sys_params; 
 
     // User buttons 
     ui_btn_num_t btn_press;                     // Button press status 

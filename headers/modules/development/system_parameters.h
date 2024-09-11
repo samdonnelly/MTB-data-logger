@@ -34,7 +34,7 @@ typedef enum {
 } param_log_index_change_t; 
 
 
-// User bike setting index 
+// Bike setting index 
 typedef enum {
     PARAM_BIKE_SET_FPSI,   // Fork PSI 
     PARAM_BIKE_SET_FC,     // Fork compression setting 
@@ -44,6 +44,17 @@ typedef enum {
     PARAM_BIKE_SET_SR,     // Shock rebound setting 
     PARAM_BIKE_SET_NONE    // No setting 
 } param_bike_set_index_t; 
+
+
+// System setting index 
+typedef enum {
+    PARAM_SYS_SET_AX_REST,      // Resting X-axis acceleration 
+    PARAM_SYS_SET_AY_REST,      // Resting Y-axis acceleration 
+    PARAM_SYS_SET_AZ_REST,      // Resting Z-axis acceleration 
+    PARAM_SYS_SET_FORK_REST,    // Resting fork position 
+    PARAM_SYS_SET_SHOCK_REST,   // Resting shock position 
+    PARAM_SYS_SET_NUM           // Number of system settings 
+} param_sys_set_index_t; 
 
 //=======================================================================================   
 
@@ -68,6 +79,10 @@ typedef struct mtbdl_param_s
     int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
     uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
     uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
+
+    // Calibration data 
+    int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
+    int32_t cal_index;                          // Calibration sample index 
 
     // SD card 
     char param_buff[MTBDL_MAX_STR_LEN];         // Buffer for reading and writing 
@@ -205,6 +220,17 @@ void param_update_log_index(param_log_index_change_t log_index_change);
 void param_update_bike_setting(
     param_bike_set_index_t setting_index, 
     uint8_t setting); 
+
+
+// /**
+//  * @brief Update system settings 
+//  * 
+//  * @param setting_index 
+//  * @param setting 
+//  */
+// void param_update_system_setting(
+//     param_sys_set_index_t setting_index, 
+//     void *setting); 
 
 //=======================================================================================
 

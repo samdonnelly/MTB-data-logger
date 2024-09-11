@@ -15,7 +15,9 @@
 //=======================================================================================
 // Includes 
 
-#include "includes_app.h" 
+#include "data_logging.h" 
+#include "ws2812_config.h" 
+#include "stm32f4xx_it.h" 
 
 //=======================================================================================
 
@@ -53,7 +55,7 @@ typedef enum {
  * @brief ADC buffer index 
  */
 typedef enum {
-    MTBDL_ADC_SOC,    // Battery State of Charge (SOC) 
+    // MTBDL_ADC_SOC,    // Battery State of Charge (SOC) 
     MTBDL_ADC_FORK,   // Fork potentiometer 
     MTBDL_ADC_SHOCK   // Shock potentiometer 
 } mtbdl_adc_buff_index_t; 
@@ -713,6 +715,9 @@ void mtbdl_calibrate(void)
             &mtbdl_data.accel_x_rest, 
             &mtbdl_data.accel_y_rest, 
             &mtbdl_data.accel_z_rest); 
+            // &mtbdl_data.accel_x, 
+            // &mtbdl_data.accel_y, 
+            // &mtbdl_data.accel_z); 
 
         // Sum all the data into the calibration buffer. This data will be averaged once the 
         // calibration state is left. 
@@ -721,6 +726,11 @@ void mtbdl_calibrate(void)
         mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] += (int32_t)mtbdl_data.accel_z_rest; 
         mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
         mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
+        // mtbdl_data.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_data.accel_x; 
+        // mtbdl_data.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_data.accel_y; 
+        // mtbdl_data.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_data.accel_z; 
+        // mtbdl_data.cal_buff[PARAM_SYS_SET_FORK_REST] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
+        // mtbdl_data.cal_buff[PARAM_SYS_SET_SHOCK_REST] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
 
         // Trigger an ADC and accelerometer read so the data is available for the next 
         // time data is recorded 
@@ -748,6 +758,18 @@ void mtbdl_cal_calc(void)
         (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] / mtbdl_data.cal_index); 
     mtbdl_data.pot_shock_rest = 
         (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] / mtbdl_data.cal_index); 
+
+    // mtbdl_data.accel_x = (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AX_REST] / mtbdl_data.cal_index); 
+    // mtbdl_data.accel_y = (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AY_REST] / mtbdl_data.cal_index); 
+    // mtbdl_data.accel_z = (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AZ_REST] / mtbdl_data.cal_index); 
+    // (uint16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_FORK_REST] / mtbdl_data.cal_index); 
+    // (uint16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_SHOCK_REST] / mtbdl_data.cal_index); 
+
+    // param_update_system_setting(PARAM_SYS_SET_AX_REST, (void *)&mtbdl_data.accel_x); 
+    // param_update_system_setting(PARAM_SYS_SET_AY_REST, (void *)&mtbdl_data.accel_y); 
+    // param_update_system_setting(PARAM_SYS_SET_AZ_REST, (void *)&mtbdl_data.accel_z); 
+    // param_update_system_setting(PARAM_SYS_SET_FORK_REST, (void *)&mtbdl_data.accel_z); 
+    // param_update_system_setting(PARAM_SYS_SET_SHOCK_REST, (void *)&mtbdl_data.accel_z); 
 
     // TODO update the parameter files? 
 }

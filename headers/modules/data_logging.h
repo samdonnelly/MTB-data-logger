@@ -19,6 +19,7 @@
 // Includes 
 
 #include "includes_drivers.h" 
+#include "system_parameters.h" 
 #include "string_config.h" 
 
 //=======================================================================================
@@ -103,7 +104,8 @@ typedef struct mtbdl_data_s
     int16_t accel_z;                            // z-axis acceleration reading 
 
     // Calibration data 
-    int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
+    // int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
+    int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
     int32_t cal_index;                          // Calibration sample index 
 
     // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 

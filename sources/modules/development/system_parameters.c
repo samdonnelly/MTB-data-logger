@@ -16,6 +16,7 @@
 // Includes 
 
 #include "system_parameters.h" 
+#include "stm32f4xx_it.h" 
 
 //=======================================================================================
 
@@ -253,6 +254,82 @@ void param_sys_read_format(void)
 
 
 //=======================================================================================
+// Calibration 
+
+// // Calibration data prep 
+// void param_calibration_prep(void)
+// {
+//     // Reset the calibration data 
+//     memset((void *)mtbdl_param.cal_buff, CLEAR, sizeof(mtbdl_param.cal_buff)); 
+//     mtbdl_param.cal_index = CLEAR; 
+
+//     // Trigger an ADC and accelerometer read so the data is available for the first 
+//     // time data is recorded 
+//     adc_start(mtbdl_data.adc); 
+//     mpu6050_set_read_flag(DEVICE_ONE); 
+
+//     // Enable log sample period interrupts 
+//     NVIC_EnableIRQ(mtbdl_data.log_irq); 
+// }
+
+
+// // Calibration 
+// void param_calibration(void)
+// {
+//     // Record new data periodically 
+//     if (handler_flags.tim1_trg_tim11_glbl_flag)
+//     {
+//         handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+//         mtbdl_param.cal_index++; 
+
+//         // Record new accel data 
+//         mpu6050_get_accel_raw(
+//             DEVICE_ONE, 
+//             &mtbdl_param.accel_x_rest, 
+//             &mtbdl_param.accel_y_rest, 
+//             &mtbdl_param.accel_z_rest); 
+
+//         // Sum all the data into the calibration buffer. This data will be averaged once the 
+//         // calibration state is left. 
+//         mtbdl_param.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_param.accel_x_rest; 
+//         mtbdl_param.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_param.accel_y_rest; 
+//         mtbdl_param.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_param.accel_z_rest; 
+//         mtbdl_param.cal_buff[PARAM_SYS_SET_FORK_REST] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
+//         mtbdl_param.cal_buff[PARAM_SYS_SET_SHOCK_REST] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
+
+//         // Trigger an ADC and accelerometer read so the data is available for the next 
+//         // time data is recorded 
+//         adc_start(mtbdl_data.adc); 
+//         mpu6050_set_read_flag(DEVICE_ONE); 
+//     }
+// }
+
+
+// // Calibration calculation 
+// void param_calibration_calculation(void)
+// {
+//     // Disable log sample period interrupts 
+//     NVIC_DisableIRQ(mtbdl_data.log_irq); 
+
+//     // Calculate and record calibration data 
+//     mtbdl_param.accel_x_rest = 
+//         (int16_t)(mtbdl_param.cal_buff[PARAM_SYS_SET_AX_REST] / mtbdl_param.cal_index); 
+//     mtbdl_param.accel_y_rest = 
+//         (int16_t)(mtbdl_param.cal_buff[PARAM_SYS_SET_AY_REST] / mtbdl_param.cal_index); 
+//     mtbdl_param.accel_z_rest = 
+//         (int16_t)(mtbdl_param.cal_buff[PARAM_SYS_SET_AZ_REST] / mtbdl_param.cal_index); 
+//     mtbdl_param.pot_fork_rest = 
+//         (uint16_t)(mtbdl_param.cal_buff[PARAM_SYS_SET_FORK_REST] / mtbdl_param.cal_index); 
+//     mtbdl_param.pot_shock_rest = 
+//         (uint16_t)(mtbdl_param.cal_buff[PARAM_SYS_SET_SHOCK_REST] / mtbdl_param.cal_index); 
+
+//     // TODO update the parameter files? 
+// }
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Setters 
 
 // Increment/decrement log file index 
@@ -324,6 +401,39 @@ void param_update_bike_setting(
     }
 }
 
+
+// // Update system settings 
+// void param_update_system_setting(
+//     param_sys_set_index_t setting_index, 
+//     void *setting)
+// {
+//     switch (setting_index)
+//     {
+//         case PARAM_SYS_SET_AX_REST:
+//             mtbdl_param.accel_x_rest = *(int16_t *)setting; 
+//             break;
+
+//         case PARAM_SYS_SET_AY_REST:
+//             mtbdl_param.accel_y_rest = *(int16_t *)setting; 
+//             break;
+
+//         case PARAM_SYS_SET_AZ_REST:
+//             mtbdl_param.accel_z_rest = *(int16_t *)setting; 
+//             break;
+
+//         case PARAM_SYS_SET_FORK_REST:
+//             mtbdl_param.pot_fork_rest = *(uint16_t *)setting; 
+//             break;
+
+//         case PARAM_SYS_SET_SHOCK_REST:
+//             mtbdl_param.pot_shock_rest = *(uint16_t *)setting; 
+//             break;
+        
+//         default: 
+//             break;
+//     }
+// }
+
 //=======================================================================================
 
 
@@ -340,7 +450,7 @@ uint8_t param_get_log_index(void)
 // Get bike settings 
 uint8_t param_get_bike_setting(param_bike_set_index_t setting_index)
 {
-    uint8_t setting = (uint8_t)PARAM_BIKE_SET_NONE; 
+    uint8_t setting = ~CLEAR; 
 
     switch (setting_index)
     {

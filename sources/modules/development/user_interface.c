@@ -20,6 +20,7 @@
 
 #include "ws2812_config.h" 
 #include "hd44780u_config.h" 
+#include "battery_config.h" 
 #include "stm32f4xx_it.h" 
 
 //=======================================================================================
@@ -30,6 +31,7 @@
 
 #define UI_LED_COUNTER_PERIOD 200      // 5ms interrupt * 200 == 1s counter period 
 #define UI_LED_WRITE_PERIOD 10         // 5ms interrupt * 10 == 50ms write period 
+#define UI_SOC_CALC_PERIOD 2000        // 5ms interrupt * 2000 == 10s calculation period 
 
 #define UI_LOG_INDEX_OFFSET 1 
 #define UI_SCREEN_LINE_CHAR_OFFSET 1   // Prevents NULL from being the last line character 
@@ -91,10 +93,18 @@ void ui_init(
     pin_selector_t btn1, 
     pin_selector_t btn2, 
     pin_selector_t btn3, 
-    pin_selector_t btn4)
+    pin_selector_t btn4, 
+    ADC_TypeDef *soc_adc_port, 
+    adc_channel_t soc_adc_channel)
 {
-    // GPIO port for the buttons 
+    // Peripheral initialization 
     mtbdl_ui.user_btn_port = btn_port; 
+    mtbdl_ui.soc_adc_port = soc_adc_port; 
+    mtbdl_ui.soc_adc_channel = soc_adc_channel; 
+
+    // Initialize system info 
+    mtbdl_ui.navstat = M8Q_NAVSTAT_NF; 
+    mtbdl_ui.soc = battery_soc_calc(adc_read_single(soc_adc_port, soc_adc_channel)); 
 
     // User button pin numbers 
     mtbdl_ui.user_btn_1 = (uint8_t)(SET_BIT << btn1); 
@@ -136,9 +146,6 @@ void ui_init(
         (mtbdl_ui_led_blink_t){ WS2812_LED_2, UI_LED_DUTY_SHORT, CLEAR }; 
     mtbdl_ui.led_state[WS2812_LED_3] = 
         (mtbdl_ui_led_blink_t){ WS2812_LED_3, UI_LED_DUTY_SHORT, CLEAR }; 
-
-    // Initialize system info 
-    mtbdl_ui.navstat = M8Q_NAVSTAT_NF; 
 
     // Initialize SD card info 
     memset((void *)mtbdl_ui.data_buff, CLEAR, sizeof(mtbdl_ui.data_buff)); 
@@ -269,7 +276,7 @@ void ui_led_update(void)
     }
 
     // Update the LED output periodically 
-    if (led_write_counter++ == UI_LED_WRITE_PERIOD)
+    if (led_write_counter++ >= UI_LED_WRITE_PERIOD)
     {
         ws2812_send(DEVICE_ONE, mtbdl_ui.led_write_data); 
         led_write_counter = CLEAR; 
@@ -280,7 +287,17 @@ void ui_led_update(void)
 // Update the SOC calculation 
 void ui_soc_update(void)
 {
-    // 
+    static uint16_t soc_calc_counter = CLEAR; 
+    uint16_t voltage = CLEAR; 
+
+    if (soc_calc_counter++ >= UI_SOC_CALC_PERIOD)
+    {
+        // Read the battery voltage and calculate the current SOC using battery specific 
+        // information. 
+        soc_calc_counter = CLEAR; 
+        voltage = adc_read_single(mtbdl_ui.soc_adc_port, mtbdl_ui.soc_adc_channel); 
+        mtbdl_ui.soc = battery_soc_calc(voltage); 
+    }
 }
 
 
@@ -597,6 +614,18 @@ void ui_led_duty_set(
     {
         mtbdl_ui.led_state[led_num].duty_cycle = duty_cycle; 
     }
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Getters 
+
+// Get battery SOC 
+uint8_t ui_get_soc(void)
+{
+    return mtbdl_ui.soc; 
 }
 
 //=======================================================================================

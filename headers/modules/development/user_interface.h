@@ -63,7 +63,14 @@ mtbdl_ui_led_blink_t;
 // User interface data record 
 typedef struct mtbdl_ui_s 
 {
+    // Peripherals 
     GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
+    ADC_TypeDef *soc_adc_port;                  // ADC port for battery SOC 
+    adc_channel_t soc_adc_channel;              // ADC channel for battery SOC 
+
+    // System info 
+    uint16_t navstat;                           // Navigation status of GPS module 
+    uint8_t soc;                                // Battery state of charge 
 
     // User buttons 
     uint8_t user_btn_1;                         // User button 1 pin number 
@@ -80,9 +87,6 @@ typedef struct mtbdl_ui_s
     uint32_t led_write_data[WS2812_LED_NUM];    // LED write buffer 
     uint16_t led_counter; 
     mtbdl_ui_led_blink_t led_state[WS2812_LED_NUM]; 
-
-    // System info 
-    uint16_t navstat;                           // Navigation status of GPS module 
 
     // SD Card 
     char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
@@ -110,13 +114,17 @@ mtbdl_ui_t;
  * @param btn2 
  * @param btn3 
  * @param btn4 
+ * @param soc_adc_port : 
+ * @param soc_adc_channel : 
  */
 void ui_init(
     GPIO_TypeDef *btn_port, 
     pin_selector_t btn1, 
     pin_selector_t btn2, 
     pin_selector_t btn3, 
-    pin_selector_t btn4); 
+    pin_selector_t btn4, 
+    ADC_TypeDef *soc_adc_port, 
+    adc_channel_t soc_adc_channel); 
 
 //=======================================================================================
 
@@ -300,6 +308,19 @@ void ui_led_colour_change(
 void ui_led_duty_set(
     ws2812_led_index_t led_num, 
     uint8_t duty_cycle); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Getters 
+
+/**
+ * @brief Get battery SOC 
+ * 
+ * @return uint8_t : Battery SOC 
+ */
+uint8_t ui_get_soc(void); 
 
 //=======================================================================================
 

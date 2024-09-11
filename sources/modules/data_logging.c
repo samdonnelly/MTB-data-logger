@@ -1290,14 +1290,14 @@ void mtbdl_cal_calc(void)
 //=======================================================================================
 // Data checks and updates 
 
-// // Update LED colours 
-// void mtbdl_led_update(
-//     ws2812_led_index_t led_index, 
-//     uint32_t led_code)
-// {
-//     mtbdl_data.led_colour_data[led_index] = led_code; 
-//     ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
-// }
+// Update LED colours 
+void mtbdl_led_update(
+    ws2812_led_index_t led_index, 
+    uint32_t led_code)
+{
+    mtbdl_data.led_colour_data[led_index] = led_code; 
+    ws2812_send(DEVICE_ONE, mtbdl_data.led_colour_data); 
+}
 
 // Set trail marker flag 
 void mtbdl_set_trailmark(void)

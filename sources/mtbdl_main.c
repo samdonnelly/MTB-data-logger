@@ -28,6 +28,10 @@
 #define MTBDL_LCD_LP_SLEEP 3000000       // (us) Low power state message display time 
 #define MTBDL_STATE_CHECK_SLOW 5000000   // (us) Long period time for non-blocking timer 
 
+// Battery Voltage 
+#define MTBDL_SOC_CUTOFF 15              // Low power enter cutoff battery SOC 
+#define MTBDL_SOC_THRESHOLD 20           // Low power exit min threshold battery SOC 
+
 //=======================================================================================
 
 
@@ -532,11 +536,11 @@ void mtbdl_app(void)
 {
     mtbdl_states_t next_state = mtbdl_trackers.state; 
 
+    // User interface update 
+    mtbdl_trackers.btn_press = ui_status_update(); 
+
     // System status checks 
     system_status_checks(); 
-
-    // UI update 
-    mtbdl_trackers.btn_press = ui_status_update(); 
 
     //===================================================
     // System state machine 
@@ -554,6 +558,10 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+            else if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
             }
             else if (mtbdl_trackers.run)
             {
@@ -573,6 +581,10 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+            else if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
@@ -601,7 +613,7 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-            else if (mtbdl_trackers.run)
+            else if (mtbdl_trackers.run || mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_POSTRUN_STATE; 
             }
@@ -619,6 +631,10 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+            else if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
@@ -639,6 +655,10 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
+            else if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
+            }
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
@@ -657,6 +677,10 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+            else if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
@@ -677,7 +701,9 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-            else if (mtbdl_trackers.rx || mtbdl_trackers.noncrit_fault)
+            else if (mtbdl_trackers.rx || 
+                     mtbdl_trackers.noncrit_fault || 
+                     mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_POSTRX_STATE; 
             }
@@ -694,6 +720,10 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+            else if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
@@ -714,7 +744,9 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_FAULT_STATE; 
             }
-            else if (mtbdl_trackers.tx || mtbdl_trackers.noncrit_fault)
+            else if (mtbdl_trackers.tx || 
+                     mtbdl_trackers.noncrit_fault || 
+                     mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_POSTTX_STATE; 
             }
@@ -735,6 +767,10 @@ void mtbdl_app(void)
             if (mtbdl_trackers.fault_code)
             {
                 next_state = MTBDL_FAULT_STATE; 
+            }
+            else if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
@@ -768,7 +804,11 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_FAULT_STATE: 
-            if (mtbdl_trackers.reset)
+            if (mtbdl_trackers.low_pwr)
+            {
+                next_state = MTBDL_LOWPWR_STATE; 
+            }
+            else if (mtbdl_trackers.reset)
             {
                 next_state = MTBDL_RESET_STATE; 
             }
@@ -803,6 +843,13 @@ void mtbdl_app(void)
 // System status checks 
 void system_status_checks(void)
 {
+    // Low power check 
+    if ((mtbdl_trackers.state != MTBDL_LOWPWR_STATE) && (ui_get_soc() <= MTBDL_SOC_CUTOFF))
+    {
+        mtbdl_trackers.low_pwr = SET_BIT; 
+    } 
+
+    // Fault checks 
     if (hd44780u_get_fault_code())
     {
         mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_0); 
@@ -933,7 +980,8 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
     ui_gps_led_status_update(); 
 
     // State exit 
-    if (mtbdl->run || mtbdl->data_select || mtbdl->calibrate || mtbdl->fault_code)
+    if (mtbdl->run || mtbdl->data_select || mtbdl->calibrate || 
+        mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_idle_state_exit(); 
@@ -945,7 +993,8 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_idle_state_entry(void)
 {
     // Display the idle state message 
-    mtbdl_set_idle_msg(); 
+    // mtbdl_set_idle_msg(); 
+    ui_set_idle_msg(); 
 
     // Set the screen to power save mode 
     hd44780u_set_pwr_save_flag(); 
@@ -1026,7 +1075,8 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
         if (mtbdl_log_name_prep()) 
         {
             // New file name created - display the run prep state message 
-            mtbdl_set_run_prep_msg(); 
+            // mtbdl_set_run_prep_msg(); 
+            ui_set_run_prep_msg(); 
             mtbdl->run = CLEAR_BIT; 
 
             // Make sure the M8Q is out of low power mode 
@@ -1053,7 +1103,7 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
     ui_gps_led_status_update(); 
 
     // State exit 
-    if (mtbdl->run || mtbdl->idle || mtbdl->fault_code)
+    if (mtbdl->run || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_run_prep_state_exit(); 
@@ -1199,7 +1249,7 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
     ui_gps_led_status_update(); 
 
     // State exit 
-    if (mtbdl->run || mtbdl->fault_code)
+    if (mtbdl->run || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->msg = mtbdl_postrun_msg; 
         mtbdl->msg_len = MTBDL_MSG_LEN_2_LINE; 
@@ -1279,11 +1329,17 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
         mtbdl->run = CLEAR_BIT; 
 
         mtbdl_postrun_state_entry(); 
+
+        // Consider adding a screen message that indicates the log was ended due to 
+        // low battery voltage. 
     }
     
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
+        // Consider only setting the idle state bit if the low power state bit is not 
+        // set. 
+
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_postrun_state_exit(); 
@@ -1339,7 +1395,8 @@ void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl)
     mtbdl_data_select_user_input_check(mtbdl); 
 
     // State exit 
-    if (mtbdl->data_select || mtbdl->tx || mtbdl->idle || mtbdl->fault_code)
+    if (mtbdl->data_select || mtbdl->tx || mtbdl->idle || 
+        mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl_data_select_state_exit(); 
     }
@@ -1432,7 +1489,7 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl->idle || mtbdl->data_select || mtbdl->fault_code)
+    if (mtbdl->idle || mtbdl->data_select || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->led_state = CLEAR; 
@@ -1521,7 +1578,7 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl->rx || mtbdl->idle || mtbdl->fault_code)
+    if (mtbdl->rx || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->led_state = CLEAR; 
@@ -1613,7 +1670,7 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
     ui_rx(); 
 
     // State exit 
-    if (mtbdl->rx || mtbdl->fault_code)
+    if (mtbdl->rx || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->led_state = CLEAR; 
@@ -1687,6 +1744,9 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
         mtbdl->noncrit_fault = CLEAR_BIT; 
         mtbdl->rx = CLEAR_BIT; 
         mtbdl_postrx_state_entry(); 
+
+        // Consider adding a screen message indicating RX mode was exited due to low 
+        // battery voltage. 
     }
 
     // State operations: 
@@ -1696,6 +1756,9 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
+        // Consider adding a condition to only set the idle state bit if the low 
+        // power state bit is not set. 
+
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_postrx_state_exit(); 
@@ -1747,7 +1810,8 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
         if (ui_tx_prep())
         {
             // File ready - display the pre tx state message 
-            mtbdl_set_pretx_msg(); 
+            // mtbdl_set_pretx_msg(); 
+            ui_set_pretx_msg(); 
             mtbdl->tx = CLEAR_BIT; 
         }
         else 
@@ -1787,7 +1851,7 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
     ui_led_state_update(WS2812_LED_2); 
 
     // State exit 
-    if (mtbdl->tx || mtbdl->idle || mtbdl->fault_code)
+    if (mtbdl->tx || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->led_state = CLEAR; 
@@ -1885,7 +1949,7 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl->tx || mtbdl->fault_code)
+    if (mtbdl->tx || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->led_state = CLEAR; 
@@ -1961,6 +2025,9 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
 
+        // Consider adding a condition for the low power flag. It will already be set 
+        // but we want the system to go straight to the low power state after this. 
+
         // Go back to the pre-tx state if the connection was not lost 
         if (mtbdl->noncrit_fault)
         {
@@ -2028,7 +2095,7 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
     ui_led_state_update(WS2812_LED_2); 
 
     // State exit 
-    if (mtbdl->calibrate || mtbdl->idle || mtbdl->fault_code)
+    if (mtbdl->calibrate || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl->led_state = CLEAR; 
@@ -2224,9 +2291,15 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
     // State operations: 
     // - Check for user button input 
     // - Update the low power LED 
+    // - Check battery SOC 
 
     mtbdl_lowpwr_user_input_check(mtbdl); 
     ui_led_state_update(WS2812_LED_3); 
+
+    if (ui_get_soc() >= MTBDL_SOC_THRESHOLD)
+    {
+        mtbdl->low_pwr = SET_BIT; 
+    }
 
     // State exit 
     if (mtbdl->low_pwr)
@@ -2276,7 +2349,7 @@ void mtbdl_lowpwr_user_input_check(mtbdl_trackers_t *mtbdl)
     {
         // Button 3 - triggers the idle state 
         // If SOC is above the minimum threshold then we can exit low power state. 
-        // A button press is put here instead temporarily umtil SOC calibration has 
+        // A button press is put here instead temporarily until SOC calibration has 
         // been created. 
         case UI_BTN_3: 
             mtbdl->low_pwr = SET_BIT; 
@@ -2325,7 +2398,7 @@ void mtbdl_fault_state(mtbdl_trackers_t *mtbdl)
     mtbdl_fault_user_input_check(mtbdl); 
 
     // State exit 
-    if (mtbdl->reset)
+    if (mtbdl->reset || mtbdl->low_pwr)
     {
         mtbdl->fault_code = CLEAR; 
         mtbdl->fault = CLEAR_BIT; 

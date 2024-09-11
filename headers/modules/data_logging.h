@@ -85,7 +85,7 @@ typedef struct mtbdl_data_s
     uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
     // System data 
-    uint8_t soc;                                // Battery SOC 
+    // uint8_t soc;                                // Battery SOC 
     uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
     uint16_t navstat;                           // Navigation status of GPS module 
     uint8_t utc_time[MTBDL_TIME_BUFF_LEN];      // UTC time recorded by the GPS module 
@@ -106,8 +106,8 @@ typedef struct mtbdl_data_s
     int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
     int32_t cal_index;                          // Calibration sample index 
 
-    // // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
-    // uint32_t led_colour_data[WS2812_LED_NUM]; 
+    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+    uint32_t led_colour_data[WS2812_LED_NUM]; 
 
     // Wheel RPM info 
     uint8_t rev_count;                          // Wheel revolution counter 
@@ -492,37 +492,37 @@ void mtbdl_cal_calc(void);
 //==================================================
 // Screen message formatting 
 
-/**
- * @brief Format the idle state message 
- * 
- * @details The idle state message contains system values that are relevant to the user 
- *          and these values can change, This function updates the values of the idle 
- *          state message and triggers a write of this message to the screen. A list of 
- *          the values that the message contains are listed in the parameters below. 
- */
-void mtbdl_set_idle_msg(void); 
+// /**
+//  * @brief Format the idle state message 
+//  * 
+//  * @details The idle state message contains system values that are relevant to the user 
+//  *          and these values can change, This function updates the values of the idle 
+//  *          state message and triggers a write of this message to the screen. A list of 
+//  *          the values that the message contains are listed in the parameters below. 
+//  */
+// void mtbdl_set_idle_msg(void); 
 
 
-/**
- * @brief Format the run prep state message 
- * 
- * @details The run prep state message contains the GPS position lock status. This 
- *          information is displayed to the user before entering the run mode and allows 
- *          the user to know if they have GPS lock before beginning to record data. This 
- *          function updates GPS status information and triggers a write of this message 
- *          to the screen. 
- */
-void mtbdl_set_run_prep_msg(void); 
+// /**
+//  * @brief Format the run prep state message 
+//  * 
+//  * @details The run prep state message contains the GPS position lock status. This 
+//  *          information is displayed to the user before entering the run mode and allows 
+//  *          the user to know if they have GPS lock before beginning to record data. This 
+//  *          function updates GPS status information and triggers a write of this message 
+//  *          to the screen. 
+//  */
+// void mtbdl_set_run_prep_msg(void); 
 
 
-/**
- * @brief Format the pre TX state message 
- * 
- * @details The pre TX state message contains the current log file index which tells the 
- *          user how many log files are available to be sent. This function adds the log 
- *          index to the message before writing it to the screen. 
- */
-void mtbdl_set_pretx_msg(void); 
+// /**
+//  * @brief Format the pre TX state message 
+//  * 
+//  * @details The pre TX state message contains the current log file index which tells the 
+//  *          user how many log files are available to be sent. This function adds the log 
+//  *          index to the message before writing it to the screen. 
+//  */
+// void mtbdl_set_pretx_msg(void); 
 
 //==================================================
 

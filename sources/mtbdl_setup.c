@@ -158,17 +158,21 @@ void mtbdl_init()
         ADC_PARAM_DISABLE);    // ADC_OVR_INT_DISABLE 
 
     // Initialize the ADC pins and channels 
-    adc_pin_init(ADC1, GPIOA, PIN_6, ADC_CHANNEL_6, ADC_SMP_15); 
-    adc_pin_init(ADC1, GPIOA, PIN_7, ADC_CHANNEL_7, ADC_SMP_15); 
-    adc_pin_init(ADC1, GPIOA, PIN_4, ADC_CHANNEL_4, ADC_SMP_15); 
+    adc_pin_init(ADC1, GPIOA, PIN_6, ADC_CHANNEL_6, ADC_SMP_15);   // Battery 
+    adc_pin_init(ADC1, GPIOA, PIN_7, ADC_CHANNEL_7, ADC_SMP_15);   // Fork 
+    adc_pin_init(ADC1, GPIOA, PIN_4, ADC_CHANNEL_4, ADC_SMP_15);   // Shock 
 
     // Set the ADC conversion sequence 
-    adc_seq(ADC1, ADC_CHANNEL_6, ADC_SEQ_1); 
-    adc_seq(ADC1, ADC_CHANNEL_7, ADC_SEQ_2); 
-    adc_seq(ADC1, ADC_CHANNEL_4, ADC_SEQ_3); 
+    // Note that only the fork and shock voltages are used in the sequence. Battery 
+    // voltage is read separetly and continuously. 
+    // adc_seq(ADC1, ADC_CHANNEL_6, ADC_SEQ_1); 
+    adc_seq(ADC1, ADC_CHANNEL_7, ADC_SEQ_1);   // Fork 
+    adc_seq(ADC1, ADC_CHANNEL_4, ADC_SEQ_2);   // Shock 
 
     // Set the sequence length (called once and only for more than one channel) 
-    adc_seq_len_set(ADC1, (adc_seq_num_t)MTBDL_ADC_BUFF_SIZE); 
+    // TODO update the DMA ADC stuff 
+    // adc_seq_len_set(ADC1, (adc_seq_num_t)MTBDL_ADC_BUFF_SIZE); 
+    adc_seq_len_set(ADC1, ADC_SEQ_2); 
 
     // Turn the ADC on 
     adc_on(ADC1); 
@@ -299,9 +303,9 @@ void mtbdl_init()
     //==================================================
 
     //==================================================
-    // User interface setup (button & LEDs) 
+    // User interface setup 
 
-    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3); 
+    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3, ADC1, ADC_CHANNEL_6); 
 
     //==================================================
 

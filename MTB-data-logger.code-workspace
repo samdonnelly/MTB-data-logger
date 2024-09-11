@@ -44,7 +44,13 @@
 			"switch_debounce.h": "c",
 			"user_interface.h": "c",
 			"analog_driver.h": "c",
-			"dma_driver.h": "c"
+			"dma_driver.h": "c",
+			"battery_config.h": "c",
+			"mpu6050_controller.h": "c",
+			"hc05_driver.h": "c",
+			"stdio.h": "c",
+			"stdint.h": "c",
+			"cstdint": "c"
 		}
 	}
 }

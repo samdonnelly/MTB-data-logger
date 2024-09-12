@@ -67,6 +67,7 @@ void mtbdl_init()
 
     // Periodic (counter update) interrupt timer for data log timing. The interrupt is 
     // further configured at the end of the setup. 
+    // TODO change to 50ms 
     tim_9_to_11_counter_init(
         TIM11, 
         TIM_84MHZ_100US_PSC, 
@@ -164,7 +165,7 @@ void mtbdl_init()
 
     // Set the ADC conversion sequence 
     // Note that only the fork and shock voltages are used in the sequence. Battery 
-    // voltage is read separetly and continuously. 
+    // voltage is read separetly because it's need at a different time. 
     // adc_seq(ADC1, ADC_CHANNEL_6, ADC_SEQ_1); 
     adc_seq(ADC1, ADC_CHANNEL_7, ADC_SEQ_1);   // Fork 
     adc_seq(ADC1, ADC_CHANNEL_4, ADC_SEQ_2);   // Shock 

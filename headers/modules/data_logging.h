@@ -38,17 +38,17 @@
 // #define MTBDL_NUM_CAL_DATA 5             // Number of parameters that require calibration 
 
 // Data logging 
-#define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
-#define MTBDL_LOG_PERIOD 10              // (ms) Period between data samples 
-#define MTBDL_NUM_LOG_STREAMS 6          // Number of data logging streams 
-#define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
-#define MTBDL_LOG_COUNT_CYCLE 99         // Log sample sequence max timer counter value 
-#define MTBDL_COO_BUFF_LEN 6             // Coordinate buffer size - data from M8Q driver 
-#define MTBDL_TIME_BUFF_LEN 10           // UTC time buffer size - data from M8Q driver 
-#define MTBDL_DATE_BUFF_LEN 7            // UTC date buffer size - data from M8Q driver 
+#define LOG_MAX_FILES 250                // Max data log file number 
+#define LOG_GPS_BUFF_LEN 12              // GPS coordinate buffer size 
+#define LOG_TIME_BUFF_LEN 10             // UTC time and data buff size 
+// #define MTBDL_NUM_LOG_SEQ 25             // Number of data logging sequence steps 
+// #define MTBDL_LOG_COUNT_CYCLE 99         // Log sample sequence max timer counter value 
+// #define MTBDL_NUM_LOG_STREAMS 6          // Number of data logging streams 
+// #define MTBDL_COO_BUFF_LEN 6             // Coordinate buffer size - data from M8Q driver 
+// #define MTBDL_TIME_BUFF_LEN 10           // UTC time buffer size - data from M8Q driver 
+// #define MTBDL_DATE_BUFF_LEN 7            // UTC date buffer size - data from M8Q driver 
 
 // Wheel RPM info 
-#define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
 #define MTBDL_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
 
 // Debugging 
@@ -99,30 +99,31 @@ typedef struct mtbdl_log_s
     // uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
     // System data 
-    // uint8_t soc;                                // Battery SOC 
     uint16_t adc_buff[ADC_BUFF_SIZE];           // ADC buffer - SOC, fork pot, shock pot 
-    // uint16_t navstat;                           // Navigation status of GPS module 
-    uint8_t utc_time[MTBDL_TIME_BUFF_LEN];      // UTC time recorded by the GPS module 
-    uint8_t utc_date[MTBDL_DATE_BUFF_LEN];      // UTC date recorded by the GPS module 
-    uint8_t deg_min_lat[MTBDL_COO_BUFF_LEN];    // Latitude: degrees and minutes integer part 
-    uint8_t min_frac_lat[MTBDL_COO_BUFF_LEN];   // Latitude: minuutes fractional part 
-    uint8_t lat_str[MTBDL_COO_BUFF_LEN];        // Latitude string 
+    uint8_t utc_time[LOG_TIME_BUFF_LEN];        // UTC time recorded by the GPS module 
+    uint8_t utc_date[LOG_TIME_BUFF_LEN];        // UTC date recorded by the GPS module 
+    uint8_t lat_str[LOG_GPS_BUFF_LEN];          // Latitude string 
     uint8_t NS;                                 // North/South indicator of latitude 
-    uint8_t deg_min_lon[MTBDL_COO_BUFF_LEN];    // Longitude: degrees and minutes integer part 
-    uint8_t min_frac_lon[MTBDL_COO_BUFF_LEN];   // Longitude: minuutes fractional part 
-    uint8_t lon_str[MTBDL_COO_BUFF_LEN];        // Longitude string 
+    uint8_t lon_str[LOG_GPS_BUFF_LEN];          // Longitude string 
     uint8_t EW;                                 // Eeast/West indicator of longitude 
     int16_t accel_x;                            // x-axis acceleration reading 
     int16_t accel_y;                            // y-axis acceleration reading 
     int16_t accel_z;                            // z-axis acceleration reading 
+    uint8_t trailmark;                          // Trail marker flag 
+    // uint8_t soc;                                // Battery SOC 
+    // uint16_t navstat;                           // Navigation status of GPS module 
+    // uint8_t deg_min_lat[MTBDL_COO_BUFF_LEN];    // Latitude: degrees and minutes integer part 
+    // uint8_t min_frac_lat[MTBDL_COO_BUFF_LEN];   // Latitude: minuutes fractional part 
+    // uint8_t deg_min_lon[MTBDL_COO_BUFF_LEN];    // Longitude: degrees and minutes integer part 
+    // uint8_t min_frac_lon[MTBDL_COO_BUFF_LEN];   // Longitude: minuutes fractional part 
 
     // Calibration data 
     // int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
     int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
     int32_t cal_samples;                        // Calibration sample index 
 
-    // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
-    uint32_t led_colour_data[WS2812_LED_NUM]; 
+    // // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
+    // uint32_t led_colour_data[WS2812_LED_NUM]; 
 
     // Wheel RPM info 
     uint8_t rev_count;                          // Wheel revolution counter 
@@ -134,14 +135,18 @@ typedef struct mtbdl_log_s
     char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
     // uint8_t tx_status : 1;                      // TX transaction status 
 
+    // Stream counters 
+    uint8_t gps_stream_counter; 
+    uint8_t accel_stream_counter; 
+    uint8_t speed_stream_counter; 
+
     // Log tracking 
-    uint32_t time_count;                        // Time tracking counter for logging 
-    uint8_t stream_index;                       // Index for log stream sequencing 
-    uint8_t led_toggle : 1;                     // LED toggle bit 
-    uint8_t run_count  : 1;                     // Log stream toggle 
-    uint8_t trailmark  : 1;                     // Trail marker flag 
-    uint8_t user_input : 1;                     // User input flag 
-    uint8_t log_stream : 3;                     // Logging stream number (mtbdl_log_streams_t)
+    // uint32_t time_count;                        // Time tracking counter for logging 
+    // uint8_t stream_index;                       // Index for log stream sequencing 
+    // uint8_t led_toggle : 1;                     // LED toggle bit 
+    // uint8_t run_count  : 1;                     // Log stream toggle 
+    // uint8_t user_input : 1;                     // User input flag 
+    // uint8_t log_stream : 3;                     // Logging stream number (mtbdl_log_streams_t)
 
 #if MTBDL_DEBUG 
     // Testing 
@@ -565,19 +570,19 @@ void log_set_trailmark(void);
 //==================================================
 // Data checks and updates 
 
-/**
- * @brief Update LED colours 
- * 
- * @details Assigns the specified colour to the LED and updates the LED output. This 
- *          function only needs to update one LED at a time because LEDs in this system 
- *          are only used as indicators for the user. 
- * 
- * @param led_index : LED to update 
- * @param led_code : colour code that that sets the colour of the LED 
- */
-void mtbdl_led_update(
-    ws2812_led_index_t led_index, 
-    uint32_t led_code); 
+// /**
+//  * @brief Update LED colours 
+//  * 
+//  * @details Assigns the specified colour to the LED and updates the LED output. This 
+//  *          function only needs to update one LED at a time because LEDs in this system 
+//  *          are only used as indicators for the user. 
+//  * 
+//  * @param led_index : LED to update 
+//  * @param led_code : colour code that that sets the colour of the LED 
+//  */
+// void mtbdl_led_update(
+//     ws2812_led_index_t led_index, 
+//     uint32_t led_code); 
 
 //==================================================
 

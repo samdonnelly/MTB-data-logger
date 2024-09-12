@@ -1202,6 +1202,9 @@ void mtbdl_run_countdown_state_entry(void)
     // Take the MPU-6050 out of low power mode 
     mpu6050_clear_low_power(DEVICE_ONE); 
 
+    // Set the M8Q to idle state so the time of reading can be controlled. 
+    m8q_set_idle_flag(); 
+
     // Turn on the data logging LED 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
 
@@ -1354,6 +1357,9 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 // Post run state entry 
 void mtbdl_postrun_state_entry(void)
 {
+    // Put the M8Q back into a continuous read state 
+    m8q_set_read_flag(); 
+
     // Turn on the data logging LED 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
 

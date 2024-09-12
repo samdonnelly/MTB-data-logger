@@ -28,14 +28,14 @@
 //=======================================================================================
 // Macros 
 
-#define MTBDL_ADC_BUFF_SIZE 3            // Size according to the number of ADCs used 
+// #define MTBDL_ADC_BUFF_SIZE 3            // Size according to the number of ADCs used 
 
 // #define MTBDL_MAX_DATA_STR_LEN 60        // Max string length containing data 
-#define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
-#define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
+// #define MTBDL_DATA_INDEX_OFFSET 1        // Log file number offset for the TX state 
+// #define MTBDL_MAX_SUS_SETTING 20         // Max compression and rebound setting 
 
 // Calibration 
-#define MTBDL_NUM_CAL_DATA 5             // Number of parameters that require calibration 
+// #define MTBDL_NUM_CAL_DATA 5             // Number of parameters that require calibration 
 
 // Data logging 
 #define MTBDL_LOG_NUM_MAX 250            // Max data log file number 
@@ -59,10 +59,23 @@
 
 
 //=======================================================================================
+// Enums 
+
+// ADC buffer index 
+typedef enum {
+    ADC_FORK,       // Fork potentiometer 
+    ADC_SHOCK,      // Shock potentiometer 
+    ADC_BUFF_SIZE   // Size of buffer to hold all ADC values 
+} mtbdl_adc_buff_index_t; 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Structure 
 
 // Data logging data record 
-typedef struct mtbdl_data_s 
+typedef struct mtbdl_log_s 
 {
     // Peripherals 
     IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
@@ -87,7 +100,7 @@ typedef struct mtbdl_data_s
 
     // System data 
     // uint8_t soc;                                // Battery SOC 
-    uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
+    uint16_t adc_buff[ADC_BUFF_SIZE];           // ADC buffer - SOC, fork pot, shock pot 
     // uint16_t navstat;                           // Navigation status of GPS module 
     uint8_t utc_time[MTBDL_TIME_BUFF_LEN];      // UTC time recorded by the GPS module 
     uint8_t utc_date[MTBDL_DATE_BUFF_LEN];      // UTC date recorded by the GPS module 
@@ -145,7 +158,7 @@ typedef struct mtbdl_data_s
     uint16_t adc_count; 
 #endif   // MTBDL_DEBUG 
 }
-mtbdl_data_t; 
+mtbdl_log_t; 
 
 //=======================================================================================
 
@@ -171,7 +184,7 @@ mtbdl_data_t;
  * @param adc : pointer to ADC port used 
  * @param dma_stream : pointer to DMA stream being used 
  */
-void data_log_init(
+void log_init(
     IRQn_Type rpm_irqn, 
     IRQn_Type log_irqn, 
     ADC_TypeDef *adc, 
@@ -192,7 +205,7 @@ void data_log_init(
  * 
  * @return uint8_t : file availability status 
  */
-uint8_t mtbdl_log_name_prep(void); 
+uint8_t log_data_name_prep(void); 
 
 
 /**
@@ -206,9 +219,9 @@ uint8_t mtbdl_log_name_prep(void);
  *          Note that the log file preparation function should be called before this 
  *          function so a new file name can be created. 
  * 
- * @see mtbdl_log_name_prep 
+ * @see log_data_name_prep 
  */
-void mtbdl_log_file_prep(void); 
+void log_data_file_prep(void); 
 
 
 /**
@@ -218,7 +231,7 @@ void mtbdl_log_file_prep(void);
  *          before beginning to log data correctly. Without a call to this function, no 
  *          data will be logged in the logging function. 
  */
-void mtbdl_log_data_prep(void); 
+void log_data_prep(void); 
 
 
 /**
@@ -236,11 +249,11 @@ void mtbdl_log_data_prep(void);
  *          
  *          Before calling this function, the log file and data need to be prepared. 
  * 
- * @see mtbdl_log_name_prep 
- * @see mtbdl_log_file_prep 
- * @see mtbdl_log_data_prep 
+ * @see log_data_name_prep 
+ * @see log_data_file_prep 
+ * @see log_data_prep 
  */
-void mtbdl_logging(void); 
+void log_data(void); 
 
 
 /**
@@ -250,7 +263,7 @@ void mtbdl_logging(void);
  *          This function must be called after the logging function in order to finish 
  *          the logging process. 
  */
-void mtbdl_log_end(void); 
+void log_data_end(void); 
 
 //=======================================================================================
 
@@ -324,7 +337,7 @@ void log_calibration_calculation(void);
  *          the marker button is pushed. The trail marker gets written to the log file 
  *          so the used can identify points within the log. 
  */
-void mtbdl_set_trailmark(void); 
+void log_set_trailmark(void); 
 
 //=======================================================================================
 

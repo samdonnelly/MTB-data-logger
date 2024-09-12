@@ -310,21 +310,21 @@ void mtbdl_init()
     //==================================================
 
     //==================================================
-    // System parameters setup 
-
-    param_init(); 
-    
-    //==================================================
-
-    //==================================================
     // Data logging setup 
 
     // This function handles DMA stream init so that the correct ADC buffer can be used. 
-    data_log_init(
+    log_init(
         EXTI4_IRQn, 
         TIM1_TRG_COM_TIM11_IRQn, 
         ADC1, 
         DMA2_Stream0); 
+    
+    //==================================================
+
+    //==================================================
+    // System parameters setup 
+
+    param_init(); 
     
     //==================================================
 

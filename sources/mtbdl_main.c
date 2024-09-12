@@ -1074,7 +1074,7 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
     if (mtbdl->run)
     {
         // Check the log file name 
-        if (mtbdl_log_name_prep()) 
+        if (log_data_name_prep()) 
         {
             // New file name created - display the run prep state message 
             // mtbdl_set_run_prep_msg(); 
@@ -1140,7 +1140,7 @@ void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl)
         // Button 1 - triggers the run state 
         case UI_BTN_1: 
             mtbdl->run = SET_BIT; 
-            mtbdl_log_file_prep(); 
+            log_data_file_prep(); 
             break; 
 
         // Button 2 - cancels the run state --> triggers idle state 
@@ -1223,7 +1223,7 @@ void mtbdl_run_countdown_state_exit(void)
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
 
     // Prep the logging data 
-    mtbdl_log_data_prep(); 
+    log_data_prep(); 
 }
 
 //=======================================================================================
@@ -1248,7 +1248,7 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
     // - Update the GPS status and feedback 
 
     mtbdl_run_user_input_check(mtbdl); 
-    mtbdl_logging(); 
+    log_data(); 
     ui_led_state_update(WS2812_LED_0); 
     ui_gps_led_status_update(); 
 
@@ -1291,7 +1291,7 @@ void mtbdl_run_user_input_check(mtbdl_trackers_t *mtbdl)
 
         // Button 2 - Sets a marker 
         case UI_BTN_2: 
-            mtbdl_set_trailmark(); 
+            log_set_trailmark(); 
             break; 
 
         default: 
@@ -1325,7 +1325,7 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
         // Close the open data log file if there was no non-critical faults 
         if (!mtbdl->noncrit_fault)
         {
-            mtbdl_log_end(); 
+            log_data_end(); 
         }
 
         hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 

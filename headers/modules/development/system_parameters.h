@@ -80,10 +80,6 @@ typedef struct mtbdl_param_s
     uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
     uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
-    // Calibration data 
-    int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
-    int32_t cal_index;                          // Calibration sample index 
-
     // SD card 
     char param_buff[MTBDL_MAX_STR_LEN];         // Buffer for reading and writing 
     uint8_t log_index;                          // Data log index 
@@ -222,15 +218,15 @@ void param_update_bike_setting(
     uint8_t setting); 
 
 
-// /**
-//  * @brief Update system settings 
-//  * 
-//  * @param setting_index 
-//  * @param setting 
-//  */
-// void param_update_system_setting(
-//     param_sys_set_index_t setting_index, 
-//     void *setting); 
+/**
+ * @brief Update system settings 
+ * 
+ * @param setting_index 
+ * @param setting 
+ */
+void param_update_system_setting(
+    param_sys_set_index_t setting_index, 
+    void *setting); 
 
 //=======================================================================================
 

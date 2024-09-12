@@ -55,22 +55,21 @@ typedef enum {
  * @brief ADC buffer index 
  */
 typedef enum {
-    // MTBDL_ADC_SOC,    // Battery State of Charge (SOC) 
-    MTBDL_ADC_FORK,   // Fork potentiometer 
-    MTBDL_ADC_SHOCK   // Shock potentiometer 
+    ADC_FORK,   // Fork potentiometer 
+    ADC_SHOCK   // Shock potentiometer 
 } mtbdl_adc_buff_index_t; 
 
 
-/**
- * @brief Calibration data index 
- */
-typedef enum {
-    MTBDL_CAL_ACCEL_X, 
-    MTBDL_CAL_ACCEL_Y, 
-    MTBDL_CAL_ACCEL_Z, 
-    MTBDL_CAL_POT_FORK, 
-    MTBDL_CAL_POT_SHOCK 
-} mtbdl_cal_index_t; 
+// /**
+//  * @brief Calibration data index 
+//  */
+// typedef enum {
+//     MTBDL_CAL_ACCEL_X, 
+//     MTBDL_CAL_ACCEL_Y, 
+//     MTBDL_CAL_ACCEL_Z, 
+//     MTBDL_CAL_POT_FORK, 
+//     MTBDL_CAL_POT_SHOCK 
+// } mtbdl_cal_index_t; 
 
 //=======================================================================================
 
@@ -495,8 +494,8 @@ void mtbdl_log_stream_standard(void)
         MTBDL_MAX_STR_LEN, 
         mtbdl_data_log_1, 
         mtbdl_data.trailmark, 
-        mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
-        mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]); 
+        mtbdl_data.adc_buff[ADC_FORK], 
+        mtbdl_data.adc_buff[ADC_SHOCK]); 
     
 #if MTBDL_DEBUG 
     mtbdl_data.count_standard++; 
@@ -558,8 +557,8 @@ void mtbdl_log_stream_speed(void)
         MTBDL_MAX_STR_LEN, 
         mtbdl_data_log_2, 
         mtbdl_data.trailmark, 
-        mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
-        mtbdl_data.adc_buff[MTBDL_ADC_SHOCK], 
+        mtbdl_data.adc_buff[ADC_FORK], 
+        mtbdl_data.adc_buff[ADC_SHOCK], 
         revs); 
 
 #if MTBDL_DEBUG 
@@ -589,8 +588,8 @@ void mtbdl_log_stream_accel(void)
             MTBDL_MAX_STR_LEN, 
             mtbdl_data_log_3, 
             mtbdl_data.trailmark, 
-            mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
-            mtbdl_data.adc_buff[MTBDL_ADC_SHOCK], 
+            mtbdl_data.adc_buff[ADC_FORK], 
+            mtbdl_data.adc_buff[ADC_SHOCK], 
             mtbdl_data.accel_x, 
             mtbdl_data.accel_y, 
             mtbdl_data.accel_z); 
@@ -628,8 +627,8 @@ void mtbdl_log_stream_gps(void)
         MTBDL_MAX_STR_LEN, 
         mtbdl_data_log_4, 
         mtbdl_data.trailmark, 
-        mtbdl_data.adc_buff[MTBDL_ADC_FORK], 
-        mtbdl_data.adc_buff[MTBDL_ADC_SHOCK], 
+        mtbdl_data.adc_buff[ADC_FORK], 
+        mtbdl_data.adc_buff[ADC_SHOCK], 
         (char *)mtbdl_data.lat_str, 
         (char)mtbdl_data.NS, 
         (char *)mtbdl_data.lon_str, 
@@ -684,11 +683,11 @@ void mtbdl_log_end(void)
 // Calibration functions 
 
 // Calibration data prep 
-void mtbdl_cal_prep(void)
+void log_calibration_prep(void)
 {
     // Reset the calibration data 
     memset((void *)mtbdl_data.cal_buff, CLEAR, sizeof(mtbdl_data.cal_buff)); 
-    mtbdl_data.cal_index = CLEAR; 
+    mtbdl_data.cal_samples = CLEAR; 
 
     // Trigger an ADC and accelerometer read so the data is available for the first 
     // time data is recorded 
@@ -701,36 +700,28 @@ void mtbdl_cal_prep(void)
 
 
 // Calibration 
-void mtbdl_calibrate(void)
+void log_calibration(void)
 {
     // Record new data periodically 
     if (handler_flags.tim1_trg_tim11_glbl_flag)
     {
         handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
-        mtbdl_data.cal_index++; 
+        mtbdl_data.cal_samples++; 
 
         // Record new accel data 
         mpu6050_get_accel_raw(
             DEVICE_ONE, 
-            &mtbdl_data.accel_x_rest, 
-            &mtbdl_data.accel_y_rest, 
-            &mtbdl_data.accel_z_rest); 
-            // &mtbdl_data.accel_x, 
-            // &mtbdl_data.accel_y, 
-            // &mtbdl_data.accel_z); 
+            &mtbdl_data.accel_x, 
+            &mtbdl_data.accel_y, 
+            &mtbdl_data.accel_z); 
 
         // Sum all the data into the calibration buffer. This data will be averaged once the 
         // calibration state is left. 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] += (int32_t)mtbdl_data.accel_x_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] += (int32_t)mtbdl_data.accel_y_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] += (int32_t)mtbdl_data.accel_z_rest; 
-        mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
-        mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
-        // mtbdl_data.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_data.accel_x; 
-        // mtbdl_data.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_data.accel_y; 
-        // mtbdl_data.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_data.accel_z; 
-        // mtbdl_data.cal_buff[PARAM_SYS_SET_FORK_REST] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_FORK]; 
-        // mtbdl_data.cal_buff[PARAM_SYS_SET_SHOCK_REST] += (int32_t)mtbdl_data.adc_buff[MTBDL_ADC_SHOCK]; 
+        mtbdl_data.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_data.accel_x; 
+        mtbdl_data.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_data.accel_y; 
+        mtbdl_data.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_data.accel_z; 
+        mtbdl_data.cal_buff[PARAM_SYS_SET_FORK_REST] += (int32_t)mtbdl_data.adc_buff[ADC_FORK]; 
+        mtbdl_data.cal_buff[PARAM_SYS_SET_SHOCK_REST] += (int32_t)mtbdl_data.adc_buff[ADC_SHOCK]; 
 
         // Trigger an ADC and accelerometer read so the data is available for the next 
         // time data is recorded 
@@ -741,37 +732,36 @@ void mtbdl_calibrate(void)
 
 
 // Calibration calculation 
-void mtbdl_cal_calc(void)
+void log_calibration_calculation(void)
 {
     // Disable log sample period interrupts 
     NVIC_DisableIRQ(mtbdl_data.log_irq); 
 
-    // Calculate and record calibration data 
-    // This data is an average of all the samples taken during calibration 
-    mtbdl_data.accel_x_rest = 
-        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_X] / mtbdl_data.cal_index); 
-    mtbdl_data.accel_y_rest = 
-        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Y] / mtbdl_data.cal_index); 
-    mtbdl_data.accel_z_rest = 
-        (int16_t)(mtbdl_data.cal_buff[MTBDL_CAL_ACCEL_Z] / mtbdl_data.cal_index); 
-    mtbdl_data.pot_fork_rest = 
-        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_FORK] / mtbdl_data.cal_index); 
-    mtbdl_data.pot_shock_rest = 
-        (uint16_t)(mtbdl_data.cal_buff[MTBDL_CAL_POT_SHOCK] / mtbdl_data.cal_index); 
+    // Average the samples taken during calibration and update the system parameters with 
+    // the calculated values. 
 
-    // mtbdl_data.accel_x = (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AX_REST] / mtbdl_data.cal_index); 
-    // mtbdl_data.accel_y = (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AY_REST] / mtbdl_data.cal_index); 
-    // mtbdl_data.accel_z = (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AZ_REST] / mtbdl_data.cal_index); 
-    // (uint16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_FORK_REST] / mtbdl_data.cal_index); 
-    // (uint16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_SHOCK_REST] / mtbdl_data.cal_index); 
+    mtbdl_data.accel_x = 
+        (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AX_REST] / mtbdl_data.cal_samples); 
+    
+    mtbdl_data.accel_y = 
+        (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AY_REST] / mtbdl_data.cal_samples); 
+    
+    mtbdl_data.accel_z = 
+        (int16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_AZ_REST] / mtbdl_data.cal_samples); 
+    
+    mtbdl_data.adc_buff[ADC_FORK] = 
+        (uint16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_FORK_REST] / mtbdl_data.cal_samples); 
+    
+    mtbdl_data.adc_buff[ADC_SHOCK] = 
+        (uint16_t)(mtbdl_data.cal_buff[PARAM_SYS_SET_SHOCK_REST] / mtbdl_data.cal_samples); 
 
-    // param_update_system_setting(PARAM_SYS_SET_AX_REST, (void *)&mtbdl_data.accel_x); 
-    // param_update_system_setting(PARAM_SYS_SET_AY_REST, (void *)&mtbdl_data.accel_y); 
-    // param_update_system_setting(PARAM_SYS_SET_AZ_REST, (void *)&mtbdl_data.accel_z); 
-    // param_update_system_setting(PARAM_SYS_SET_FORK_REST, (void *)&mtbdl_data.accel_z); 
-    // param_update_system_setting(PARAM_SYS_SET_SHOCK_REST, (void *)&mtbdl_data.accel_z); 
+    param_update_system_setting(PARAM_SYS_SET_AX_REST, (void *)&mtbdl_data.accel_x); 
+    param_update_system_setting(PARAM_SYS_SET_AY_REST, (void *)&mtbdl_data.accel_y); 
+    param_update_system_setting(PARAM_SYS_SET_AZ_REST, (void *)&mtbdl_data.accel_z); 
+    param_update_system_setting(PARAM_SYS_SET_FORK_REST, (void *)&mtbdl_data.adc_buff[ADC_FORK]); 
+    param_update_system_setting(PARAM_SYS_SET_SHOCK_REST, (void *)&mtbdl_data.adc_buff[ADC_SHOCK]); 
 
-    // TODO update the parameter files? 
+    param_write_sys_params(HW125_MODE_OEW); 
 }
 
 //=======================================================================================

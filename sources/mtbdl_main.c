@@ -2171,7 +2171,7 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
 
     // State operations: 
     // - Sample data that can be used for calculating the calibration values 
-    mtbdl_calibrate(); 
+    log_calibration(); 
 
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
@@ -2190,7 +2190,7 @@ void mtbdl_calibrate_state_entry(void)
     hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
 
     // Prepare to record data for calibration 
-    mtbdl_cal_prep(); 
+    log_calibration_prep(); 
 
     // Turn the calibration LED on 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led2_2); 
@@ -2207,7 +2207,7 @@ void mtbdl_calibrate_state_entry(void)
 void mtbdl_calibrate_state_exit(void)
 {
     // Calculate the calibration values 
-    mtbdl_cal_calc(); 
+    log_calibration_calculation(); 
 
     // Clear the calibration state message 
     hd44780u_set_clear_flag(); 
@@ -2251,7 +2251,7 @@ void mtbdl_postcalibrate_state_entry(void)
     // Display the post calibration message and record the calibration data
     hd44780u_set_msg(mtbdl_postcal_msg, MTBDL_MSG_LEN_1_LINE); 
     // mtbdl_write_sys_params(HW125_MODE_OEW); 
-    param_write_sys_params(HW125_MODE_OEW); 
+    // param_write_sys_params(HW125_MODE_OEW); 
 
     // Set the calibration LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_2); 

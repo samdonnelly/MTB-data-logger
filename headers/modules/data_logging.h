@@ -69,26 +69,26 @@ typedef struct mtbdl_data_s
     IRQn_Type log_irq;                          // Log sample period interrupt number 
     ADC_TypeDef *adc;                           // ADC port battery soc and pots 
 
-    // Bike parameters 
-    uint8_t fork_psi;                           // Fork pressure (psi) 
-    uint8_t fork_comp;                          // Fork compression setting 
-    uint8_t fork_reb;                           // Fork rebound setting 
-    uint8_t shock_psi;                          // Shock pressure (psi) 
-    uint8_t shock_lock;                         // Shock lockout setting 
-    uint8_t shock_reb;                          // Shock rebound setting 
+    // // Bike parameters 
+    // uint8_t fork_psi;                           // Fork pressure (psi) 
+    // uint8_t fork_comp;                          // Fork compression setting 
+    // uint8_t fork_reb;                           // Fork rebound setting 
+    // uint8_t shock_psi;                          // Shock pressure (psi) 
+    // uint8_t shock_lock;                         // Shock lockout setting 
+    // uint8_t shock_reb;                          // Shock rebound setting 
 
     // // System parameters 
     // uint8_t log_index;                          // Data log index 
-    int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
-    int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
-    int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
-    uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
-    uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
+    // int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
+    // int16_t accel_y_rest;                       // Resting y-axis acceleration offset 
+    // int16_t accel_z_rest;                       // Resting z-axis acceleration offset 
+    // uint16_t pot_fork_rest;                     // Resting potentiometer reading for fork 
+    // uint16_t pot_shock_rest;                    // Resting potentiometer reading for shock 
 
     // System data 
     // uint8_t soc;                                // Battery SOC 
     uint16_t adc_buff[MTBDL_ADC_BUFF_SIZE];     // ADC buffer - SOC, fork pot, shock pot 
-    uint16_t navstat;                           // Navigation status of GPS module 
+    // uint16_t navstat;                           // Navigation status of GPS module 
     uint8_t utc_time[MTBDL_TIME_BUFF_LEN];      // UTC time recorded by the GPS module 
     uint8_t utc_date[MTBDL_DATE_BUFF_LEN];      // UTC date recorded by the GPS module 
     uint8_t deg_min_lat[MTBDL_COO_BUFF_LEN];    // Latitude: degrees and minutes integer part 
@@ -106,7 +106,7 @@ typedef struct mtbdl_data_s
     // Calibration data 
     // int32_t cal_buff[MTBDL_NUM_CAL_DATA];       // Buffer that holds calibration data 
     int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
-    int32_t cal_index;                          // Calibration sample index 
+    int32_t cal_samples;                        // Calibration sample index 
 
     // LED colour data - Green bits: 16-23, Red bits: 8-15, Blue bits: 0-7 
     uint32_t led_colour_data[WS2812_LED_NUM]; 
@@ -119,7 +119,7 @@ typedef struct mtbdl_data_s
     // SD card 
     char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
     char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
-    uint8_t tx_status : 1;                      // TX transaction status 
+    // uint8_t tx_status : 1;                      // TX transaction status 
 
     // Log tracking 
     uint32_t time_count;                        // Time tracking counter for logging 
@@ -269,9 +269,9 @@ void mtbdl_log_end(void);
  *          suspension potentiometers. These offsets are used "zero" the readings so 
  *          data logs values are more accurate. 
  * 
- * @see mtbdl_calibrate 
+ * @see log_calibration 
  */
-void mtbdl_cal_prep(void); 
+void log_calibration_prep(void); 
 
 
 /**
@@ -288,10 +288,10 @@ void mtbdl_cal_prep(void);
  *          suspension potentiometers. These offsets are used "zero" the readings so 
  *          data logs values are more accurate. 
  * 
- * @see mtbdl_cal_prep 
- * @see mtbdl_cal_calc 
+ * @see log_calibration_prep 
+ * @see log_calibration_calculation 
  */
-void mtbdl_calibrate(void); 
+void log_calibration(void); 
 
 
 /**
@@ -307,9 +307,9 @@ void mtbdl_calibrate(void);
  *          suspension potentiometers. These offsets are used "zero" the readings so 
  *          data logs values are more accurate. 
  * 
- * @see mtbdl_calibrate 
+ * @see log_calibration 
  */
-void mtbdl_cal_calc(void); 
+void log_calibration_calculation(void); 
 
 //=======================================================================================
 

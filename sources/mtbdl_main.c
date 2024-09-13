@@ -601,7 +601,11 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_COUNTDOWN_STATE: 
-            if (mtbdl_trackers.run)
+            if (mtbdl_trackers.fault_code)
+            {
+                next_state = MTBDL_FAULT_STATE; 
+            }
+            else if (mtbdl_trackers.run)
             {
                 next_state = MTBDL_RUN_STATE; 
             }
@@ -898,7 +902,6 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
     if (hw125_get_state() == HW125_ACCESS_STATE)
     {
         hw125_set_check_flag(); 
-        // mtbdl_file_sys_setup(); 
         param_file_sys_setup(); 
     }
 
@@ -995,7 +998,6 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_idle_state_entry(void)
 {
     // Display the idle state message 
-    // mtbdl_set_idle_msg(); 
     ui_set_idle_msg(); 
 
     // Set the screen to power save mode 
@@ -1077,7 +1079,6 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
         if (log_data_name_prep()) 
         {
             // New file name created - display the run prep state message 
-            // mtbdl_set_run_prep_msg(); 
             ui_set_run_prep_msg(); 
             mtbdl->run = CLEAR_BIT; 
 
@@ -1140,7 +1141,6 @@ void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl)
         // Button 1 - triggers the run state 
         case UI_BTN_1: 
             mtbdl->run = SET_BIT; 
-            log_data_file_prep(); 
             break; 
 
         // Button 2 - cancels the run state --> triggers idle state 
@@ -1195,6 +1195,9 @@ void mtbdl_run_countdown_state_entry(void)
 {
     // Display the run countdown state message 
     hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
+
+    // Prepare the log file 
+    log_data_file_prep(); 
 
     // SD card will be written to constantly so no need for the check state 
     hw125_clear_check_flag(); 
@@ -1780,7 +1783,6 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_postrx_state_entry(void)
 {
     // Save the parameters to file and update tracking info 
-    // mtbdl_write_bike_params(HW125_MODE_OEW); 
     param_write_bike_params(HW125_MODE_OEW); 
 
     // Set the Bluetooth LED colour and blink rate 
@@ -1820,7 +1822,6 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
         if (ui_tx_prep())
         {
             // File ready - display the pre tx state message 
-            // mtbdl_set_pretx_msg(); 
             ui_set_pretx_msg(); 
             mtbdl->tx = CLEAR_BIT; 
         }
@@ -2142,7 +2143,6 @@ void mtbdl_precalibrate_user_input_check(mtbdl_trackers_t *mtbdl)
         // Button 1 - triggers the calibration state 
         case UI_BTN_1: 
             mtbdl->calibrate = SET_BIT; 
-            // mpu6050_clear_low_power(DEVICE_ONE);   // Take MPU-6050 out of low power mode 
             break; 
 
         // Button 2 - cancels the calibration state --> triggers idle state 
@@ -2262,8 +2262,6 @@ void mtbdl_postcalibrate_state_entry(void)
 {
     // Display the post calibration message and record the calibration data
     hd44780u_set_msg(mtbdl_postcal_msg, MTBDL_MSG_LEN_1_LINE); 
-    // mtbdl_write_sys_params(HW125_MODE_OEW); 
-    // param_write_sys_params(HW125_MODE_OEW); 
 
     // Set the calibration LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_2); 

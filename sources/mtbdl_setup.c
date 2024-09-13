@@ -71,7 +71,8 @@ void mtbdl_init()
     tim_9_to_11_counter_init(
         TIM11, 
         TIM_84MHZ_100US_PSC, 
-        0x0064,  // ARR=100, (100 counts)*(100us/count) = 10ms 
+        // 0x0064,  // ARR=100, (100 counts)*(100us/count) = 10ms 
+        0x01F4,  // ARR=500, (100 counts)*(100us/count) = 50ms 
         TIM_UP_INT_ENABLE); 
     tim_enable(TIM11); 
 

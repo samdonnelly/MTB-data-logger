@@ -515,7 +515,7 @@ void ui_rx(void)
                &setting_data); 
 
         // Check for a data match if a valid parameter index is provided 
-        if (param_index < PARAM_BIKE_SET_SR)
+        if (param_index <= PARAM_BIKE_SET_SR)
         {
             param_update_bike_setting((param_bike_set_index_t)param_index, setting_data); 
         }

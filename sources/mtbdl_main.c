@@ -2119,6 +2119,9 @@ void mtbdl_precalibrate_state_entry(void)
     // Display the calibration state message 
     hd44780u_set_msg(mtbdl_precal_msg, MTBDL_MSG_LEN_4_LINE); 
 
+    // Take the MPU-6050 out of low power mode 
+    mpu6050_clear_low_power(DEVICE_ONE); 
+
     // Set the calibration LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_2); 
     ui_led_duty_set(WS2812_LED_2, UI_LED_DUTY_SHORT); 
@@ -2139,7 +2142,7 @@ void mtbdl_precalibrate_user_input_check(mtbdl_trackers_t *mtbdl)
         // Button 1 - triggers the calibration state 
         case UI_BTN_1: 
             mtbdl->calibrate = SET_BIT; 
-            mpu6050_clear_low_power(DEVICE_ONE);   // Take MPU-6050 out of low power mode 
+            // mpu6050_clear_low_power(DEVICE_ONE);   // Take MPU-6050 out of low power mode 
             break; 
 
         // Button 2 - cancels the calibration state --> triggers idle state 
@@ -2158,6 +2161,9 @@ void mtbdl_precalibrate_state_exit(void)
 {
     // Turn the calibration LED off 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
+
+    // Clear the pre-calibration state message 
+    hd44780u_set_clear_flag(); 
 }
 
 //=======================================================================================

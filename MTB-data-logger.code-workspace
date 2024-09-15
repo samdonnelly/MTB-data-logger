@@ -51,7 +51,8 @@
 			"stdio.h": "c",
 			"stdint.h": "c",
 			"cstdint": "c",
-			"m8q_driver.h": "c"
+			"m8q_driver.h": "c",
+			"string_config.h": "c"
 		}
 	}
 }

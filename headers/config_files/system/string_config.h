@@ -55,10 +55,10 @@ mtbdl_param_data[],          // Data logging info
 // Data log information 
 mtbdl_data_log_start[],      // Signifies the start of the logging info 
 mtbdl_data_log_end[],        // End of the log file 
-mtbdl_data_log_1[],          // Data log message 1 - standard 
-mtbdl_data_log_2[],          // Data log message 2 - includes wheel speed 
-mtbdl_data_log_3[],          // Data log message 3 - includes accelerometer 
-mtbdl_data_log_4[];          // Data log message 4 - includes GPS 
+mtbdl_data_log_default[],    // Default data log message 
+mtbdl_data_log_gps[],        // Default + GPS data log message 
+mtbdl_data_log_accel[],      // Default + Accelerometer data log message 
+mtbdl_data_log_speed[];      // Default + Wheel speed data log message 
 
 //=======================================================================================
 

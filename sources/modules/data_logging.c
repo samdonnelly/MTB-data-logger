@@ -26,10 +26,11 @@
 // Macros 
 
 // Data logging 
-#define MTBDL_LOG_PERIOD 10              // (ms) Period between data samples 
+#define LOG_PERIOD 10                   // (ms) Period between data samples 
+#define LOG_PERIOD_DIVIDER 5            // LOG_PERIOD * this == non-ADC log stream period 
 
 // Wheel RPM info 
-#define MTBDL_REV_LOG_FREQ 2             // (Hz) Revolution calc frequency 
+#define LOG_REV_FREQ 2                  // (Hz) Revolution calc frequency 
 
 //=======================================================================================
 
@@ -191,14 +192,14 @@ void log_init(
     mtbdl_log.log_irq = log_irqn; 
     mtbdl_log.adc = adc; 
 
-    // System data 
-    // mtbdl_log.navstat = M8Q_NAVSTAT_NF; 
-
     // Configure the DMA stream 
     dma_stream_config(
         dma_stream, 
         (uint32_t)(&adc->DR), 
-        (uint32_t)mtbdl_log.adc_buff, 
+        // (uint32_t)mtbdl_log.adc_buff, 
+        // NULL,   // TODO add second buffer address for double buffer mode 
+        (uint32_t)mtbdl_log.adc_buffer[BYTE_0], 
+        (uint32_t)mtbdl_log.adc_buffer[BYTE_1], 
         (uint16_t)ADC_BUFF_SIZE); 
 }
 
@@ -214,7 +215,6 @@ uint8_t log_data_name_prep(void)
     uint8_t log_index = param_get_log_index(); 
 
     // Check the data log index is within bounds 
-    // if (mtbdl_log.log_index > LOG_MAX_FILES)
     if (log_index > LOG_MAX_FILES)
     {
         // Too many log files on drive - don't create a new file name 
@@ -226,7 +226,6 @@ uint8_t log_data_name_prep(void)
              MTBDL_MAX_STR_LEN, 
              mtbdl_log_file, 
              log_index); 
-             // mtbdl_log.log_index); 
 
     return TRUE; 
 }
@@ -272,8 +271,8 @@ void log_data_file_prep(void)
         snprintf(mtbdl_log.data_buff, 
                  MTBDL_MAX_STR_LEN, 
                  mtbdl_param_data, 
-                 MTBDL_LOG_PERIOD, 
-                 MTBDL_REV_LOG_FREQ, 
+                 LOG_PERIOD, 
+                 LOG_REV_FREQ, 
                  MTBDL_REV_SAMPLE_SIZE); 
         hw125_puts(mtbdl_log.data_buff); 
         
@@ -296,7 +295,8 @@ void log_data_prep(void)
     // SD card data 
     memset((void *)mtbdl_log.data_buff, CLEAR, sizeof(mtbdl_log.data_buff)); 
 
-    // Stream counters 
+    // Counters 
+    mtbdl_log.log_interval_divider = CLEAR; 
     mtbdl_log.gps_stream_counter = stream_schedule[LOG_STREAM_GPS].offset; 
     mtbdl_log.accel_stream_counter = stream_schedule[LOG_STREAM_ACCEL].offset; 
     mtbdl_log.speed_stream_counter = stream_schedule[LOG_STREAM_SPEED].offset; 
@@ -327,7 +327,9 @@ void log_data(void)
     if (handler_flags.tim1_trg_tim11_glbl_flag)
     {
         handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
-        log_stream_t log_stream = LOG_STREAM_STANDARD; 
+
+        // The ADC is started in the interrupt handler so new data is available for each 
+        // logging interval. 
 
         // Before executing a log stream, the ADC (suspension position) recording is 
         // kicked off so that it can be recored at the next logging interval. The 
@@ -344,34 +346,42 @@ void log_data(void)
             mtbdl_log.rev_count++; 
         }
 
-        // Increment the stream counters, check the schedule for a stream to call, then 
-        // execute the scheduled stream. All counters must be incremented together 
-        // before the stream selection so that they're guarenteed to count. 
-
-        mtbdl_log.gps_stream_counter++; 
-        mtbdl_log.accel_stream_counter++; 
-        mtbdl_log.speed_stream_counter++; 
-
-        if (mtbdl_log.gps_stream_counter >= 
-            stream_schedule[LOG_STREAM_GPS].counter_period)
+        // Non-default log streams run at a slower period 
+        // divider is incremented by the interrupt 
+        if (mtbdl_log.log_interval_divider >= LOG_PERIOD_DIVIDER)
         {
-            mtbdl_log.gps_stream_counter = CLEAR; 
-            log_stream = LOG_STREAM_GPS; 
-        }
-        else if (mtbdl_log.accel_stream_counter >= 
-                 stream_schedule[LOG_STREAM_ACCEL].counter_period)
-        {
-            mtbdl_log.accel_stream_counter = CLEAR; 
-            log_stream = LOG_STREAM_ACCEL; 
-        }
-        else if (mtbdl_log.speed_stream_counter >= 
-                 stream_schedule[LOG_STREAM_SPEED].counter_period)
-        {
-            mtbdl_log.speed_stream_counter = CLEAR; 
-            log_stream = LOG_STREAM_SPEED; 
-        }
+            mtbdl_log.log_interval_divider = CLEAR; 
+            log_stream_t log_stream = LOG_STREAM_STANDARD; 
 
-        stream_table[log_stream](); 
+            // Increment the stream counters, check the schedule for a stream to call, 
+            // then execute the scheduled stream. All counters must be incremented 
+            // together before the stream selection so that they're guarenteed to count. 
+
+            mtbdl_log.gps_stream_counter++; 
+            mtbdl_log.accel_stream_counter++; 
+            mtbdl_log.speed_stream_counter++; 
+
+            if (mtbdl_log.gps_stream_counter >= 
+                stream_schedule[LOG_STREAM_GPS].counter_period)
+            {
+                mtbdl_log.gps_stream_counter = CLEAR; 
+                log_stream = LOG_STREAM_GPS; 
+            }
+            else if (mtbdl_log.accel_stream_counter >= 
+                    stream_schedule[LOG_STREAM_ACCEL].counter_period)
+            {
+                mtbdl_log.accel_stream_counter = CLEAR; 
+                log_stream = LOG_STREAM_ACCEL; 
+            }
+            else if (mtbdl_log.speed_stream_counter >= 
+                    stream_schedule[LOG_STREAM_SPEED].counter_period)
+            {
+                mtbdl_log.speed_stream_counter = CLEAR; 
+                log_stream = LOG_STREAM_SPEED; 
+            }
+
+            stream_table[log_stream](); 
+        }
         
         // Write the formatted data contents to the log file. Multiple strings must be 
         // written at each interval to backfill suspension position data (ADC info) 
@@ -410,7 +420,7 @@ void log_stream_standard(void)
     // Format standard log string 
     snprintf(mtbdl_log.data_buff, 
              MTBDL_MAX_STR_LEN, 
-             mtbdl_data_log_1, 
+             mtbdl_data_log_default, 
              mtbdl_log.trailmark, 
              mtbdl_log.adc_buff[ADC_FORK], 
              mtbdl_log.adc_buff[ADC_SHOCK]); 
@@ -450,7 +460,7 @@ void log_stream_gps(void)
     // Format GPS data log string 
     snprintf(mtbdl_log.data_buff, 
              MTBDL_MAX_STR_LEN, 
-             mtbdl_data_log_4, 
+             mtbdl_data_log_gps, 
              mtbdl_log.trailmark, 
              mtbdl_log.adc_buff[ADC_FORK], 
              mtbdl_log.adc_buff[ADC_SHOCK], 
@@ -495,7 +505,7 @@ void log_stream_accel(void)
     // Format accelerometer data log string 
     snprintf(mtbdl_log.data_buff, 
              MTBDL_MAX_STR_LEN, 
-             mtbdl_data_log_3, 
+             mtbdl_data_log_accel, 
              mtbdl_log.trailmark, 
              mtbdl_log.adc_buff[ADC_FORK], 
              mtbdl_log.adc_buff[ADC_SHOCK], 
@@ -528,6 +538,9 @@ void log_stream_speed(void)
     // Record the revolutions from the interval in the circular buffer and update the 
     // buffer index. 
 
+    // This is used so interrupts don't interfere with the value of mtbdl_log.rev_count. 
+    uint8_t revs = CLEAR; 
+
     mtbdl_log.rev_buff[mtbdl_log.rev_buff_index++] = mtbdl_log.rev_count; 
     mtbdl_log.rev_count = CLEAR; 
 
@@ -537,25 +550,21 @@ void log_stream_speed(void)
     }
 
     // Sum all the buffer values to get the total revolutions over the X most recent 
-    // intervals. The revolution count is cleared both before doing this as well as after 
-    // logging the total count so the revolution count can go back to recording the 
-    // count per interval. 
+    // intervals so it can be written to the log. 
 
     for (uint8_t i = CLEAR; i < MTBDL_REV_SAMPLE_SIZE; i++)
     {
-        mtbdl_log.rev_count += mtbdl_log.rev_buff[i]; 
+        revs += mtbdl_log.rev_buff[i]; 
     }
 
     // Format wheel speed data log string 
     snprintf(mtbdl_log.data_buff, 
              MTBDL_MAX_STR_LEN, 
-             mtbdl_data_log_2, 
+             mtbdl_data_log_speed, 
              mtbdl_log.trailmark, 
              mtbdl_log.adc_buff[ADC_FORK], 
              mtbdl_log.adc_buff[ADC_SHOCK], 
-             mtbdl_log.rev_count); 
-
-    mtbdl_log.rev_count = CLEAR; 
+             revs); 
 
 // #if MTBDL_DEBUG 
 //     mtbdl_log.count_speed++; 
@@ -672,10 +681,30 @@ void log_calibration_calculation(void)
 //=======================================================================================
 // Setters 
 
+// Data logging interrupt callback 
+void log_func(void)
+{
+    adc_start(mtbdl_log.adc); 
+    mtbdl_log.log_interval_divider++; 
+}
+
+
 // Set trail marker flag 
 void log_set_trailmark(void)
 {
     mtbdl_log.trailmark = SET_BIT; 
+}
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Getters 
+
+// Get battery voltage (ADC value) 
+uint16_t log_get_batt_voltage(void)
+{
+    return mtbdl_log.adc_buff[ADC_SOC]; 
 }
 
 //=======================================================================================

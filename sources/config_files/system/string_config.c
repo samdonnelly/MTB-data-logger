@@ -54,10 +54,10 @@ mtbdl_param_data[] = "Data: T:%ums RPM_f:%uHz RPM_size:%u\r\n",
 mtbdl_data_log_start[] = "Data log:\r\n", 
 mtbdl_data_log_end[] = "End\r\n\n", 
 // Data order: <trail marker>, <fork pot>, <shock pot>, <wheel speed>, <accelerometer>, <GPS> 
-mtbdl_data_log_1[] = "%u, %u, %u, -, -, -, -, -, -\r\n", 
-mtbdl_data_log_2[] = "%u, %u, %u, %u, -, -, -, -, -\r\n", 
-mtbdl_data_log_3[] = "%u, %u, %u, -, %d, %d, %d, -, -\r\n", 
-mtbdl_data_log_4[] = "%u, %u, %u, -, -, -, -, %s%c, %s%c\r\n"; 
+mtbdl_data_log_default[] = "%u, %u, %u, -, -, -, -, -, -\r\n", 
+mtbdl_data_log_gps[] = "%u, %u, %u, -, -, -, -, %s%c, %s%c\r\n", 
+mtbdl_data_log_accel[] = "%u, %u, %u, -, %d, %d, %d, -, -\r\n", 
+mtbdl_data_log_speed[] = "%u, %u, %u, %u, -, -, -, -, -\r\n"; 
 
 //=======================================================================================
 

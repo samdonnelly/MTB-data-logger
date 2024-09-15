@@ -48,6 +48,7 @@
 
 // ADC buffer index 
 typedef enum {
+    ADC_SOC,        // Battery voltage 
     ADC_FORK,       // Fork potentiometer 
     ADC_SHOCK,      // Shock potentiometer 
     ADC_BUFF_SIZE   // Size of buffer to hold all ADC values 
@@ -69,6 +70,7 @@ typedef struct mtbdl_log_s
 
     // System data 
     uint16_t adc_buff[ADC_BUFF_SIZE];           // ADC buffer - SOC, fork pot, shock pot 
+    uint16_t adc_buffer[BYTE_2][ADC_BUFF_SIZE]; // ADC buffer - SOC, fork pot, shock pot 
     uint8_t utc_time[LOG_TIME_BUFF_LEN];        // UTC time recorded by the GPS module 
     uint8_t utc_date[LOG_TIME_BUFF_LEN];        // UTC date recorded by the GPS module 
     uint8_t lat_str[LOG_GPS_BUFF_LEN];          // Latitude string 
@@ -93,10 +95,11 @@ typedef struct mtbdl_log_s
     char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
     char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
 
-    // Stream counters 
-    uint8_t gps_stream_counter; 
-    uint8_t accel_stream_counter; 
-    uint8_t speed_stream_counter; 
+    // Counters 
+    uint8_t log_interval_divider;               // Controls when non-ADC stream run 
+    uint8_t gps_stream_counter;                 // GPS log stream counter 
+    uint8_t accel_stream_counter;               // Accelerometer log stream counter 
+    uint8_t speed_stream_counter;               // Wheel speed log stream counter 
 
 // #if MTBDL_DEBUG 
 //     // Testing 
@@ -293,6 +296,19 @@ void log_calibration_calculation(void);
  *          so the used can identify points within the log. 
  */
 void log_set_trailmark(void); 
+
+//=======================================================================================
+
+
+//=======================================================================================
+// Getters 
+
+/**
+ * @brief Get battery voltage (ADC value) 
+ * 
+ * @return uint16_t 
+ */
+uint16_t log_get_batt_voltage(void); 
 
 //=======================================================================================
 

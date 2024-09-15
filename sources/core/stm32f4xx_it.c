@@ -322,6 +322,11 @@ void TIM1_UP_TIM10_IRQHandler(void)
 void TIM1_TRG_COM_TIM11_IRQHandler(void)
 {
     handler_flags.tim1_trg_tim11_glbl_flag = SET_BIT; 
+
+    // Start the ADC conversion so new data is available for each data logging interval. 
+    // adc_start(ADC1); 
+    // log_func(); 
+
     tim_uif_clear(TIM1); 
     tim_uif_clear(TIM11); 
 }

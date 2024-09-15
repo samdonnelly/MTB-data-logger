@@ -67,12 +67,10 @@ void mtbdl_init()
 
     // Periodic (counter update) interrupt timer for data log timing. The interrupt is 
     // further configured at the end of the setup. 
-    // TODO change to 50ms 
     tim_9_to_11_counter_init(
         TIM11, 
         TIM_84MHZ_100US_PSC, 
-        // 0x0064,  // ARR=100, (100 counts)*(100us/count) = 10ms 
-        0x01F4,  // ARR=500, (100 counts)*(100us/count) = 50ms 
+        0x0064,  // ARR=100, (100 counts)*(100us/count) = 10ms 
         TIM_UP_INT_ENABLE); 
     tim_enable(TIM11); 
 
@@ -165,16 +163,12 @@ void mtbdl_init()
     adc_pin_init(ADC1, GPIOA, PIN_4, ADC_CHANNEL_4, ADC_SMP_15);   // Shock 
 
     // Set the ADC conversion sequence 
-    // Note that only the fork and shock voltages are used in the sequence. Battery 
-    // voltage is read separetly because it's need at a different time. 
-    // adc_seq(ADC1, ADC_CHANNEL_6, ADC_SEQ_1); 
+    adc_seq(ADC1, ADC_CHANNEL_6, ADC_SEQ_1);   // Battery 
     adc_seq(ADC1, ADC_CHANNEL_7, ADC_SEQ_1);   // Fork 
     adc_seq(ADC1, ADC_CHANNEL_4, ADC_SEQ_2);   // Shock 
 
     // Set the sequence length (called once and only for more than one channel) 
-    // TODO update the DMA ADC stuff 
-    // adc_seq_len_set(ADC1, (adc_seq_num_t)MTBDL_ADC_BUFF_SIZE); 
-    adc_seq_len_set(ADC1, ADC_SEQ_2); 
+    adc_seq_len_set(ADC1, (adc_seq_num_t)ADC_BUFF_SIZE); 
 
     // Turn the ADC on 
     adc_on(ADC1); 
@@ -341,6 +335,7 @@ void mtbdl_init()
         DMA_DIR_PM, 
         DMA_CM_ENABLE,
         DMA_PRIOR_VHI, 
+        DMA_DBM_ENABLE,        // Double buffer mode configuration 
         DMA_ADDR_INCREMENT, 
         DMA_ADDR_FIXED, 
         DMA_DATA_SIZE_HALF, 

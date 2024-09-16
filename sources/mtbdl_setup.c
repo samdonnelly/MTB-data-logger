@@ -335,7 +335,7 @@ void mtbdl_init()
         DMA_DIR_PM, 
         DMA_CM_ENABLE,
         DMA_PRIOR_VHI, 
-        DMA_DBM_ENABLE,        // Double buffer mode configuration 
+        DMA_DBM_DISABLE,        // Double buffer mode configuration 
         DMA_ADDR_INCREMENT, 
         DMA_ADDR_FIXED, 
         DMA_DATA_SIZE_HALF, 

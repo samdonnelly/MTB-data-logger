@@ -29,9 +29,9 @@
 // Macros 
 
 // Data logging 
-#define LOG_MAX_FILES 250                // Max data log file number 
 #define LOG_GPS_BUFF_LEN 12              // GPS coordinate buffer size 
 #define LOG_TIME_BUFF_LEN 10             // UTC time and data buff size 
+#define LOG_PERIOD_DIVIDER 5            // LOG_PERIOD * this == non-ADC log stream period 
 
 // Wheel RPM info 
 #define MTBDL_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
@@ -68,38 +68,46 @@ typedef struct mtbdl_log_s
     IRQn_Type log_irq;                          // Log sample period interrupt number 
     ADC_TypeDef *adc;                           // ADC port battery soc and pots 
 
-    // System data 
-    uint16_t adc_buff[ADC_BUFF_SIZE];           // ADC buffer - SOC, fork pot, shock pot 
-    uint16_t adc_buffer[BYTE_2][ADC_BUFF_SIZE]; // ADC buffer - SOC, fork pot, shock pot 
+    // Log file info 
     uint8_t utc_time[LOG_TIME_BUFF_LEN];        // UTC time recorded by the GPS module 
     uint8_t utc_date[LOG_TIME_BUFF_LEN];        // UTC date recorded by the GPS module 
+
+    // ADC data 
+    uint16_t adc_buff[ADC_BUFF_SIZE];           // ADC buffer - SOC, fork pot, shock pot 
+    uint16_t adc_period[LOG_PERIOD_DIVIDER][ADC_BUFF_SIZE]; 
+
+    // GPS data 
     uint8_t lat_str[LOG_GPS_BUFF_LEN];          // Latitude string 
     uint8_t NS;                                 // North/South indicator of latitude 
     uint8_t lon_str[LOG_GPS_BUFF_LEN];          // Longitude string 
     uint8_t EW;                                 // Eeast/West indicator of longitude 
+
+    // Accelerometer data 
     int16_t accel_x;                            // x-axis acceleration reading 
     int16_t accel_y;                            // y-axis acceleration reading 
     int16_t accel_z;                            // z-axis acceleration reading 
+
+    // Wheel RPM data 
+    uint8_t rev_count;                          // Wheel revolution counter 
+    uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
+    uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
+
+    // User input data 
     uint8_t trailmark;                          // Trail marker flag 
+
+    // Logging counters 
+    uint8_t log_interval_divider;               // Controls when non-ADC stream run 
+    uint8_t gps_stream_counter;                 // GPS log stream counter 
+    uint8_t accel_stream_counter;               // Accelerometer log stream counter 
+    uint8_t speed_stream_counter;               // Wheel speed log stream counter 
 
     // Calibration data 
     int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
     int32_t cal_samples;                        // Calibration sample index 
 
-    // Wheel RPM info 
-    uint8_t rev_count;                          // Wheel revolution counter 
-    uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
-    uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
-
-    // SD card 
+    // SD card data 
     char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
     char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
-
-    // Counters 
-    uint8_t log_interval_divider;               // Controls when non-ADC stream run 
-    uint8_t gps_stream_counter;                 // GPS log stream counter 
-    uint8_t accel_stream_counter;               // Accelerometer log stream counter 
-    uint8_t speed_stream_counter;               // Wheel speed log stream counter 
 
 // #if MTBDL_DEBUG 
 //     // Testing 
@@ -212,6 +220,12 @@ void log_data_prep(void);
  * @see log_data_prep 
  */
 void log_data(void); 
+
+
+/**
+ * @brief Data logging interrupt callback 
+ */
+void log_data_handler(void); 
 
 
 /**

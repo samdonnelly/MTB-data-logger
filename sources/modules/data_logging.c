@@ -27,7 +27,7 @@
 
 // Data logging 
 #define LOG_PERIOD 10                   // (ms) Period between data samples 
-#define LOG_PERIOD_DIVIDER 5            // LOG_PERIOD * this == non-ADC log stream period 
+#define LOG_MAX_FILES 250               // Max data log file number 
 
 // Wheel RPM info 
 #define LOG_REV_FREQ 2                  // (Hz) Revolution calc frequency 
@@ -149,8 +149,6 @@ static mtbdl_log_stream stream_table[LOG_STREAM_NUM] =
     &log_stream_gps, 
     &log_stream_accel, 
     &log_stream_speed 
-    // &log_stream_blink, 
-    // &log_stream_user 
 }; 
 
 
@@ -184,22 +182,58 @@ void log_init(
     ADC_TypeDef *adc, 
     DMA_Stream_TypeDef *dma_stream)
 {
-    // Reset the whole data record 
-    memset((void *)&mtbdl_log, CLEAR, sizeof(mtbdl_log_t)); 
-
     // Peripherals 
     mtbdl_log.rpm_irq = rpm_irqn; 
     mtbdl_log.log_irq = log_irqn; 
     mtbdl_log.adc = adc; 
 
+    // Log file info 
+    memset((void *)mtbdl_log.utc_time, CLEAR, sizeof(mtbdl_log.utc_time)); 
+    memset((void *)mtbdl_log.utc_date, CLEAR, sizeof(mtbdl_log.utc_date)); 
+
+    // ADC data 
+    memset((void *)mtbdl_log.adc_buff, CLEAR, sizeof(mtbdl_log.adc_buff)); 
+    memset((void *)mtbdl_log.adc_period, CLEAR, sizeof(mtbdl_log.adc_period)); 
+
+    // GPS data 
+    memset((void *)mtbdl_log.lat_str, CLEAR, sizeof(mtbdl_log.lat_str)); 
+    mtbdl_log.NS = CLEAR; 
+    memset((void *)mtbdl_log.lon_str, CLEAR, sizeof(mtbdl_log.lon_str)); 
+    mtbdl_log.EW = CLEAR; 
+
+    // Accelerometer data 
+    mtbdl_log.accel_x = CLEAR; 
+    mtbdl_log.accel_y = CLEAR; 
+    mtbdl_log.accel_z = CLEAR; 
+
+    // Wheel RPM data 
+    mtbdl_log.rev_count = CLEAR; 
+    mtbdl_log.rev_buff_index = CLEAR; 
+    memset((void *)mtbdl_log.rev_buff, CLEAR, sizeof(mtbdl_log.rev_buff)); 
+
+    // User input data 
+    mtbdl_log.trailmark = CLEAR_BIT; 
+
+    // Logging counters 
+    mtbdl_log.log_interval_divider = CLEAR; 
+    mtbdl_log.gps_stream_counter = CLEAR; 
+    mtbdl_log.accel_stream_counter = CLEAR; 
+    mtbdl_log.speed_stream_counter = CLEAR; 
+
+    // Calibration data 
+    memset((void *)mtbdl_log.cal_buff, CLEAR, sizeof(mtbdl_log.cal_buff)); 
+    mtbdl_log.cal_samples = CLEAR; 
+
+    // SD card data 
+    memset((void *)mtbdl_log.data_buff, CLEAR, sizeof(mtbdl_log.data_buff)); 
+    memset((void *)mtbdl_log.filename, CLEAR, sizeof(mtbdl_log.filename)); 
+
     // Configure the DMA stream 
     dma_stream_config(
         dma_stream, 
         (uint32_t)(&adc->DR), 
-        // (uint32_t)mtbdl_log.adc_buff, 
-        // NULL,   // TODO add second buffer address for double buffer mode 
-        (uint32_t)mtbdl_log.adc_buffer[BYTE_0], 
-        (uint32_t)mtbdl_log.adc_buffer[BYTE_1], 
+        (uint32_t)mtbdl_log.adc_buff, 
+        (uint32_t)NULL, 
         (uint16_t)ADC_BUFF_SIZE); 
 }
 
@@ -286,20 +320,26 @@ void log_data_prep(void)
 {
     // System info 
     mtbdl_log.trailmark = CLEAR_BIT; 
+
+    // ADC data 
+    memset((void *)mtbdl_log.adc_period, CLEAR, sizeof(mtbdl_log.adc_period)); 
     
     // Wheel RPM info 
     mtbdl_log.rev_count = CLEAR; 
     mtbdl_log.rev_buff_index = CLEAR; 
     memset((void *)mtbdl_log.rev_buff, CLEAR, sizeof(mtbdl_log.rev_buff)); 
 
-    // SD card data 
-    memset((void *)mtbdl_log.data_buff, CLEAR, sizeof(mtbdl_log.data_buff)); 
+    // User input data 
+    mtbdl_log.trailmark = CLEAR_BIT; 
 
-    // Counters 
+    // Logging counters 
     mtbdl_log.log_interval_divider = CLEAR; 
     mtbdl_log.gps_stream_counter = stream_schedule[LOG_STREAM_GPS].offset; 
     mtbdl_log.accel_stream_counter = stream_schedule[LOG_STREAM_ACCEL].offset; 
     mtbdl_log.speed_stream_counter = stream_schedule[LOG_STREAM_SPEED].offset; 
+
+    // SD card data 
+    memset((void *)mtbdl_log.data_buff, CLEAR, sizeof(mtbdl_log.data_buff)); 
 
 // #if MTBDL_DEBUG 
 //     mtbdl_log.time_stop = CLEAR; 
@@ -324,65 +364,114 @@ void log_data_prep(void)
 // Logging data 
 void log_data(void)
 {
-    if (handler_flags.tim1_trg_tim11_glbl_flag)
-    {
-        handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+    // if (handler_flags.tim1_trg_tim11_glbl_flag)
+    // {
+    //     handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+    //     log_stream_t log_stream = LOG_STREAM_STANDARD; 
 
-        // The ADC is started in the interrupt handler so new data is available for each 
-        // logging interval. 
+    //     // The ADC is started in the interrupt handler so new data is available for each 
+    //     // logging interval. 
 
-        // Before executing a log stream, the ADC (suspension position) recording is 
-        // kicked off so that it can be recored at the next logging interval. The 
-        // data from the previous interval is isolated so it can be recored in the 
-        // log file during the current interval. The wheel speed interrupt is also 
-        // checked and updated as needed. 
+    //     // Before executing a log stream, the ADC (suspension position) recording is 
+    //     // kicked off so that it can be recored at the next logging interval. The 
+    //     // data from the previous interval is isolated so it can be recored in the 
+    //     // log file during the current interval. The wheel speed interrupt is also 
+    //     // checked and updated as needed. 
 
-        // TODO ADC handling 
-        adc_start(mtbdl_log.adc); 
+    //     // TODO ADC handling 
+    //     adc_start(mtbdl_log.adc); 
 
-        if (handler_flags.exti4_flag)
-        {
-            handler_flags.exti4_flag = CLEAR; 
-            mtbdl_log.rev_count++; 
-        }
+    //     if (handler_flags.exti4_flag)
+    //     {
+    //         handler_flags.exti4_flag = CLEAR; 
+    //         mtbdl_log.rev_count++; 
+    //     }
 
-        // Non-default log streams run at a slower period 
-        // divider is incremented by the interrupt 
-        if (mtbdl_log.log_interval_divider >= LOG_PERIOD_DIVIDER)
-        {
-            mtbdl_log.log_interval_divider = CLEAR; 
-            log_stream_t log_stream = LOG_STREAM_STANDARD; 
+    //     // Increment the stream counters, check the schedule for a stream to call, 
+    //     // then execute the scheduled stream. All counters must be incremented 
+    //     // together before the stream selection so that they're guarenteed to count. 
 
-            // Increment the stream counters, check the schedule for a stream to call, 
-            // then execute the scheduled stream. All counters must be incremented 
-            // together before the stream selection so that they're guarenteed to count. 
+    //     mtbdl_log.gps_stream_counter++; 
+    //     mtbdl_log.accel_stream_counter++; 
+    //     mtbdl_log.speed_stream_counter++; 
 
-            mtbdl_log.gps_stream_counter++; 
-            mtbdl_log.accel_stream_counter++; 
-            mtbdl_log.speed_stream_counter++; 
+    //     if (mtbdl_log.gps_stream_counter >= 
+    //         stream_schedule[LOG_STREAM_GPS].counter_period)
+    //     {
+    //         mtbdl_log.gps_stream_counter = CLEAR; 
+    //         log_stream = LOG_STREAM_GPS; 
+    //     }
+    //     else if (mtbdl_log.accel_stream_counter >= 
+    //             stream_schedule[LOG_STREAM_ACCEL].counter_period)
+    //     {
+    //         mtbdl_log.accel_stream_counter = CLEAR; 
+    //         log_stream = LOG_STREAM_ACCEL; 
+    //     }
+    //     else if (mtbdl_log.speed_stream_counter >= 
+    //             stream_schedule[LOG_STREAM_SPEED].counter_period)
+    //     {
+    //         mtbdl_log.speed_stream_counter = CLEAR; 
+    //         log_stream = LOG_STREAM_SPEED; 
+    //     }
 
-            if (mtbdl_log.gps_stream_counter >= 
-                stream_schedule[LOG_STREAM_GPS].counter_period)
-            {
-                mtbdl_log.gps_stream_counter = CLEAR; 
-                log_stream = LOG_STREAM_GPS; 
-            }
-            else if (mtbdl_log.accel_stream_counter >= 
-                    stream_schedule[LOG_STREAM_ACCEL].counter_period)
-            {
-                mtbdl_log.accel_stream_counter = CLEAR; 
-                log_stream = LOG_STREAM_ACCEL; 
-            }
-            else if (mtbdl_log.speed_stream_counter >= 
-                    stream_schedule[LOG_STREAM_SPEED].counter_period)
-            {
-                mtbdl_log.speed_stream_counter = CLEAR; 
-                log_stream = LOG_STREAM_SPEED; 
-            }
-
-            stream_table[log_stream](); 
-        }
+    //     stream_table[log_stream](); 
         
+    //     // Write the formatted data contents to the log file. Multiple strings must be 
+    //     // written at each interval to backfill suspension position data (ADC info) 
+    //     // which gets recoreded faster than other device data. The user trailmarker is 
+    //     // reset after updating the log file so it's sure to be recored. 
+
+    //     // TODO will change based on ADC stuff 
+    //     hw125_puts(mtbdl_log.data_buff); 
+        
+    //     mtbdl_log.trailmark = CLEAR_BIT; 
+    // }
+
+
+
+    // The ADC is started in the interrupt handler so new data is available for each 
+    // logging interval. 
+
+    if (handler_flags.exti4_flag)
+    {
+        handler_flags.exti4_flag = CLEAR; 
+        mtbdl_log.rev_count++; 
+    }
+
+    if (mtbdl_log.log_interval_divider >= LOG_PERIOD_DIVIDER)
+    {
+        mtbdl_log.log_interval_divider = CLEAR; 
+        log_stream_t log_stream = LOG_STREAM_STANDARD; 
+
+        // Increment the stream counters, check the schedule for a stream to call, 
+        // then execute the scheduled stream. All counters must be incremented 
+        // together before the stream selection so that they're guarenteed to count. 
+
+        mtbdl_log.gps_stream_counter++; 
+        mtbdl_log.accel_stream_counter++; 
+        mtbdl_log.speed_stream_counter++; 
+
+        if (mtbdl_log.gps_stream_counter >= 
+            stream_schedule[LOG_STREAM_GPS].counter_period)
+        {
+            mtbdl_log.gps_stream_counter = CLEAR; 
+            log_stream = LOG_STREAM_GPS; 
+        }
+        else if (mtbdl_log.accel_stream_counter >= 
+                stream_schedule[LOG_STREAM_ACCEL].counter_period)
+        {
+            mtbdl_log.accel_stream_counter = CLEAR; 
+            log_stream = LOG_STREAM_ACCEL; 
+        }
+        else if (mtbdl_log.speed_stream_counter >= 
+                stream_schedule[LOG_STREAM_SPEED].counter_period)
+        {
+            mtbdl_log.speed_stream_counter = CLEAR; 
+            log_stream = LOG_STREAM_SPEED; 
+        }
+
+        stream_table[log_stream](); 
+    
         // Write the formatted data contents to the log file. Multiple strings must be 
         // written at each interval to backfill suspension position data (ADC info) 
         // which gets recoreded faster than other device data. The user trailmarker is 
@@ -411,6 +500,29 @@ void log_data(void)
 //         mtbdl_log.count_wait = CLEAR; 
 //     }
 // #endif   // MTBDL_DEBUG 
+}
+
+
+// Data logging interrupt callback 
+void log_data_handler(void)
+{
+    handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+
+    if (mtbdl_log.log_interval_divider < LOG_PERIOD_DIVIDER)
+    {
+        mtbdl_log.adc_period[mtbdl_log.log_interval_divider][ADC_SOC] = 
+            mtbdl_log.adc_buff[ADC_SOC]; 
+        
+        mtbdl_log.adc_period[mtbdl_log.log_interval_divider][ADC_FORK] = 
+            mtbdl_log.adc_buff[ADC_FORK]; 
+        
+        mtbdl_log.adc_period[mtbdl_log.log_interval_divider][ADC_SHOCK] = 
+            mtbdl_log.adc_buff[ADC_SHOCK]; 
+
+        mtbdl_log.log_interval_divider++; 
+    }
+
+    adc_start(mtbdl_log.adc); 
 }
 
 
@@ -680,14 +792,6 @@ void log_calibration_calculation(void)
 
 //=======================================================================================
 // Setters 
-
-// Data logging interrupt callback 
-void log_func(void)
-{
-    adc_start(mtbdl_log.adc); 
-    mtbdl_log.log_interval_divider++; 
-}
-
 
 // Set trail marker flag 
 void log_set_trailmark(void)

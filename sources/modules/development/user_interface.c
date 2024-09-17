@@ -118,7 +118,8 @@ void ui_init(
 
     // Initialize system info 
     mtbdl_ui.navstat = M8Q_NAVSTAT_NF; 
-    mtbdl_ui.soc = battery_soc_calc(adc_read_single(soc_adc_port, soc_adc_channel)); 
+    // mtbdl_ui.soc = battery_soc_calc(adc_read_single(soc_adc_port, soc_adc_channel)); 
+    mtbdl_ui.soc = 100; 
 
     // User button pin numbers 
     mtbdl_ui.user_btn_1 = (uint8_t)(SET_BIT << btn1); 
@@ -305,15 +306,15 @@ void ui_led_update(void)
 void ui_soc_update(void)
 {
     static uint16_t soc_calc_counter = CLEAR; 
-    uint16_t voltage = CLEAR; 
+    // uint16_t voltage = CLEAR; 
 
     if (soc_calc_counter++ >= UI_SOC_CALC_PERIOD)
     {
         // Read the battery voltage and calculate the current SOC using battery specific 
         // information. 
         soc_calc_counter = CLEAR; 
-        voltage = adc_read_single(mtbdl_ui.soc_adc_port, mtbdl_ui.soc_adc_channel); 
-        mtbdl_ui.soc = battery_soc_calc(voltage); 
+        // voltage = adc_read_single(mtbdl_ui.soc_adc_port, mtbdl_ui.soc_adc_channel); 
+        // mtbdl_ui.soc = battery_soc_calc(voltage); 
     }
 }
 

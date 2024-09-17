@@ -31,14 +31,11 @@
 // Data logging 
 #define LOG_GPS_BUFF_LEN 12              // GPS coordinate buffer size 
 #define LOG_TIME_BUFF_LEN 10             // UTC time and data buff size 
-#define LOG_PERIOD_DIVIDER 5            // LOG_PERIOD * this == non-ADC log stream period 
+#define LOG_PERIOD_DIVIDER 5             // LOG_PERIOD * this == non-ADC log stream period 
+#define LOG_MAX_LOG_LEN (LOG_PERIOD_DIVIDER*MTBDL_MAX_STR_LEN) 
 
 // Wheel RPM info 
-#define MTBDL_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
-
-// Debugging 
-#define MTBDL_DEBUG 0                    // Conditional compilation for debugging 
-#define MTBDL_DEBUG_SAMPLE_COUNT 999     // Number of data samples to take in debug mode 
+#define LOG_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
 
 //=======================================================================================
 
@@ -90,7 +87,7 @@ typedef struct mtbdl_log_s
     // Wheel RPM data 
     uint8_t rev_count;                          // Wheel revolution counter 
     uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
-    uint8_t rev_buff[MTBDL_REV_SAMPLE_SIZE];    // Circular buffer for revolution calcs 
+    uint8_t rev_buff[LOG_REV_SAMPLE_SIZE];      // Circular buffer for revolution calcs 
 
     // User input data 
     uint8_t trailmark;                          // Trail marker flag 
@@ -100,29 +97,17 @@ typedef struct mtbdl_log_s
     uint8_t gps_stream_counter;                 // GPS log stream counter 
     uint8_t accel_stream_counter;               // Accelerometer log stream counter 
     uint8_t speed_stream_counter;               // Wheel speed log stream counter 
+    uint8_t interrupt_counter;                  // Counts interrupts called 
 
     // Calibration data 
     int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
     int32_t cal_samples;                        // Calibration sample index 
 
     // SD card data 
-    char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
+    char data_buff[LOG_PERIOD_DIVIDER][MTBDL_MAX_STR_LEN]; 
+    char data_str[LOG_MAX_LOG_LEN]; 
+    uint8_t data_buff_index; 
     char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
-
-// #if MTBDL_DEBUG 
-//     // Testing 
-//     uint16_t time_stop; 
-//     uint16_t time_limit; 
-//     uint16_t count_standard; 
-//     uint16_t count_wait; 
-//     uint8_t time_overflow; 
-//     uint8_t count_blink; 
-//     uint8_t count_speed; 
-//     uint8_t count_accel; 
-//     uint8_t count_gps; 
-//     uint8_t count_user; 
-//     uint16_t adc_count; 
-// #endif   // MTBDL_DEBUG 
 }
 mtbdl_log_t; 
 
@@ -225,7 +210,7 @@ void log_data(void);
 /**
  * @brief Data logging interrupt callback 
  */
-void log_data_handler(void); 
+void log_data_adc_handler(void); 
 
 
 /**

@@ -18,6 +18,8 @@
 #include "stm32f4xx_it.h" 
 #include "stm32f4xx_hal.h" 
 
+#include "data_logging.h" 
+
 //=======================================================================================
 
 
@@ -324,8 +326,7 @@ void TIM1_TRG_COM_TIM11_IRQHandler(void)
     handler_flags.tim1_trg_tim11_glbl_flag = SET_BIT; 
 
     // Start the ADC conversion so new data is available for each data logging interval. 
-    // adc_start(ADC1); 
-    // log_func(); 
+    log_data_adc_handler(); 
 
     tim_uif_clear(TIM1); 
     tim_uif_clear(TIM11); 

@@ -22,6 +22,7 @@
 
 //=======================================================================================
 
+
 //=======================================================================================
 // Directories 
 
@@ -56,6 +57,7 @@ mtbdl_param_data[],          // Data logging info
 mtbdl_data_log_start[],      // Signifies the start of the logging info 
 mtbdl_data_log_end[],        // End of the log file 
 mtbdl_data_log_default[],    // Default data log message 
+mtbdl_data_log_adc[],        // Default + ADC data log message 
 mtbdl_data_log_gps[],        // Default + GPS data log message 
 mtbdl_data_log_accel[],      // Default + Accelerometer data log message 
 mtbdl_data_log_speed[];      // Default + Wheel speed data log message 

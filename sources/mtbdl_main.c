@@ -44,10 +44,10 @@
 typedef void (*mtbdl_func_ptr_t)(mtbdl_trackers_t *mtbdl); 
 
 
-
-// System status checks 
+/**
+ * @brief System status checks 
+ */
 void system_status_checks(void); 
-
 
 
 /**

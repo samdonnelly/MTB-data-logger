@@ -63,14 +63,16 @@ typedef struct mtbdl_log_s
     // Peripherals 
     IRQn_Type rpm_irq;                          // Wheel RPM interrupt number 
     IRQn_Type log_irq;                          // Log sample period interrupt number 
-    ADC_TypeDef *adc;                           // ADC port battery soc and pots 
+    ADC_TypeDef *adc;                           // ADC port for battery soc and pots 
+    DMA_TypeDef *dma;                           // DMA port for ADC transfers 
+    DMA_Stream_TypeDef *dma_stream;             // DMA stream for ADC transfers 
 
     // Log file info 
-    uint8_t utc_time[LOG_TIME_BUFF_LEN];        // UTC time recorded by the GPS module 
-    uint8_t utc_date[LOG_TIME_BUFF_LEN];        // UTC date recorded by the GPS module 
+    uint8_t utc_time[LOG_TIME_BUFF_LEN];        // UTC time 
+    uint8_t utc_date[LOG_TIME_BUFF_LEN];        // UTC date 
 
-    // ADC data 
-    uint16_t adc_buff[ADC_BUFF_SIZE];           // ADC buffer - SOC, fork pot, shock pot 
+    // ADC data - buffers to store current and pervious values - SOC, fork pot, shock pot 
+    uint16_t adc_buff[ADC_BUFF_SIZE]; 
     uint16_t adc_period[LOG_PERIOD_DIVIDER][ADC_BUFF_SIZE]; 
 
     // GPS data 
@@ -80,34 +82,35 @@ typedef struct mtbdl_log_s
     uint8_t EW;                                 // Eeast/West indicator of longitude 
 
     // Accelerometer data 
-    int16_t accel_x;                            // x-axis acceleration reading 
-    int16_t accel_y;                            // y-axis acceleration reading 
-    int16_t accel_z;                            // z-axis acceleration reading 
+    int16_t accel_x;                            // x-axis acceleration 
+    int16_t accel_y;                            // y-axis acceleration 
+    int16_t accel_z;                            // z-axis acceleration 
 
-    // Wheel RPM data 
+    // Wheel revolution data 
     uint8_t rev_count;                          // Wheel revolution counter 
     uint8_t rev_buff_index;                     // Wheel revolution circular buffer index 
-    uint8_t rev_buff[LOG_REV_SAMPLE_SIZE];      // Circular buffer for revolution calcs 
+    uint8_t rev_buff[LOG_REV_SAMPLE_SIZE];      // Wheel revolution circular buffer
 
     // User input data 
     uint8_t trailmark;                          // Trail marker flag 
 
     // Logging counters 
-    uint8_t log_interval_divider;               // Controls when non-ADC stream run 
+    uint8_t log_interval_divider;               // Controls timing of non-ADC streams 
     uint8_t gps_stream_counter;                 // GPS log stream counter 
     uint8_t accel_stream_counter;               // Accelerometer log stream counter 
     uint8_t speed_stream_counter;               // Wheel speed log stream counter 
     uint8_t interrupt_counter;                  // Counts interrupts called 
 
     // Calibration data 
-    int32_t cal_buff[PARAM_SYS_SET_NUM];        // Buffer that holds calibration data 
-    int32_t cal_samples;                        // Calibration sample index 
+    int32_t cal_buff[PARAM_SYS_SET_NUM];        // Calibration data buffer 
+    int32_t cal_adc_samples;                    // Number of ADC calibration samples 
+    int32_t cal_accel_samples;                  // Number of accelerometer calibration samples 
 
-    // SD card data 
+    // SD card data - buffers to hold interval data, log data string and log file name 
     char data_buff[LOG_PERIOD_DIVIDER][MTBDL_MAX_STR_LEN]; 
     char data_str[LOG_MAX_LOG_LEN]; 
     uint8_t data_buff_index; 
-    char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
+    char filename[MTBDL_MAX_STR_LEN]; 
 }
 mtbdl_log_t; 
 
@@ -133,12 +136,14 @@ mtbdl_log_t;
  * @param rpm_irqn : wheel speed periodic interrupt index 
  * @param log_irqn : data sample periodic interrupt index 
  * @param adc : pointer to ADC port used 
+ * @param dma : DMA port to use 
  * @param dma_stream : pointer to DMA stream being used 
  */
 void log_init(
     IRQn_Type rpm_irqn, 
     IRQn_Type log_irqn, 
     ADC_TypeDef *adc, 
+    DMA_TypeDef *dma, 
     DMA_Stream_TypeDef *dma_stream); 
 
 //=======================================================================================
@@ -305,7 +310,7 @@ void log_set_trailmark(void);
 /**
  * @brief Get battery voltage (ADC value) 
  * 
- * @return uint16_t 
+ * @return uint16_t : battery ADC that represents voltage 
  */
 uint16_t log_get_batt_voltage(void); 
 

@@ -32,6 +32,9 @@
 // Wheel RPM info 
 #define LOG_REV_FREQ 2                  // (Hz) Revolution calc frequency 
 
+// Timing 
+#define LOG_ADC_DMA_WAIT 1000           // Number of times to wait on ADC DMA to complete 
+
 //=======================================================================================
 
 
@@ -180,12 +183,15 @@ void log_init(
     IRQn_Type rpm_irqn, 
     IRQn_Type log_irqn, 
     ADC_TypeDef *adc, 
+    DMA_TypeDef *dma, 
     DMA_Stream_TypeDef *dma_stream)
 {
     // Peripherals 
     mtbdl_log.rpm_irq = rpm_irqn; 
     mtbdl_log.log_irq = log_irqn; 
     mtbdl_log.adc = adc; 
+    mtbdl_log.dma = dma; 
+    mtbdl_log.dma_stream = dma_stream; 
 
     // Log file info 
     memset((void *)mtbdl_log.utc_time, CLEAR, sizeof(mtbdl_log.utc_time)); 
@@ -223,7 +229,8 @@ void log_init(
 
     // Calibration data 
     memset((void *)mtbdl_log.cal_buff, CLEAR, sizeof(mtbdl_log.cal_buff)); 
-    mtbdl_log.cal_samples = CLEAR; 
+    mtbdl_log.cal_adc_samples = CLEAR; 
+    mtbdl_log.cal_accel_samples = CLEAR; 
 
     // SD card data 
     memset((void*)mtbdl_log.data_buff, CLEAR, sizeof(mtbdl_log.data_buff)); 
@@ -233,8 +240,8 @@ void log_init(
 
     // Configure the DMA stream 
     dma_stream_config(
-        dma_stream, 
-        (uint32_t)(&adc->DR), 
+        mtbdl_log.dma_stream, 
+        (uint32_t)(&mtbdl_log.adc->DR), 
         (uint32_t)mtbdl_log.adc_buff, 
         (uint32_t)NULL, 
         (uint16_t)ADC_BUFF_SIZE); 
@@ -321,8 +328,10 @@ void log_data_file_prep(void)
 // Log data preparation 
 void log_data_prep(void)
 {
-    // System info 
-    mtbdl_log.trailmark = CLEAR_BIT; 
+    // This function sets important logging parameters to their default value so 
+    // data is accurately recorded. Some logging parameters are not set here either 
+    // because they don't need to be or because they get updated even while not 
+    // logging so their data is up to date. 
 
     // ADC data 
     memset((void *)mtbdl_log.adc_period, CLEAR, sizeof(mtbdl_log.adc_period)); 
@@ -348,27 +357,34 @@ void log_data_prep(void)
     mtbdl_log.data_buff_index = CLEAR; 
 
     // Enable interrupts 
-    NVIC_EnableIRQ(mtbdl_log.rpm_irq);   // Enable the wheel speed interrupts 
-    NVIC_EnableIRQ(mtbdl_log.log_irq);   // Enable log sample period interrupts 
+    NVIC_EnableIRQ(mtbdl_log.rpm_irq);   // Wheel speed 
+    NVIC_EnableIRQ(mtbdl_log.log_irq);   // Log sample period 
 }
 
 
 // Logging data 
 void log_data(void)
 {
-    // The ADC is started in the interrupt handler so new data is available for each 
-    // logging interval. 
+    // Recording of log data is handled here. A periodic interrupt runs to trigger ADC 
+    // conversions and keep track of logging intervals which in turn triggers the reading 
+    // and recording of other data in this function. Multiple intervals of data are 
+    // recorded before compiling them together and writing them to the SD card. This is 
+    // done to give time for other processes to complete that may accumulate to a time 
+    // longer than the sampling interval. 
 
+    // External wheel revolution interrupt. This interrupt does not happen fast enough 
+    // for the revolution counter to need to be in the interrupt handler so it's easier 
+    // to keep it here. 
     if (handler_flags.exti4_flag)
     {
         handler_flags.exti4_flag = CLEAR; 
         mtbdl_log.rev_count++; 
     }    
     
-    // We want to use 'interrupt_counter' instead of the interrupt flag to keep track 
-    // of when to execute a non-stream logging event because the interrupt flag may 
-    // get set twice but we'd only see it once. 
-
+    // 'interrupt_counter' gets incremented in the perodic interrupt callback function 
+    // below. Using this variable instead of just the interrupt handler flag to trigger 
+    // logging streams allows for multiple interrupts to occur while data is being read 
+    // and processed without missing any ADC data. 
     if (mtbdl_log.interrupt_counter)
     {
         if (mtbdl_log.log_interval_divider >= LOG_PERIOD_DIVIDER)
@@ -377,8 +393,12 @@ void log_data(void)
             log_stream_t log_stream = LOG_STREAM_STANDARD; 
 
             // Increment the stream counters, check the schedule for a stream to call, 
-            // then execute the scheduled stream. All counters must be incremented 
-            // together before the stream selection so that they're guarenteed to count. 
+            // execute the scheduled stream, then write data from the previous X intervals 
+            // to the SD card. All counters must be incremented together before the stream 
+            // selection so that they're guarenteed to count. Streams are coordinated 
+            // using the 'stream_schedule' table which ensures multiple devices (excluding 
+            // ADC reads) are not read from at the same interval. This is due to the 
+            // tight sampling window that needs to be maintained. 
 
             mtbdl_log.gps_stream_counter++; 
             mtbdl_log.accel_stream_counter++; 
@@ -410,7 +430,13 @@ void log_data(void)
         }
         else 
         {
-            // Format the latest ADC data so it's available for logging later. 
+            // For every interrupt that occurs that doesn't trigger a logging stream, the 
+            // latest ADC data is formatted and stored so that it can be compiled and 
+            // written to the SD card when a logging stream occurs later. A buffer that 
+            // can store multiple intervals of ADC data is used so that old intervals can 
+            // still be formatted and recorded even if interrupts have triggered new ADC 
+            // conversions before this has had a chance to run. 
+
             snprintf(mtbdl_log.data_buff[mtbdl_log.data_buff_index], 
                      MTBDL_MAX_STR_LEN, 
                      mtbdl_data_log_default, 
@@ -490,7 +516,7 @@ void log_stream_gps(void)
     m8q_get_position_lon_str(mtbdl_log.lon_str, LOG_GPS_BUFF_LEN); 
     mtbdl_log.EW = m8q_get_position_EW(); 
 
-    // TODO add ground speed? 
+    // Add ground speed? 
 
     // Format GPS data log string 
     snprintf(mtbdl_log.data_str, 
@@ -615,49 +641,96 @@ void log_data_end(void)
 // Calibration data prep 
 void log_calibration_prep(void)
 {
-    // Reset the calibration data 
-    memset((void *)mtbdl_log.cal_buff, CLEAR, sizeof(mtbdl_log.cal_buff)); 
-    mtbdl_log.cal_samples = CLEAR; 
+    // ADC data 
+    memset((void *)mtbdl_log.adc_period, CLEAR, sizeof(mtbdl_log.adc_period)); 
 
-    // Trigger an ADC and accelerometer read so the data is available for the first 
-    // time data is recorded 
-    adc_start(mtbdl_log.adc); 
-    mpu6050_set_read_flag(DEVICE_ONE); 
+    // Logging counters 
+    mtbdl_log.log_interval_divider = CLEAR; 
+    mtbdl_log.accel_stream_counter = stream_schedule[LOG_STREAM_ACCEL].offset; 
+    mtbdl_log.interrupt_counter = CLEAR; 
+    
+    // Calibration data 
+    memset((void *)mtbdl_log.cal_buff, CLEAR, sizeof(mtbdl_log.cal_buff)); 
+    mtbdl_log.cal_adc_samples = CLEAR; 
+    mtbdl_log.cal_accel_samples = CLEAR; 
+
+    // SD card data 
+    memset((void*)mtbdl_log.data_buff, CLEAR, sizeof(mtbdl_log.data_buff)); 
+    memset((void*)mtbdl_log.data_str, CLEAR, sizeof(mtbdl_log.data_str)); 
+    mtbdl_log.data_buff_index = CLEAR; 
 
     // Enable log sample period interrupts 
     NVIC_EnableIRQ(mtbdl_log.log_irq); 
+
+    // Trigger an ADC and accelerometer read so the data is available for the first 
+    // time data is recorded 
+    // adc_start(mtbdl_log.adc); 
+    // mpu6050_set_read_flag(DEVICE_ONE); 
 }
 
 
 // Calibration 
 void log_calibration(void)
 {
-    // Record new data periodically 
-    if (handler_flags.tim1_trg_tim11_glbl_flag)
+    if (mtbdl_log.interrupt_counter)
     {
-        handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
-        mtbdl_log.cal_samples++; 
+        if (mtbdl_log.log_interval_divider >= LOG_PERIOD_DIVIDER)
+        {
+            mtbdl_log.log_interval_divider = CLEAR; 
 
-        // Record new accel data 
-        mpu6050_get_accel_raw(
-            DEVICE_ONE, 
-            &mtbdl_log.accel_x, 
-            &mtbdl_log.accel_y, 
-            &mtbdl_log.accel_z); 
+            if (++mtbdl_log.accel_stream_counter >= 
+                    stream_schedule[LOG_STREAM_ACCEL].counter_period)
+            {
+                mtbdl_log.accel_stream_counter = CLEAR; 
+                mtbdl_log.cal_accel_samples++; 
 
-        // Sum all the data into the calibration buffer. This data will be averaged once the 
-        // calibration state is left. 
-        mtbdl_log.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_log.accel_x; 
-        mtbdl_log.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_log.accel_y; 
-        mtbdl_log.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_log.accel_z; 
-        mtbdl_log.cal_buff[PARAM_SYS_SET_FORK_REST] += (int32_t)mtbdl_log.adc_buff[ADC_FORK]; 
-        mtbdl_log.cal_buff[PARAM_SYS_SET_SHOCK_REST] += (int32_t)mtbdl_log.adc_buff[ADC_SHOCK]; 
+                log_stream_accel(); 
 
-        // Trigger an ADC and accelerometer read so the data is available for the next 
-        // time data is recorded 
-        adc_start(mtbdl_log.adc); 
-        mpu6050_set_read_flag(DEVICE_ONE); 
+                mtbdl_log.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_log.accel_x; 
+                mtbdl_log.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_log.accel_y; 
+                mtbdl_log.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_log.accel_z; 
+            }
+        }
+
+        mtbdl_log.cal_buff[PARAM_SYS_SET_FORK_REST] += 
+            (int32_t)mtbdl_log.adc_period[mtbdl_log.data_buff_index][ADC_FORK]; 
+        mtbdl_log.cal_buff[PARAM_SYS_SET_SHOCK_REST] += 
+            (int32_t)mtbdl_log.adc_period[mtbdl_log.data_buff_index][ADC_SHOCK]; 
+        
+        if (++mtbdl_log.data_buff_index >= LOG_PERIOD_DIVIDER)
+        {
+            mtbdl_log.data_buff_index = CLEAR; 
+        }
+
+        mtbdl_log.cal_adc_samples++; 
+        mtbdl_log.interrupt_counter--; 
     }
+
+    // // Record new data periodically 
+    // if (handler_flags.tim1_trg_tim11_glbl_flag)
+    // {
+    //     handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
+    //     mtbdl_log.cal_adc_samples++; 
+
+    //     mpu6050_get_accel_raw(
+    //         DEVICE_ONE, 
+    //         &mtbdl_log.accel_x, 
+    //         &mtbdl_log.accel_y, 
+    //         &mtbdl_log.accel_z); 
+
+    //     // Sum all the data into the calibration buffer. This data will be averaged once the 
+    //     // calibration state is left. 
+    //     mtbdl_log.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_log.accel_x; 
+    //     mtbdl_log.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_log.accel_y; 
+    //     mtbdl_log.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_log.accel_z; 
+    //     mtbdl_log.cal_buff[PARAM_SYS_SET_FORK_REST] += (int32_t)mtbdl_log.adc_buff[ADC_FORK]; 
+    //     mtbdl_log.cal_buff[PARAM_SYS_SET_SHOCK_REST] += (int32_t)mtbdl_log.adc_buff[ADC_SHOCK]; 
+
+    //     // Trigger an ADC and accelerometer read so the data is available for the next 
+    //     // time data is recorded 
+    //     adc_start(mtbdl_log.adc); 
+    //     mpu6050_set_read_flag(DEVICE_ONE); 
+    // }
 }
 
 
@@ -671,19 +744,19 @@ void log_calibration_calculation(void)
     // the calculated values. 
 
     mtbdl_log.accel_x = 
-        (int16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_AX_REST] / mtbdl_log.cal_samples); 
+        (int16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_AX_REST] / mtbdl_log.cal_accel_samples); 
     
     mtbdl_log.accel_y = 
-        (int16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_AY_REST] / mtbdl_log.cal_samples); 
+        (int16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_AY_REST] / mtbdl_log.cal_accel_samples); 
     
     mtbdl_log.accel_z = 
-        (int16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_AZ_REST] / mtbdl_log.cal_samples); 
+        (int16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_AZ_REST] / mtbdl_log.cal_accel_samples); 
     
     mtbdl_log.adc_buff[ADC_FORK] = 
-        (uint16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_FORK_REST] / mtbdl_log.cal_samples); 
+        (uint16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_FORK_REST] / mtbdl_log.cal_adc_samples); 
     
     mtbdl_log.adc_buff[ADC_SHOCK] = 
-        (uint16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_SHOCK_REST] / mtbdl_log.cal_samples); 
+        (uint16_t)(mtbdl_log.cal_buff[PARAM_SYS_SET_SHOCK_REST] / mtbdl_log.cal_adc_samples); 
 
     param_update_system_setting(PARAM_SYS_SET_AX_REST, (void *)&mtbdl_log.accel_x); 
     param_update_system_setting(PARAM_SYS_SET_AY_REST, (void *)&mtbdl_log.accel_y); 
@@ -715,6 +788,17 @@ void log_set_trailmark(void)
 // Get battery voltage (ADC value) 
 uint16_t log_get_batt_voltage(void)
 {
+    // Update the current ADC values if the data logging periodic interrupt is not 
+    // enabled (i.e. if data logging or calibration is not happening). 
+    if (!NVIC_GetEnableIRQ(mtbdl_log.log_irq))
+    {
+        uint16_t timeout = LOG_ADC_DMA_WAIT; 
+
+        dma_clear_int_flags(mtbdl_log.dma); 
+        adc_start(mtbdl_log.adc); 
+        while(!dma_get_tc_status(mtbdl_log.dma, mtbdl_log.dma_stream) && --timeout); 
+    }
+
     return mtbdl_log.adc_buff[ADC_SOC]; 
 }
 

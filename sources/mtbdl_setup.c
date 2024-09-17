@@ -42,6 +42,9 @@ void mtbdl_init()
 
     // Initialize GPIO ports 
     gpio_port_init(); 
+
+    // Initialize interrupt handler flags 
+    int_handler_init(); 
     
     //==================================================
 
@@ -164,14 +167,63 @@ void mtbdl_init()
 
     // Set the ADC conversion sequence 
     adc_seq(ADC1, ADC_CHANNEL_6, ADC_SEQ_1);   // Battery 
-    adc_seq(ADC1, ADC_CHANNEL_7, ADC_SEQ_1);   // Fork 
-    adc_seq(ADC1, ADC_CHANNEL_4, ADC_SEQ_2);   // Shock 
+    adc_seq(ADC1, ADC_CHANNEL_7, ADC_SEQ_2);   // Fork 
+    adc_seq(ADC1, ADC_CHANNEL_4, ADC_SEQ_3);   // Shock 
 
     // Set the sequence length (called once and only for more than one channel) 
     adc_seq_len_set(ADC1, (adc_seq_num_t)ADC_BUFF_SIZE); 
 
     // Turn the ADC on 
     adc_on(ADC1); 
+
+    //==================================================
+
+    //==================================================
+    // DMA setup 
+
+    // Initialize the DMA stream 
+    dma_stream_init(
+        DMA2, 
+        DMA2_Stream0, 
+        DMA_CHNL_0, 
+        DMA_DIR_PM, 
+        DMA_CM_ENABLE,
+        DMA_PRIOR_VHI, 
+        DMA_DBM_DISABLE,        // Double buffer mode configuration 
+        DMA_ADDR_INCREMENT, 
+        DMA_ADDR_FIXED, 
+        DMA_DATA_SIZE_HALF, 
+        DMA_DATA_SIZE_HALF); 
+
+    // Configure the DMA stream 
+    // The ADC DMA stream is configured in the data logging module init function. This 
+    // is done so the ADC buffer in the data logging module can be used. The stream 
+    // must be configured before we can enable the DMA. 
+
+    // The DMA is enabled at the end of the setup so that all configuration can be 
+    // done before enabling. 
+
+    //==================================================
+
+    //==================================================
+    // External interrupts 
+
+    // Initialize external interrupts 
+    exti_init(); 
+
+    // Wheel revolutions interrupt configuration 
+    exti_config(
+        GPIOC, 
+        EXTI_PC, 
+        PIN_4, 
+        PUPDR_PU, 
+        EXTI_L4, 
+        EXTI_INT_NOT_MASKED, 
+        EXTI_EVENT_MASKED, 
+        EXTI_RISE_TRIG_DISABLE, 
+        EXTI_FALL_TRIG_ENABLE); 
+
+    // Further interrupt setup is done at the end. 
 
     //==================================================
 
@@ -279,7 +331,6 @@ void mtbdl_init()
     // System information 
     mtbdl_trackers.state = MTBDL_INIT_STATE; 
     mtbdl_trackers.fault_code = CLEAR; 
-    // mtbdl_trackers.user_btn_port = GPIOC; 
 
     // Timing information 
     mtbdl_trackers.timer_nonblocking = TIM9; 
@@ -293,15 +344,28 @@ void mtbdl_init()
     memset((void *)mtbdl_trackers.msg, CLEAR, sizeof(mtbdl_trackers.msg)); 
     mtbdl_trackers.msg_len = CLEAR; 
 
+    // User buttons 
+    mtbdl_trackers.btn_press = UI_BTN_NONE; 
+
     // State flags 
     mtbdl_trackers.init = SET_BIT; 
+    mtbdl_trackers.idle = CLEAR_BIT; 
+    mtbdl_trackers.run = CLEAR_BIT; 
+    mtbdl_trackers.data_select = CLEAR_BIT; 
+    mtbdl_trackers.tx = CLEAR_BIT; 
+    mtbdl_trackers.rx = CLEAR_BIT; 
+    mtbdl_trackers.calibrate = CLEAR_BIT; 
+    mtbdl_trackers.low_pwr = CLEAR_BIT; 
+    mtbdl_trackers.noncrit_fault = CLEAR_BIT; 
+    mtbdl_trackers.fault = CLEAR_BIT; 
+    mtbdl_trackers.reset = CLEAR_BIT; 
 
     //==================================================
 
     //==================================================
     // User interface setup 
 
-    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3, ADC1, ADC_CHANNEL_6); 
+    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3); 
 
     //==================================================
 
@@ -313,6 +377,7 @@ void mtbdl_init()
         EXTI4_IRQn, 
         TIM1_TRG_COM_TIM11_IRQn, 
         ADC1, 
+        DMA2, 
         DMA2_Stream0); 
     
     //==================================================
@@ -325,59 +390,13 @@ void mtbdl_init()
     //==================================================
 
     //==================================================
-    // DMA setup 
+    // Finalize setup 
 
-    // Initialize the DMA stream 
-    dma_stream_init(
-        DMA2, 
-        DMA2_Stream0, 
-        DMA_CHNL_0, 
-        DMA_DIR_PM, 
-        DMA_CM_ENABLE,
-        DMA_PRIOR_VHI, 
-        DMA_DBM_DISABLE,        // Double buffer mode configuration 
-        DMA_ADDR_INCREMENT, 
-        DMA_ADDR_FIXED, 
-        DMA_DATA_SIZE_HALF, 
-        DMA_DATA_SIZE_HALF); 
-
-    // Configure the DMA stream 
-    // The ADC DMA stream is configured in the data logging module init function called 
-    // above. This is done so the ADC buffer in the data logging module can be used. 
-
-    // Enable the DMA stream 
+    // Enable the DMA stream. This is done here because the data logging module does 
+    // further DMA configuration after the DMA setup section. 
     dma_stream_enable(DMA2_Stream0); 
 
-    //==================================================
-
-    //==================================================
-    // Wheel speed sensor setup (external interrupt) 
-
-    // Enable external interrupts 
-    exti_init(); 
-
-    // Configure the external interrupt. Further interrupt setup is done at the end 
-    // of the setup. 
-    exti_config(
-        GPIOC, 
-        EXTI_PC, 
-        PIN_4, 
-        PUPDR_PU, 
-        EXTI_L4, 
-        EXTI_INT_NOT_MASKED, 
-        EXTI_EVENT_MASKED, 
-        EXTI_RISE_TRIG_DISABLE, 
-        EXTI_FALL_TRIG_ENABLE); 
-
-    //==================================================
-
-    //==================================================
-    // Interrupt setup 
-
-    // Initialize interrupt handler flags 
-    int_handler_init(); 
-
-    // Periodic interrupt (button and LED updates): Enable the interrupt handlers 
+    // Periodic interrupt (button and LED updates): Enable the interrupt handler 
     nvic_config(TIM1_UP_TIM10_IRQn, EXTI_PRIORITY_2); 
 
     // Periodic interrupt (data logging): Set the interrupt priority and disable until 

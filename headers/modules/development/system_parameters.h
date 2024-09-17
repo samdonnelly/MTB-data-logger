@@ -120,7 +120,7 @@ void param_file_sys_setup(void);
 /**
  * @brief Write bike parameters to file 
  * 
- * @param mode 
+ * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */
 void param_write_bike_params(uint8_t mode); 
 
@@ -128,7 +128,7 @@ void param_write_bike_params(uint8_t mode);
 /**
  * @brief Read bike parameter on file 
  * 
- * @param mode 
+ * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */
 void param_read_bike_params(uint8_t mode); 
 
@@ -136,7 +136,7 @@ void param_read_bike_params(uint8_t mode);
 /**
  * @brief Write system parameters to file 
  * 
- * @param mode 
+ * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */
 void param_write_sys_params(uint8_t mode); 
 
@@ -144,7 +144,7 @@ void param_write_sys_params(uint8_t mode);
 /**
  * @brief Read system parameters on file 
  * 
- * @param mode 
+ * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */
 void param_read_sys_params(uint8_t mode); 
 
@@ -202,7 +202,7 @@ void param_sys_read_format(void);
 /**
  * @brief Increment/decrement log file index 
  * 
- * @param log_index_change 
+ * @param log_index_change : increment or decrement of log index 
  */
 void param_update_log_index(param_log_index_change_t log_index_change); 
 
@@ -210,8 +210,8 @@ void param_update_log_index(param_log_index_change_t log_index_change);
 /**
  * @brief Update bike setting 
  * 
- * @param setting_index 
- * @param setting 
+ * @param setting_index : bike setting index to set 
+ * @param setting : value of bike setting to write 
  */
 void param_update_bike_setting(
     param_bike_set_index_t setting_index, 
@@ -221,8 +221,11 @@ void param_update_bike_setting(
 /**
  * @brief Update system settings 
  * 
- * @param setting_index 
- * @param setting 
+ * @details The setting value is cast to void because the system settings have different 
+ *          data types. 
+ * 
+ * @param setting_index : system setting index to set 
+ * @param setting : value of the system setting to write 
  */
 void param_update_system_setting(
     param_sys_set_index_t setting_index, 
@@ -237,7 +240,7 @@ void param_update_system_setting(
 /**
  * @brief Get log file index 
  * 
- * @return uint8_t 
+ * @return uint8_t : log file index 
  */
 uint8_t param_get_log_index(void); 
 
@@ -245,8 +248,8 @@ uint8_t param_get_log_index(void);
 /**
  * @brief Get bike settings 
  * 
- * @param setting_index 
- * @return uint8_t 
+ * @param setting_index : bike setting index to get 
+ * @return uint8_t : value of the bike setting on file 
  */
 uint8_t param_get_bike_setting(param_bike_set_index_t setting_index); 
 

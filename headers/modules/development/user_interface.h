@@ -27,6 +27,7 @@
 //=======================================================================================
 // Macos 
 
+// Timing 
 #define UI_LED_DUTY_SHORT 20        // 5ms interrupt * 20 == 100ms duty cycle 
 #define UI_LED_DUTY_LONG 100        // 5ms interrupt * 100 == 500ms duty cycle 
 
@@ -36,6 +37,7 @@
 //=======================================================================================
 // Enums 
 
+// User button number 
 typedef enum {
     UI_BTN_NONE, 
     UI_BTN_1, 
@@ -73,8 +75,6 @@ typedef struct mtbdl_ui_s
 {
     // Peripherals 
     GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
-    ADC_TypeDef *soc_adc_port;                  // ADC port for battery SOC 
-    adc_channel_t soc_adc_channel;              // ADC channel for battery SOC 
 
     // System info 
     uint16_t navstat;                           // Navigation status of GPS module 
@@ -115,27 +115,24 @@ mtbdl_ui_t;
 /**
  * @brief User interface init 
  * 
- * @details 
+ * @details Sets module data to its default value, sets up the user buttons and 
+ *          initializes button debouncing. 
  *          
- *          The button pins must be pins 0-7. Anything higher will be truncated. This 
- *          happens due to the switch debounce driver data size. 
+ *          NOTE: The button pins must be pins 0-7. Anything higher will be truncated. 
+ *                This happens due to the switch debounce driver data size. 
  * 
- * @param btn_port 
- * @param btn1 
- * @param btn2 
- * @param btn3 
- * @param btn4 
- * @param soc_adc_port : 
- * @param soc_adc_channel : 
+ * @param btn_port : GPIO port of the buttons 
+ * @param btn1 : button 1 pin 
+ * @param btn2 : button 2 pin 
+ * @param btn3 : button 3 pin 
+ * @param btn4 : button 4 pin 
  */
 void ui_init(
     GPIO_TypeDef *btn_port, 
     pin_selector_t btn1, 
     pin_selector_t btn2, 
     pin_selector_t btn3, 
-    pin_selector_t btn4, 
-    ADC_TypeDef *soc_adc_port, 
-    adc_channel_t soc_adc_channel); 
+    pin_selector_t btn4); 
 
 //=======================================================================================
 
@@ -178,7 +175,7 @@ void ui_gps_led_status_update(void);
 /**
  * @brief Update screen message output 
  * 
- * @param msg_index 
+ * @param msg_index : message to update 
  */
 void ui_msg_update(ui_msg_update_index_t msg_index); 
 
@@ -299,8 +296,8 @@ void ui_tx_end(void);
 /**
  * @brief Store the LED colour to use 
  * 
- * @param led_num 
- * @param colour 
+ * @param led_num : LED to set 
+ * @param colour : LED colour to set 
  */
 void ui_led_colour_set(
     ws2812_led_index_t led_num, 
@@ -310,8 +307,8 @@ void ui_led_colour_set(
 /**
  * @brief Change the LED colour to write next 
  * 
- * @param led_num 
- * @param colour 
+ * @param led_num : LED to change 
+ * @param colour : LED colour to set 
  */
 void ui_led_colour_change(
     ws2812_led_index_t led_num, 
@@ -321,8 +318,8 @@ void ui_led_colour_change(
 /**
  * @brief Update the blinking LED duty cycle 
  * 
- * @param led_num 
- * @param duty_cycle 
+ * @param led_num : LED to set 
+ * @param duty_cycle : on time of the LED 
  */
 void ui_led_duty_set(
     ws2812_led_index_t led_num, 
@@ -337,7 +334,7 @@ void ui_led_duty_set(
 /**
  * @brief Get battery SOC 
  * 
- * @return uint8_t : Battery SOC 
+ * @return uint8_t : battery SOC 
  */
 uint8_t ui_get_soc(void); 
 

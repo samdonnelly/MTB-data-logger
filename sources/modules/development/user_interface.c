@@ -16,6 +16,7 @@
 // Includes 
 
 #include "user_interface.h" 
+#include "data_logging.h" 
 #include "system_parameters.h" 
 
 #include "ws2812_config.h" 
@@ -29,11 +30,16 @@
 //=======================================================================================
 // Macros 
 
+// Initialization 
+#define UI_SOC_INIT 100                // Initial SOC value - ensures not low battery 
+
+// Timing 
 #define UI_LED_COUNTER_PERIOD 200      // 5ms interrupt * 200 == 1s counter period 
 #define UI_LED_WRITE_PERIOD 10         // 5ms interrupt * 10 == 50ms write period 
 #define UI_SOC_CALC_PERIOD 2000        // 5ms interrupt * 2000 == 10s calculation period 
 #define UI_MSG_COUNTER_PERIOD 2000     // 5ms interrupt * 2000 == 10s counter period 
 
+// Data offsets 
 #define UI_LOG_INDEX_OFFSET 1          // Difference between log index and number 
 #define UI_SCREEN_LINE_CHAR_OFFSET 1   // Prevents NULL from being the last line character 
 
@@ -52,7 +58,7 @@ typedef void (*ui_screen_msg_func_ptr)(void);
 /**
  * @brief Button press check 
  * 
- * @return ui_btn_num_t 
+ * @return ui_btn_num_t : button currently being pressed 
  */
 ui_btn_num_t ui_button_press(void); 
 
@@ -88,6 +94,7 @@ void ui_msg_timer_update(void);
 
 static mtbdl_ui_t mtbdl_ui; 
 
+
 // Function pointers to screen message formatting functions 
 static ui_screen_msg_func_ptr msg_table[UI_MSG_NUM] = 
 {
@@ -107,19 +114,14 @@ void ui_init(
     pin_selector_t btn1, 
     pin_selector_t btn2, 
     pin_selector_t btn3, 
-    pin_selector_t btn4, 
-    ADC_TypeDef *soc_adc_port, 
-    adc_channel_t soc_adc_channel)
+    pin_selector_t btn4)
 {
     // Peripheral initialization 
     mtbdl_ui.user_btn_port = btn_port; 
-    mtbdl_ui.soc_adc_port = soc_adc_port; 
-    mtbdl_ui.soc_adc_channel = soc_adc_channel; 
 
     // Initialize system info 
     mtbdl_ui.navstat = M8Q_NAVSTAT_NF; 
-    // mtbdl_ui.soc = battery_soc_calc(adc_read_single(soc_adc_port, soc_adc_channel)); 
-    mtbdl_ui.soc = 100; 
+    mtbdl_ui.soc = UI_SOC_INIT; 
 
     // User button pin numbers 
     mtbdl_ui.user_btn_1 = (uint8_t)(SET_BIT << btn1); 
@@ -305,16 +307,17 @@ void ui_led_update(void)
 // Update the SOC calculation 
 void ui_soc_update(void)
 {
-    static uint16_t soc_calc_counter = CLEAR; 
-    // uint16_t voltage = CLEAR; 
+    // The SOC counter is set to trigger a calculation right away so the SOC is updated 
+    // for the first screen message shown to the user. This isn't handled in the init 
+    // function because DMA is not yet enabled so we can't read the ADC. 
+    static uint16_t soc_calc_counter = UI_SOC_CALC_PERIOD; 
 
     if (soc_calc_counter++ >= UI_SOC_CALC_PERIOD)
     {
         // Read the battery voltage and calculate the current SOC using battery specific 
         // information. 
         soc_calc_counter = CLEAR; 
-        // voltage = adc_read_single(mtbdl_ui.soc_adc_port, mtbdl_ui.soc_adc_channel); 
-        // mtbdl_ui.soc = battery_soc_calc(voltage); 
+        mtbdl_ui.soc = battery_soc_calc(log_get_batt_voltage()); 
     }
 }
 

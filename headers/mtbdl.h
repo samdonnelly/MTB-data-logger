@@ -64,7 +64,6 @@ typedef struct mtbdl_trackers_s
     // System information 
     mtbdl_states_t state;                       // State of the system controller 
     uint16_t fault_code;                        // System fault code 
-    // GPIO_TypeDef *user_btn_port;                // GPIO port for user buttons 
 
     // Timing information 
     TIM_TypeDef *timer_nonblocking;             // Timer used for non-blocking delays 

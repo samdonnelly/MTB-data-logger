@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB data logging interface 
+ * @brief Data logging module interface 
  * 
  * @version 0.1
  * @date 2023-05-24

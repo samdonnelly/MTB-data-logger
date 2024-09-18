@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief User interface 
+ * @brief UI (user interface) module 
  * 
  * @version 0.1
  * @date 2024-07-10

@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTB data logging 
+ * @brief Data logging module 
  * 
  * @version 0.1
  * @date 2023-05-24
@@ -61,15 +61,6 @@ static mtbdl_log_t mtbdl_log;
 
 
 // Logging schedule data 
-typedef struct log_stream_state_s 
-{
-    uint8_t counter; 
-    log_stream_t stream; 
-}
-log_stream_state_t; 
-
-
-// Logging schedule data 
 typedef struct log_stream_schedule_s 
 {
     log_stream_t stream; 
@@ -103,15 +94,16 @@ void log_stream_standard(void);
 
 
 /**
- * @brief Data logging stream: wheel speed 
+ * @brief Data logging stream: GPS location 
  * 
- * @details This function is used during data logging to record standard data for the 
- *          current logging interval and estimated wheel speed. Wheel speed is determined 
- *          by recording the number of hall effect sensor interrupts over a period of time 
- *          which means this stream has to look at previous sensor data. See the 
+ * @details This function is used during data logging to record standard data and GPS 
+ *          position for the current logging interval. The GPS device is only read from 
+ *          during intervals where no other data besides standard data is being read 
+ *          and recorded. That way an interval will not exceed its max time and this 
+ *          stream can be only for recording the most recent GPS position. See the 
  *          'stream_schedule' table for the data stream sequence. 
  */
-void log_stream_speed(void); 
+void log_stream_gps(void); 
 
 
 /**
@@ -128,16 +120,15 @@ void log_stream_accel(void);
 
 
 /**
- * @brief Data logging stream: GPS location 
+ * @brief Data logging stream: wheel speed 
  * 
- * @details This function is used during data logging to record standard data and GPS 
- *          position for the current logging interval. The GPS device is only read from 
- *          during intervals where no other data besides standard data is being read 
- *          and recorded. That way an interval will not exceed its max time and this 
- *          stream can be only for recording the most recent GPS position. See the 
+ * @details This function is used during data logging to record standard data for the 
+ *          current logging interval and estimated wheel speed. Wheel speed is determined 
+ *          by recording the number of hall effect sensor interrupts over a period of time 
+ *          which means this stream has to look at previous sensor data. See the 
  *          'stream_schedule' table for the data stream sequence. 
  */
-void log_stream_gps(void); 
+void log_stream_speed(void); 
 
 //=======================================================================================
 
@@ -160,7 +151,7 @@ static mtbdl_log_stream stream_table[LOG_STREAM_NUM] =
 // - The counter period and starting offsets of each stream are chosen so that no two 
 //   streams will run during the same interval. 
 // - The standard log stream runs when no other stream needs to run so it does not 
-//   require a period and offset. 
+//   require a period or offset. 
 // - This table must order log streams in the same order that they are listed in 
 //   log_stream_t. 
 static const log_stream_schedule_t stream_schedule[LOG_STREAM_NUM] = 
@@ -515,8 +506,6 @@ void log_stream_gps(void)
     mtbdl_log.NS = m8q_get_position_NS(); 
     m8q_get_position_lon_str(mtbdl_log.lon_str, LOG_GPS_BUFF_LEN); 
     mtbdl_log.EW = m8q_get_position_EW(); 
-
-    // Add ground speed? 
 
     // Format GPS data log string 
     snprintf(mtbdl_log.data_str, 

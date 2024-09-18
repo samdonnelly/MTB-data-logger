@@ -108,7 +108,7 @@ void mtbdl_idle_state_exit(void);
 void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl); 
 
 // Run prep state helper functions 
-void mtbdl_run_prep_state_entry(void); 
+void mtbdl_run_prep_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl); 
 void mtbdl_run_prep_state_exit(void); 
 
@@ -175,7 +175,7 @@ void mtbdl_run_state_exit(void);
 void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl); 
 
 // Post run state helper functions 
-void mtbdl_postrun_state_entry(void); 
+void mtbdl_postrun_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_postrun_state_exit(void); 
 
 
@@ -288,7 +288,7 @@ void mtbdl_rx_state_exit(void);
 void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl); 
 
 // Post-RX state helper functions 
-void mtbdl_postrx_state_entry(void); 
+void mtbdl_postrx_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_postrx_state_exit(void); 
 
 
@@ -312,7 +312,7 @@ void mtbdl_postrx_state_exit(void);
 void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl); 
 
 // Pre-TX state helper functions 
-void mtbdl_pretx_state_entry(void); 
+void mtbdl_pretx_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_pretx_user_input_check(mtbdl_trackers_t *mtbdl); 
 void mtbdl_pretx_state_exit(void); 
 
@@ -355,8 +355,8 @@ void mtbdl_tx_state_exit(void);
 void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl); 
 
 // Post-TX state helper functions 
-void mtbdl_posttx_state_entry(void); 
-void mtbdl_posttx_state_exit(void); 
+void mtbdl_posttx_state_entry(mtbdl_trackers_t *mtbdl); 
+void mtbdl_posttx_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -1075,25 +1075,7 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->run)
     {
-        // Check the log file name 
-        if (log_data_name_prep()) 
-        {
-            // New file name created - display the run prep state message 
-            ui_set_run_prep_msg(); 
-            mtbdl->run = CLEAR_BIT; 
-
-            // Make sure the M8Q is out of low power mode 
-            m8q_clear_low_pwr_flag(); 
-        }
-        else 
-        {
-            // Too many log files saved - abort 
-            mtbdl->noncrit_fault = SET_BIT; 
-            mtbdl->msg = mtbdl_ncf_excess_files_msg; 
-            mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
-        }
-
-        mtbdl_run_prep_state_entry(); 
+        mtbdl_run_prep_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1117,19 +1099,37 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
 
 
 // Pre run (run prep) state entry 
-void mtbdl_run_prep_state_entry(void)
+void mtbdl_run_prep_state_entry(mtbdl_trackers_t *mtbdl)
 {
-    // Set the colour and blink rate of the data logging and GPS LEDs 
-    ui_led_colour_set(WS2812_LED_0, mtbdl_led0_1); 
-    ui_led_colour_set(WS2812_LED_1, mtbdl_led1_1); 
-    ui_led_duty_set(WS2812_LED_0, UI_LED_DUTY_LONG); 
-    ui_led_duty_set(WS2812_LED_1, UI_LED_DUTY_SHORT); 
+    // Check the log file name 
+    if (log_data_name_prep()) 
+    {
+        // New file name created - display the run prep state message 
+        ui_set_run_prep_msg(); 
+        mtbdl->run = CLEAR_BIT; 
 
-    // Set user button LED colours 
-    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
+        // Make sure the M8Q is out of low power mode 
+        m8q_clear_low_pwr_flag(); 
+
+        // Set the colour and blink rate of the data logging and GPS LEDs 
+        ui_led_colour_set(WS2812_LED_0, mtbdl_led0_1); 
+        ui_led_colour_set(WS2812_LED_1, mtbdl_led1_1); 
+        ui_led_duty_set(WS2812_LED_0, UI_LED_DUTY_LONG); 
+        ui_led_duty_set(WS2812_LED_1, UI_LED_DUTY_SHORT); 
+
+        // Set user button LED colours 
+        ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+        ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+        ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+        ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
+    }
+    else 
+    {
+        // Too many log files saved - abort the state 
+        mtbdl->noncrit_fault = SET_BIT; 
+        mtbdl->msg = mtbdl_ncf_excess_files_msg; 
+        mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
+    }
 }
 
 
@@ -1328,28 +1328,12 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->run)
     {
-        // Close the open data log file if there was no non-critical faults 
-        if (!mtbdl->noncrit_fault)
-        {
-            log_data_end(); 
-        }
-
-        hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
-        mtbdl->noncrit_fault = CLEAR_BIT; 
-        mtbdl->run = CLEAR_BIT; 
-
-        mtbdl_postrun_state_entry(); 
-
-        // Consider adding a screen message that indicates the log was ended due to 
-        // low battery voltage. 
+        mtbdl_postrun_state_entry(mtbdl); 
     }
     
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        // Consider only setting the idle state bit if the low power state bit is not 
-        // set. 
-
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_postrun_state_exit(); 
@@ -1358,8 +1342,18 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 
 
 // Post run state entry 
-void mtbdl_postrun_state_entry(void)
+void mtbdl_postrun_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    // Close the open data log file if there was no non-critical faults 
+    if (!mtbdl->noncrit_fault)
+    {
+        log_data_end(); 
+    }
+
+    hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
+    mtbdl->noncrit_fault = CLEAR_BIT; 
+    mtbdl->run = CLEAR_BIT; 
+    
     // Put the M8Q back into a continuous read state 
     m8q_set_read_flag(); 
 
@@ -1751,15 +1745,9 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->rx)
     {
-        // Update the screen message 
-        hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
-
         mtbdl->noncrit_fault = CLEAR_BIT; 
         mtbdl->rx = CLEAR_BIT; 
-        mtbdl_postrx_state_entry(); 
-
-        // Consider adding a screen message indicating RX mode was exited due to low 
-        // battery voltage. 
+        mtbdl_postrx_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1769,9 +1757,6 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
-        // Consider adding a condition to only set the idle state bit if the low 
-        // power state bit is not set. 
-
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_postrx_state_exit(); 
@@ -1780,8 +1765,11 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
 
 
 // Post RX state entry 
-void mtbdl_postrx_state_entry(void)
+void mtbdl_postrx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    // Update the screen message 
+    hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
+    
     // Save the parameters to file and update tracking info 
     param_write_bike_params(HW125_MODE_OEW); 
 
@@ -1818,24 +1806,8 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->tx)
     {
-        // Prepare the log file to send 
-        if (ui_tx_prep())
-        {
-            // File ready - display the pre tx state message 
-            ui_set_pretx_msg(); 
-            mtbdl->tx = CLEAR_BIT; 
-        }
-        else 
-        {
-            // File does not exist - update the message to send and abort the state 
-            mtbdl->noncrit_fault = SET_BIT; 
-            mtbdl->msg = mtbdl_ncf_no_files_msg; 
-            mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
-        }
-
         mtbdl->data_select = CLEAR_BIT; 
-
-        mtbdl_pretx_state_entry(); 
+        mtbdl_pretx_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1871,17 +1843,32 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
 
 
 // Pre TX state entry 
-void mtbdl_pretx_state_entry(void)
+void mtbdl_pretx_state_entry(mtbdl_trackers_t *mtbdl)
 {
-    // Set the Bluetooth LED colour and blink rate 
-    ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
-    ui_led_duty_set(WS2812_LED_2, UI_LED_DUTY_SHORT); 
+    // Prepare the log file to send 
+    if (ui_tx_prep())
+    {
+        // File ready - display the pre tx state message 
+        ui_set_pretx_msg(); 
+        mtbdl->tx = CLEAR_BIT; 
 
-    // Set user button LED colours 
-    ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
-    ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
-    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
-    ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
+        // Set the Bluetooth LED colour and blink rate 
+        ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
+        ui_led_duty_set(WS2812_LED_2, UI_LED_DUTY_SHORT); 
+
+        // Set user button LED colours 
+        ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
+        ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
+        ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
+        ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
+    }
+    else 
+    {
+        // File does not exist - update the message and abort the state 
+        mtbdl->noncrit_fault = SET_BIT; 
+        mtbdl->msg = mtbdl_ncf_no_files_msg; 
+        mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
+    }
 }
 
 
@@ -1928,12 +1915,9 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->tx)
     {
-        // Display the tx state message 
-        hd44780u_set_msg(mtbdl_tx_msg, MTBDL_MSG_LEN_2_LINE); 
         mtbdl->msg = mtbdl_posttx_msg; 
         mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
         mtbdl->tx = CLEAR_BIT; 
-
         mtbdl_tx_state_entry(); 
     }
 
@@ -1971,6 +1955,9 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
 // TX state entry 
 void mtbdl_tx_state_entry(void)
 {
+    // Display the tx state message 
+    hd44780u_set_msg(mtbdl_tx_msg, MTBDL_MSG_LEN_2_LINE); 
+    
     // Turn the Bluetooth LED on 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led2_1); 
 
@@ -2019,11 +2006,8 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->tx)
     {
-        // Set the post TX state message 
-        hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
-
         mtbdl->tx = CLEAR_BIT; 
-        mtbdl_posttx_state_entry(); 
+        mtbdl_posttx_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -2034,29 +2018,17 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
-
-        // Consider adding a condition for the low power flag. It will already be set 
-        // but we want the system to go straight to the low power state after this. 
-
-        // Go back to the pre-tx state if the connection was not lost 
-        if (mtbdl->noncrit_fault)
-        {
-            mtbdl->idle = SET_BIT; 
-        }
-        else 
-        {
-            mtbdl->tx = SET_BIT; 
-        }
-
-        mtbdl->noncrit_fault = CLEAR_BIT; 
-        mtbdl_posttx_state_exit(); 
+        mtbdl_posttx_state_exit(mtbdl); 
     }
 }
 
 
 // Post TX state entry 
-void mtbdl_posttx_state_entry(void)
+void mtbdl_posttx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    // Set the post TX state message 
+    hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
+
     // End the transaction 
     ui_tx_end(); 
 
@@ -2073,8 +2045,20 @@ void mtbdl_posttx_state_entry(void)
 
 
 // Post TX state exit 
-void mtbdl_posttx_state_exit(void)
+void mtbdl_posttx_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    // Go back to the pre-tx state if the connection was not lost 
+    if (mtbdl->noncrit_fault)
+    {
+        mtbdl->idle = SET_BIT; 
+    }
+    else 
+    {
+        mtbdl->tx = SET_BIT; 
+    }
+
+    mtbdl->noncrit_fault = CLEAR_BIT; 
+    
     // Clear the post tx state message 
     hd44780u_set_clear_flag(); 
 
@@ -2350,7 +2334,7 @@ void mtbdl_lowpwr_state_entry(void)
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
     ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
-    ui_led_colour_set(WS2812_LED_5, mtbdl_led5_1); 
+    ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
     ui_led_colour_set(WS2812_LED_4, mtbdl_led4_1); 
 }
 
@@ -2360,14 +2344,6 @@ void mtbdl_lowpwr_user_input_check(mtbdl_trackers_t *mtbdl)
 {
     switch (mtbdl->btn_press)
     {
-        // Button 3 - triggers the idle state 
-        // If SOC is above the minimum threshold then we can exit low power state. 
-        // A button press is put here instead temporarily until SOC calibration has 
-        // been created. 
-        case UI_BTN_3: 
-            mtbdl->low_pwr = SET_BIT; 
-            break; 
-
         // Button 4 - Turns the screen backlight on 
         case UI_BTN_4: 
             hd44780u_wake_up(); 
@@ -2426,10 +2402,6 @@ void mtbdl_fault_state_entry(void)
     // Display the fault state message and take screen out of power save mode 
     hd44780u_set_msg(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
     hd44780u_clear_pwr_save_flag(); 
-
-    // Record the fault code in a log 
-
-    // Stop any existing processes - assess each state case 
 
     // Turn the fault LED on 
     ui_led_colour_change(WS2812_LED_3, mtbdl_led3_1); 

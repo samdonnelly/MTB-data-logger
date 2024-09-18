@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief MTBDL string configuration 
+ * @brief String configuration 
  * 
  * @version 0.1
  * @date 2023-05-21

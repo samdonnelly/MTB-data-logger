@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief System parameters 
+ * @brief System parameters module 
  * 
  * @version 0.1
  * @date 2024-07-09

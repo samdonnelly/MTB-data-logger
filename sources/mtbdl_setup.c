@@ -103,10 +103,10 @@ void mtbdl_init()
     spi_init(
         SPI2, 
         GPIOB, 
-        PIN_10,  // SCK pin 
+        PIN_10,             // SCK pin 
         GPIOB, 
-        PIN_14,  // MISO pin 
-        PIN_15,  // MOSI pin 
+        PIN_14,             // MISO pin 
+        PIN_15,             // MOSI pin 
         SPI_BR_FPCLK_8, 
         SPI_CLOCK_MODE_0); 
 

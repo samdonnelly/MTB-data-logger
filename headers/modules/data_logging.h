@@ -35,7 +35,7 @@
 #define LOG_MAX_LOG_LEN (LOG_PERIOD_DIVIDER*MTBDL_MAX_STR_LEN) 
 
 // Wheel RPM info 
-#define LOG_REV_SAMPLE_SIZE 4          // Number of samples for revolution calc 
+#define LOG_REV_SAMPLE_SIZE 4            // Number of samples for revolution calc 
 
 //=======================================================================================
 
@@ -113,7 +113,7 @@ typedef struct mtbdl_log_s
     char filename[MTBDL_MAX_STR_LEN]; 
 
     // Debugging / log checking 
-    uint8_t overrun; 
+    uint8_t overrun;                            // Checks if data has been skipped 
 }
 mtbdl_log_t; 
 

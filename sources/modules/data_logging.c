@@ -358,7 +358,9 @@ void log_data_prep(void)
     NVIC_EnableIRQ(mtbdl_log.log_irq);   // Log sample period 
 }
 
-
+//=======================================================================================
+// 
+//=======================================================================================
 // Logging data 
 void log_data(void)
 {
@@ -384,10 +386,24 @@ void log_data(void)
     // and processed without missing any ADC data. 
     if (mtbdl_log.interrupt_counter)
     {
+        mtbdl_log.interrupt_counter--; 
+
         if (mtbdl_log.log_interval_divider >= LOG_PERIOD_DIVIDER)
         {
             mtbdl_log.log_interval_divider = CLEAR; 
-            log_stream_t log_stream = LOG_STREAM_STANDARD; 
+
+            // If the code enters this process and the interrupt counter is greater than 
+            // 0 then it means interrupts have occured without the data being processed 
+            // and therefore means we've lost data. This logging process (that involves 
+            // the use of 'interrupt_counter' and 'log_interval_divider') is designed to 
+            // give time for longer processes to complete without dropping any data from 
+            // each logging interval. 'overrun' keeps track of how many times the code 
+            // has lost data. 
+            // mtbdl_log.overrun += mtbdl_log.interrupt_counter; 
+            if (mtbdl_log.interrupt_counter)
+            {
+                mtbdl_log.overrun++; 
+            }
 
             // Increment the stream counters, check the schedule for a stream to call, 
             // execute the scheduled stream, then write data from the previous X intervals 
@@ -396,6 +412,8 @@ void log_data(void)
             // using the 'stream_schedule' table which ensures multiple devices (excluding 
             // ADC reads) are not read from at the same interval. This is due to the 
             // tight sampling window that needs to be maintained. 
+
+            log_stream_t log_stream = LOG_STREAM_STANDARD; 
 
             mtbdl_log.gps_stream_counter++; 
             mtbdl_log.accel_stream_counter++; 
@@ -408,13 +426,13 @@ void log_data(void)
                 log_stream = LOG_STREAM_GPS; 
             }
             else if (mtbdl_log.accel_stream_counter >= 
-                    stream_schedule[LOG_STREAM_ACCEL].counter_period)
+                     stream_schedule[LOG_STREAM_ACCEL].counter_period)
             {
                 mtbdl_log.accel_stream_counter = CLEAR; 
                 log_stream = LOG_STREAM_ACCEL; 
             }
             else if (mtbdl_log.speed_stream_counter >= 
-                    stream_schedule[LOG_STREAM_SPEED].counter_period)
+                     stream_schedule[LOG_STREAM_SPEED].counter_period)
             {
                 mtbdl_log.speed_stream_counter = CLEAR; 
                 log_stream = LOG_STREAM_SPEED; 
@@ -443,8 +461,9 @@ void log_data(void)
 
             mtbdl_log.data_buff_index++; 
         }
-
-        mtbdl_log.interrupt_counter--; 
+        
+        // The trail marker flag gets cleared at the end so that it's status can be used 
+        // in the strings that will be logged to the SD card. 
         mtbdl_log.trailmark = CLEAR_BIT; 
     }
 }

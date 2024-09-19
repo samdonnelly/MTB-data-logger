@@ -1227,9 +1227,6 @@ void mtbdl_run_countdown_state_exit(void)
 
     // Turn off the data logging LED 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
-
-    // Prep the logging data 
-    log_data_prep(); 
 }
 
 //=======================================================================================
@@ -1282,6 +1279,9 @@ void mtbdl_run_state_entry(void)
     ui_led_colour_set(WS2812_LED_6, mtbdl_led6_1); 
     ui_led_colour_set(WS2812_LED_5, mtbdl_led_clear); 
     ui_led_colour_set(WS2812_LED_4, mtbdl_led_clear); 
+
+    // Prep the logging data and start interrupts 
+    log_data_prep(); 
 }
 
 

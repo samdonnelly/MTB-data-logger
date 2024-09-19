@@ -30,7 +30,7 @@
 #define LOG_MAX_FILES 250               // Max data log file number 
 
 // Wheel RPM info 
-#define LOG_REV_FREQ 2                  // (Hz) Revolution calc frequency 
+#define LOG_REV_FREQ 5                  // (Hz) Revolution calc frequency 
 
 // Timing 
 #define LOG_ADC_DMA_WAIT 1000           // Number of times to wait on ADC DMA to complete 
@@ -229,6 +229,9 @@ void log_init(
     mtbdl_log.data_buff_index = CLEAR; 
     memset((void *)mtbdl_log.filename, CLEAR, sizeof(mtbdl_log.filename)); 
 
+    // Debugging / log checking 
+    mtbdl_log.overrun = CLEAR; 
+
     // Configure the DMA stream 
     dma_stream_config(
         mtbdl_log.dma_stream, 
@@ -346,6 +349,9 @@ void log_data_prep(void)
     memset((void*)mtbdl_log.data_buff, CLEAR, sizeof(mtbdl_log.data_buff)); 
     memset((void*)mtbdl_log.data_str, CLEAR, sizeof(mtbdl_log.data_str)); 
     mtbdl_log.data_buff_index = CLEAR; 
+
+    // Debugging / log checking 
+    mtbdl_log.overrun = CLEAR; 
 
     // Enable interrupts 
     NVIC_EnableIRQ(mtbdl_log.rpm_irq);   // Wheel speed 
@@ -650,11 +656,6 @@ void log_calibration_prep(void)
 
     // Enable log sample period interrupts 
     NVIC_EnableIRQ(mtbdl_log.log_irq); 
-
-    // Trigger an ADC and accelerometer read so the data is available for the first 
-    // time data is recorded 
-    // adc_start(mtbdl_log.adc); 
-    // mpu6050_set_read_flag(DEVICE_ONE); 
 }
 
 
@@ -694,32 +695,6 @@ void log_calibration(void)
         mtbdl_log.cal_adc_samples++; 
         mtbdl_log.interrupt_counter--; 
     }
-
-    // // Record new data periodically 
-    // if (handler_flags.tim1_trg_tim11_glbl_flag)
-    // {
-    //     handler_flags.tim1_trg_tim11_glbl_flag = CLEAR_BIT; 
-    //     mtbdl_log.cal_adc_samples++; 
-
-    //     mpu6050_get_accel_raw(
-    //         DEVICE_ONE, 
-    //         &mtbdl_log.accel_x, 
-    //         &mtbdl_log.accel_y, 
-    //         &mtbdl_log.accel_z); 
-
-    //     // Sum all the data into the calibration buffer. This data will be averaged once the 
-    //     // calibration state is left. 
-    //     mtbdl_log.cal_buff[PARAM_SYS_SET_AX_REST] += (int32_t)mtbdl_log.accel_x; 
-    //     mtbdl_log.cal_buff[PARAM_SYS_SET_AY_REST] += (int32_t)mtbdl_log.accel_y; 
-    //     mtbdl_log.cal_buff[PARAM_SYS_SET_AZ_REST] += (int32_t)mtbdl_log.accel_z; 
-    //     mtbdl_log.cal_buff[PARAM_SYS_SET_FORK_REST] += (int32_t)mtbdl_log.adc_buff[ADC_FORK]; 
-    //     mtbdl_log.cal_buff[PARAM_SYS_SET_SHOCK_REST] += (int32_t)mtbdl_log.adc_buff[ADC_SHOCK]; 
-
-    //     // Trigger an ADC and accelerometer read so the data is available for the next 
-    //     // time data is recorded 
-    //     adc_start(mtbdl_log.adc); 
-    //     mpu6050_set_read_flag(DEVICE_ONE); 
-    // }
 }
 
 

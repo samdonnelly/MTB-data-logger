@@ -111,6 +111,9 @@ typedef struct mtbdl_log_s
     char data_str[LOG_MAX_LOG_LEN]; 
     uint8_t data_buff_index; 
     char filename[MTBDL_MAX_STR_LEN]; 
+
+    // Debugging / log checking 
+    uint8_t overrun; 
 }
 mtbdl_log_t; 
 

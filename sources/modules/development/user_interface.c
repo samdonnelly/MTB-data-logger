@@ -538,8 +538,10 @@ void ui_rx(void)
 // Prepare to send a data log file 
 uint8_t ui_tx_prep(void)
 {
+    uint8_t log_index = param_get_log_index(); 
+
     // Check if there are no log files 
-    if (!param_get_log_index())
+    if (!log_index)
     {
         return FALSE; 
     }
@@ -552,11 +554,15 @@ uint8_t ui_tx_prep(void)
     snprintf(mtbdl_ui.filename, 
              MTBDL_MAX_STR_LEN, 
              mtbdl_log_file, 
-             (param_get_log_index() - UI_LOG_INDEX_OFFSET)); 
+             (log_index - UI_LOG_INDEX_OFFSET)); 
 
     // Check for the existance of the specified file number 
     if (hw125_get_exists(mtbdl_ui.filename) == FR_NO_FILE)
     {
+        // If the file does not exist then decrement the file index. At the top of this 
+        // function we already check if the index is 0 which means if we get to this 
+        // point then the index is greater than 0. 
+        param_update_log_index(PARAM_LOG_INDEX_DEC); 
         return FALSE; 
     }
 

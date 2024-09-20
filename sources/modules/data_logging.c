@@ -358,9 +358,7 @@ void log_data_prep(void)
     NVIC_EnableIRQ(mtbdl_log.log_irq);   // Log sample period 
 }
 
-//=======================================================================================
-// 
-//=======================================================================================
+
 // Logging data 
 void log_data(void)
 {
@@ -386,6 +384,7 @@ void log_data(void)
     // and processed without missing any ADC data. 
     if (mtbdl_log.interrupt_counter)
     {
+        // This is decremented here specifically so data overruns can be detected. 
         mtbdl_log.interrupt_counter--; 
 
         if (mtbdl_log.log_interval_divider >= LOG_PERIOD_DIVIDER)
@@ -399,7 +398,6 @@ void log_data(void)
             // give time for longer processes to complete without dropping any data from 
             // each logging interval. 'overrun' keeps track of how many times the code 
             // has lost data. 
-            // mtbdl_log.overrun += mtbdl_log.interrupt_counter; 
             if (mtbdl_log.interrupt_counter)
             {
                 mtbdl_log.overrun++; 

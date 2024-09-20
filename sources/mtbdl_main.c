@@ -1205,9 +1205,6 @@ void mtbdl_run_countdown_state_entry(void)
     // Take the MPU-6050 out of low power mode 
     mpu6050_clear_low_power(DEVICE_ONE); 
 
-    // Set the M8Q to idle state so the time of reading can be controlled. 
-    m8q_set_idle_flag(); 
-
     // Turn on the data logging LED 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led0_1); 
 
@@ -1224,6 +1221,17 @@ void mtbdl_run_countdown_state_exit(void)
 {
     // Put the screen in low power mode 
     hd44780u_set_low_pwr_flag(); 
+
+    // Set the M8Q to idle state so the time of reading can be controlled. This setter 
+    // is placed here specifically so that the M8Q does not go too long without being 
+    // read from. Originally it was in the state entry function but the state takes ~5s 
+    // which means the M8Q then doesn't get read from for at least 5 seconds until the 
+    // system starts data logging. The device will consider itself not needed and go into 
+    // an idle state after a couple seconds if it's not read from which means once we 
+    // got to data logging, it would take a bit longer to get the first read of data 
+    // from the device which was casing a data overrun. Putting the setter here prevents 
+    // this from happening. 
+    m8q_set_idle_flag(); 
 
     // Turn off the data logging LED 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 

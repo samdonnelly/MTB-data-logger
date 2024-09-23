@@ -21,6 +21,7 @@
 
 import math 
 import matplotlib.pyplot as plt 
+import numpy as np 
 
 #================================================================================
 
@@ -52,6 +53,8 @@ linkage_offset_y = 25.4   # Distance between crown and arch linkage mounting
 
 # Fork data 
 fork_travel = 163         # Total distance the fork can travel 
+fork_travel_res = 0.5     # Fork travel data resolution 
+travel_points = int(fork_travel / fork_travel_res + 1) 
 
 # Pot calibration data (see notes above) 
 pot_min_angle = 0.0       # Minimum potentiometer reference angle 
@@ -61,24 +64,29 @@ pot_min_voltage = 1.0     # Potentiometer voltage at its minimum angle
 pot_max_voltage = 3.0     # Potentiometer voltage at its maximum angle 
 pot_voltage_delta = pot_max_voltage - pot_min_voltage 
 
+# ADC/DAC conversion info 
+adc_resolution = 8        # Potentiometer ADC resolution (bits) 
+adc_max_volt = 3.3        # Maximum voltage for ADC 
+adc_max_volt_dig = 0      # Maximum digital voltage for ADC (set during init) 
+
 #================================================================================
 
 
 #================================================================================
-# Test data 
+# Test data - for internal use only 
 
 # This data is used for testing the calculations. They're not used during the 
 # data log analysis. 
 
 # Fork travel & potentiometer angle data points 
-fork_travel_data = range(0, fork_travel + 1) 
-pot_voltage_data = [None] * (fork_travel + 1)
+fork_travel_data = np.linspace(0, fork_travel, travel_points) 
+pot_voltage_data = [None] * travel_points 
 
 #================================================================================
 
 
 #================================================================================
-# Calculation functions 
+# Calculation functions - for internal use only 
 
 ##
 # brief: Distance between linkage mounting points. 
@@ -118,11 +126,6 @@ def pot_theta_to_volt(theta):
 def pot_volt_to_theta(voltage): 
     return voltage * pot_angle_delta / pot_voltage_delta + pot_min_angle 
 
-#================================================================================
-
-
-#================================================================================
-# Test functions - For internal use 
 
 ##
 # brief: Converts a fork travel distance to a potentiometer angle 
@@ -132,6 +135,66 @@ def pot_angle_calc(travel):
     theta = ab_right_angle(ab) + a_cosine_angle(ab) 
     return pot_theta_to_volt(theta) 
 
+
+##
+# brief: Converts a digital voltage integer to analog float 
+##
+def voltage_dac(voltage_digital): 
+    return voltage_digital * adc_max_volt / adc_max_volt_dig 
+
+
+##
+# brief: Converts an analog voltage float to a digital integer 
+##
+def voltage_adc(voltage_analog): 
+    return voltage_analog * adc_max_volt_dig / adc_max_volt 
+
+#================================================================================
+
+
+#================================================================================
+# Test functions - for internal use only 
+
+##
+# brief: User interface to test the calculations 
+##
+def user_pot_calc_test(): 
+    while (True): 
+        user_input = input("Travel: ") 
+
+        # Make sure the input is a number 
+        try: 
+            test_travel = float(user_input) 
+        except: 
+            break 
+        
+        # Bound the input 
+        if (test_travel > fork_travel): 
+            test_travel = fork_travel 
+        elif (test_travel < 0): 
+            test_travel = 0 
+
+        # Find the closest pre-defined fork travel distance based on the input. 
+        for y in range(travel_points): 
+            if (fork_travel_data[y] >= test_travel): 
+                index = y 
+                break 
+        
+        if (index != 0): 
+            diff_low = test_travel - fork_travel_data[index - 1] 
+            diff_high = fork_travel_data[index] - test_travel 
+
+            if (diff_low < diff_high): 
+                index = index - 1 
+        
+        test_voltage = pot_voltage_data[index] 
+        calc_travel = fork_travel_calc(voltage_adc(test_voltage)) 
+
+        # Show the user the results 
+        print("Test travel: " + str(fork_travel_data[index])) 
+        print("Test voltage: " + str(test_voltage)) 
+        print("Calc travel: " + str(calc_travel) + "\r\n") 
+
 #================================================================================
 
 
@@ -139,27 +202,60 @@ def pot_angle_calc(travel):
 # User functions - Include these in other scripts as needed 
 
 ##
-# brief: Initialize the potentiometer voltage data 
+# brief: Initialize data so conversions can be done properly 
+# 
+# description: Must be called before the 'fork_travel_calc' function can be used 
+#              properly. 
 ##
 def pot_conversion_init(): 
-    for y in fork_travel_data: 
-        pot_voltage_data[y] = pot_angle_calc(y) 
+    # Generate a relationship between the fork travel and the potentiometer 
+    # voltage. This is used to convert voltages to travel distances. 
+    for y in range(travel_points): 
+        pot_voltage_data[y] = pot_angle_calc(fork_travel_data[y]) 
+
+    # Creates the upper limit of the digital voltage value based on the ADC 
+    # resolution set. This is needed to convert the digital value from log files 
+    # to floating values used for travel calculations. 
+    global adc_max_volt_dig
+    for i in range(adc_resolution): 
+        adc_max_volt_dig += (1 << i) 
 
 
 ##
 # brief: Converts a potentiometer voltage to a fork travel distance 
+# 
+# description: A binary search is performed on the 'pot_voltage_data' buffer 
+#              using a potentiometer voltage supplied to the function to find 
+#              the fork travel distance that most closely represents the 
+#              provided voltage. 
+# 
+# param : voltage : digital (integer) voltage reading from data log file 
 ##
 def fork_travel_calc(voltage): 
-    pot_volt_to_theta(1) 
+    # Convert the digital (integer) voltage value to a floating "analog" value. 
+    voltage = voltage_dac(voltage) 
 
-    # Use the 'pot_voltage_data' generated during init to guess the fork travel 
-    # given a voltage from the potentiometer. Start with a guess of the fork 
-    # travel (halfway) and check if the voltage is higher or lower. Based on the 
-    # result, split the remaining possible answers as the new guess and repeat 
-    # until an answer is converged upon. Will have to account for an answer that 
-    # lies between two travel points. 
+    travel_max = travel_points 
+    travel_min = 0 
 
-    return 1   # travel 
+    while (True): 
+        travel_guess = int((travel_max - travel_min) / 2 + travel_min) 
+
+        # Convergance on a solution is checked after 'travel_guess' is updated 
+        # so that the correct value it returned. 
+        if (travel_min >= travel_max): 
+            break 
+
+        voltage_guess = pot_voltage_data[travel_guess] 
+
+        if (voltage < voltage_guess): 
+            travel_max = travel_guess - 1 
+        elif (voltage > voltage_guess): 
+            travel_min = travel_guess + 1 
+        else: 
+            break 
+
+    return fork_travel_data[travel_guess] 
 
 #================================================================================
 
@@ -167,15 +263,18 @@ def fork_travel_calc(voltage):
 #================================================================================
 # Test Calculation 
 
-# Populate the potentiometer angle buffer 
+# Initialize data so conversions can be done 
 pot_conversion_init() 
 
-# Plot the potentiometer angle against the fork travel 
+# User interface to test the calculations 
+user_pot_calc_test() 
+
+# Plot the potentiometer voltage against the fork travel 
 fig, ax = plt.subplots() 
 ax.plot(fork_travel_data, pot_voltage_data) 
 ax.set_xlabel("Fork Travel (mm)") 
-ax.set_ylabel("Fork Pot Angle (degrees)") 
-ax.set_title("Fork Travel to Potentiometer Angle Conversion")
+ax.set_ylabel("Fork Pot Voltage (V)") 
+ax.set_title("Fork Travel <--> Potentiometer Voltage")
 plt.show() 
 
 #================================================================================

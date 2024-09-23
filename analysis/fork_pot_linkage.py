@@ -139,10 +139,27 @@ def pot_angle_calc(travel):
 # User functions - Include these in other scripts as needed 
 
 ##
+# brief: Initialize the potentiometer voltage data 
+##
+def pot_conversion_init(): 
+    for y in fork_travel_data: 
+        pot_voltage_data[y] = pot_angle_calc(y) 
+
+
+##
 # brief: Converts a potentiometer voltage to a fork travel distance 
 ##
 def fork_travel_calc(voltage): 
-    print(1) 
+    pot_volt_to_theta(1) 
+
+    # Use the 'pot_voltage_data' generated during init to guess the fork travel 
+    # given a voltage from the potentiometer. Start with a guess of the fork 
+    # travel (halfway) and check if the voltage is higher or lower. Based on the 
+    # result, split the remaining possible answers as the new guess and repeat 
+    # until an answer is converged upon. Will have to account for an answer that 
+    # lies between two travel points. 
+
+    return 1   # travel 
 
 #================================================================================
 
@@ -151,8 +168,7 @@ def fork_travel_calc(voltage):
 # Test Calculation 
 
 # Populate the potentiometer angle buffer 
-for y in fork_travel_data: 
-    pot_voltage_data[y] = pot_angle_calc(y) 
+pot_conversion_init() 
 
 # Plot the potentiometer angle against the fork travel 
 fig, ax = plt.subplots() 

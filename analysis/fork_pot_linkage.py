@@ -23,6 +23,8 @@ import math
 import matplotlib.pyplot as plt 
 import numpy as np 
 
+import matplotlib.animation as animation 
+
 #================================================================================
 
 
@@ -41,6 +43,10 @@ import numpy as np
 #   starting at the crown linkage mounting point and going downwards parallel to 
 #   the fork travel direction. The potentiometer is assumed to provide a linear 
 #   relationship between angle and voltage read. 
+# - The fork travel data resolution controls the number of data points used to 
+#   generate the relationship between fork travel distance and potentiometer 
+#   voltage. A higher resolution (smaller number) will produce more accurate 
+#   conversions. This value should be in the range of: 0 < res <= 1. 
 
 # Linkage dimensions 
 linkage_1_len = 114.3     # Length of linkage piece 1 
@@ -53,19 +59,19 @@ linkage_offset_y = 25.4   # Distance between crown and arch linkage mounting
 
 # Fork data 
 fork_travel = 163         # Total distance the fork can travel 
-fork_travel_res = 0.5     # Fork travel data resolution 
+fork_travel_res = 0.25    # Fork travel data resolution 
 travel_points = int(fork_travel / fork_travel_res + 1) 
 
 # Pot calibration data (see notes above) 
 pot_min_angle = 0.0       # Minimum potentiometer reference angle 
 pot_max_angle = 180.0     # Maximum potentiometer reference angle 
 pot_angle_delta = pot_max_angle - pot_min_angle
-pot_min_voltage = 1.0     # Potentiometer voltage at its minimum angle 
-pot_max_voltage = 3.0     # Potentiometer voltage at its maximum angle 
+pot_min_voltage = 1.0     # Potentiometer voltage at its minimum ref angle 
+pot_max_voltage = 3.0     # Potentiometer voltage at its maximum ref angle 
 pot_voltage_delta = pot_max_voltage - pot_min_voltage 
 
 # ADC/DAC conversion info 
-adc_resolution = 8        # Potentiometer ADC resolution (bits) 
+adc_resolution = 10       # Potentiometer ADC resolution (bits) 
 adc_max_volt = 3.3        # Maximum voltage for ADC 
 adc_max_volt_dig = 0      # Maximum digital voltage for ADC (set during init) 
 
@@ -128,9 +134,9 @@ def pot_volt_to_theta(voltage):
 
 
 ##
-# brief: Converts a fork travel distance to a potentiometer angle 
+# brief: Converts a fork travel distance to a potentiometer voltage reading 
 ##
-def pot_angle_calc(travel): 
+def pot_voltage_calc(travel): 
     ab = ab_distance(fork_travel + linkage_offset_y - travel) 
     theta = ab_right_angle(ab) + a_cosine_angle(ab) 
     return pot_theta_to_volt(theta) 
@@ -162,7 +168,7 @@ def user_pot_calc_test():
     while (True): 
         user_input = input("Travel: ") 
 
-        # Make sure the input is a number 
+        # Make sure the input is a number. If not then exit the user interface. 
         try: 
             test_travel = float(user_input) 
         except: 
@@ -211,7 +217,7 @@ def pot_conversion_init():
     # Generate a relationship between the fork travel and the potentiometer 
     # voltage. This is used to convert voltages to travel distances. 
     for y in range(travel_points): 
-        pot_voltage_data[y] = pot_angle_calc(fork_travel_data[y]) 
+        pot_voltage_data[y] = pot_voltage_calc(fork_travel_data[y]) 
 
     # Creates the upper limit of the digital voltage value based on the ADC 
     # resolution set. This is needed to convert the digital value from log files 
@@ -228,16 +234,34 @@ def pot_conversion_init():
 #              using a potentiometer voltage supplied to the function to find 
 #              the fork travel distance that most closely represents the 
 #              provided voltage. 
+#              
+#              Increasing the fork travel data resolution in the constants 
+#              defined at the top of the script will give a more accurate 
+#              answer. Interpolation is not done for voltages that lie between 
+#              data points simply because the resolution can be changed instead. 
 # 
 # param : voltage : digital (integer) voltage reading from data log file 
 ##
 def fork_travel_calc(voltage): 
-    # Convert the digital (integer) voltage value to a floating "analog" value. 
+    # Convert the digital voltage value (integer) to a floating "analog" value. 
+    # Data log files save a 0-3.3V reading as a 6, 8, 10 or 12-bit integer 
+    # depending on the resolution of the conversion. Make sure the ADC 
+    # resolution defined in this script matches what is put in the log files. 
     voltage = voltage_dac(voltage) 
 
+    # Set the initial bounds of the data to check the voltage against. 
     travel_max = travel_points 
     travel_min = 0 
 
+    # Bound the voltage. There will likely be noise in the voltage reading that 
+    # exceeds the voltage limits for the given linkage geometry. If that is the 
+    # case then return the bound of the data. 
+    if (voltage <= pot_voltage_data[travel_min]): 
+        return fork_travel_data[travel_min] 
+    elif (voltage >= pot_voltage_data[travel_max - 1]): 
+        return fork_travel_data[travel_max - 1] 
+
+    # Binary search for the closest result to the provided voltage. 
     while (True): 
         travel_guess = int((travel_max - travel_min) / 2 + travel_min) 
 
@@ -266,15 +290,36 @@ def fork_travel_calc(voltage):
 # Initialize data so conversions can be done 
 pot_conversion_init() 
 
-# User interface to test the calculations 
-user_pot_calc_test() 
+# # User interface to test the calculations 
+# user_pot_calc_test() 
 
-# Plot the potentiometer voltage against the fork travel 
-fig, ax = plt.subplots() 
-ax.plot(fork_travel_data, pot_voltage_data) 
+# # Plot the potentiometer voltage against the fork travel 
+# fig, ax = plt.subplots() 
+# ax.plot(fork_travel_data, pot_voltage_data) 
+# ax.set_xlabel("Fork Travel (mm)") 
+# ax.set_ylabel("Fork Pot Voltage (V)") 
+# ax.set_title("Fork Travel <--> Potentiometer Voltage")
+# plt.show() 
+
+#================================================================================
+
+
+#================================================================================
+# https://matplotlib.org/stable/users/explain/animations/animations.html 
+
+fig, ax = plt.subplots()
+line = ax.plot(fork_travel_data[0], pot_voltage_data[0])[0] 
 ax.set_xlabel("Fork Travel (mm)") 
 ax.set_ylabel("Fork Pot Voltage (V)") 
 ax.set_title("Fork Travel <--> Potentiometer Voltage")
-plt.show() 
+ax.set(xlim=[0, 200], ylim=[1.2, 3.0])
+
+def update(frame):
+    line.set_xdata(fork_travel_data[:frame])
+    line.set_ydata(pot_voltage_data[:frame])
+    return line 
+
+ani = animation.FuncAnimation(fig=fig, func=update, frames=400, interval=1)
+plt.show()
 
 #================================================================================

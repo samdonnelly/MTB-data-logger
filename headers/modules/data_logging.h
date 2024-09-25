@@ -80,6 +80,7 @@ typedef struct mtbdl_log_s
     uint8_t NS;                                 // North/South indicator of latitude 
     uint8_t lon_str[LOG_GPS_BUFF_LEN];          // Longitude string 
     uint8_t EW;                                 // Eeast/West indicator of longitude 
+    uint8_t sog_str[LOG_GPS_BUFF_LEN];          // Speed over ground string 
 
     // Accelerometer data 
     int16_t accel_x;                            // x-axis acceleration 

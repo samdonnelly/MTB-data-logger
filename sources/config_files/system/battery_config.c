@@ -51,10 +51,10 @@
 //   is 11-11.8V. This can be adjusted with better knowledge of the battery range and 
 //   the right voltage divider to support it but this range is a relatively safe one. 
 
-// Digital voltages - 0-255 range (8-bit) 
+// Digital voltages - 0-1023 range (10-bit) 
 const uint16_t 
-adc_volt_min = 238,   // Min voltage - 3.09V ADC - 11.0V battery 
-adc_volt_max = 255;   // Max voltage - 3.30V ADC - 11.8V battery 
+adc_volt_min = 958,    // Min voltage - 3.09V ADC - 11.0V battery 
+adc_volt_max = 1023;   // Max voltage - 3.30V ADC - 11.8V battery 
 
 
 // Battery SOC calculation 

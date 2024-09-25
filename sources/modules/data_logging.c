@@ -197,6 +197,7 @@ void log_init(
     mtbdl_log.NS = CLEAR; 
     memset((void *)mtbdl_log.lon_str, CLEAR, sizeof(mtbdl_log.lon_str)); 
     mtbdl_log.EW = CLEAR; 
+    memset((void *)mtbdl_log.sog_str, CLEAR, sizeof(mtbdl_log.sog_str)); 
 
     // Accelerometer data 
     mtbdl_log.accel_x = CLEAR; 
@@ -529,6 +530,7 @@ void log_stream_gps(void)
     mtbdl_log.NS = m8q_get_position_NS(); 
     m8q_get_position_lon_str(mtbdl_log.lon_str, LOG_GPS_BUFF_LEN); 
     mtbdl_log.EW = m8q_get_position_EW(); 
+    m8q_get_position_sog_str(mtbdl_log.sog_str, LOG_GPS_BUFF_LEN); 
 
     // Format GPS data log string 
     snprintf(mtbdl_log.data_str, 
@@ -541,6 +543,7 @@ void log_stream_gps(void)
              mtbdl_log.trailmark, 
              mtbdl_log.adc_period[mtbdl_log.data_buff_index][ADC_FORK], 
              mtbdl_log.adc_period[mtbdl_log.data_buff_index][ADC_SHOCK], 
+             (char *)mtbdl_log.sog_str, 
              (char *)mtbdl_log.lat_str, 
              (char)mtbdl_log.NS, 
              (char *)mtbdl_log.lon_str, 

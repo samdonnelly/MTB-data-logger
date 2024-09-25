@@ -151,7 +151,7 @@ void mtbdl_init()
         ADC1, 
         ADC1_COMMON, 
         ADC_PCLK2_4, 
-        ADC_RES_8, 
+        ADC_RES_10, 
         ADC_PARAM_ENABLE,      // ADC_EOC_EACH 
         ADC_PARAM_DISABLE,     // ADC_EOC_INT_DISABLE 
         ADC_PARAM_ENABLE,      // ADC_SCAN_ENABLE 

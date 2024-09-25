@@ -51,6 +51,8 @@ from openpyxl import Workbook, load_workbook
 import atexit 
 import os 
 
+import matplotlib.animation as animation 
+
 #================================================================================
 
 
@@ -346,5 +348,26 @@ while (True):
     mode_select() 
 
 #==================================================
+
+#================================================================================
+
+
+#================================================================================
+# https://matplotlib.org/stable/users/explain/animations/animations.html 
+
+# fig, ax = plt.subplots()
+# line = ax.plot(fork_travel_data[0], pot_voltage_data[0])[0] 
+# ax.set_xlabel("Fork Travel (mm)") 
+# ax.set_ylabel("Fork Pot Voltage (V)") 
+# ax.set_title("Fork Travel <--> Potentiometer Voltage")
+# ax.set(xlim=[0, 200], ylim=[1.2, 3.0])
+
+# def update(frame):
+#     line.set_xdata(fork_travel_data[:frame])
+#     line.set_ydata(pot_voltage_data[:frame])
+#     return line 
+
+# ani = animation.FuncAnimation(fig=fig, func=update, frames=400, interval=1)
+# plt.show()
 
 #================================================================================

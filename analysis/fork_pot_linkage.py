@@ -23,8 +23,6 @@ import math
 import matplotlib.pyplot as plt 
 import numpy as np 
 
-import matplotlib.animation as animation 
-
 #================================================================================
 
 
@@ -54,8 +52,8 @@ linkage_2_len = 114.3     # Length of linkage piece 2
 linkage_offset_x = 25.4   # Distance between crown and arch linkage mounting 
                           # points perpendicular to fork travel direction. 
 linkage_offset_y = 25.4   # Distance between crown and arch linkage mounting 
-                          # points parrallel to for travel direction (excluding 
-                          # travel) 
+                          # points parrallel to fork travel direction (excluding 
+                          # fork travel) 
 
 # Fork data 
 fork_travel = 163         # Total distance the fork can travel 
@@ -213,7 +211,7 @@ def user_pot_calc_test():
 # description: Must be called before the 'fork_travel_calc' function can be used 
 #              properly. 
 ##
-def pot_conversion_init(): 
+def fork_pot_init(): 
     # Generate a relationship between the fork travel and the potentiometer 
     # voltage. This is used to convert voltages to travel distances. 
     for y in range(travel_points): 
@@ -288,38 +286,17 @@ def fork_travel_calc(voltage):
 # Test Calculation 
 
 # Initialize data so conversions can be done 
-pot_conversion_init() 
+fork_pot_init() 
 
-# # User interface to test the calculations 
-# user_pot_calc_test() 
+# User interface to test the calculations 
+user_pot_calc_test() 
 
-# # Plot the potentiometer voltage against the fork travel 
-# fig, ax = plt.subplots() 
-# ax.plot(fork_travel_data, pot_voltage_data) 
-# ax.set_xlabel("Fork Travel (mm)") 
-# ax.set_ylabel("Fork Pot Voltage (V)") 
-# ax.set_title("Fork Travel <--> Potentiometer Voltage")
-# plt.show() 
-
-#================================================================================
-
-
-#================================================================================
-# https://matplotlib.org/stable/users/explain/animations/animations.html 
-
-fig, ax = plt.subplots()
-line = ax.plot(fork_travel_data[0], pot_voltage_data[0])[0] 
+# Plot the potentiometer voltage against the fork travel 
+fig, ax = plt.subplots() 
+ax.plot(fork_travel_data, pot_voltage_data) 
 ax.set_xlabel("Fork Travel (mm)") 
 ax.set_ylabel("Fork Pot Voltage (V)") 
 ax.set_title("Fork Travel <--> Potentiometer Voltage")
-ax.set(xlim=[0, 200], ylim=[1.2, 3.0])
-
-def update(frame):
-    line.set_xdata(fork_travel_data[:frame])
-    line.set_ydata(pot_voltage_data[:frame])
-    return line 
-
-ani = animation.FuncAnimation(fig=fig, func=update, frames=400, interval=1)
-plt.show()
+plt.show() 
 
 #================================================================================

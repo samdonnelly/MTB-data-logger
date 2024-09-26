@@ -423,18 +423,21 @@ void ui_set_idle_msg(void)
              mtbdl_idle_msg[HD44780U_L1].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_FPSI), 
              param_get_bike_setting(PARAM_BIKE_SET_FC), 
-             param_get_bike_setting(PARAM_BIKE_SET_FR)); 
+             param_get_bike_setting(PARAM_BIKE_SET_FR), 
+             param_get_bike_setting(PARAM_BIKE_SET_FT)); 
     
     snprintf(msg[HD44780U_L2].msg, 
              (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
              mtbdl_idle_msg[HD44780U_L2].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_SPSI), 
              param_get_bike_setting(PARAM_BIKE_SET_SL), 
-             param_get_bike_setting(PARAM_BIKE_SET_SR)); 
+             param_get_bike_setting(PARAM_BIKE_SET_SR), 
+             param_get_bike_setting(PARAM_BIKE_SET_ST)); 
     
     snprintf(msg[HD44780U_L3].msg, 
              (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
              mtbdl_idle_msg[HD44780U_L3].msg, 
+             param_get_bike_setting(PARAM_BIKE_SET_WS), 
              mtbdl_ui.soc, 
              (char)(mtbdl_ui.navstat >> SHIFT_8), 
              (char)(mtbdl_ui.navstat)); 
@@ -506,7 +509,7 @@ void ui_rx_prep(void)
 // Read user input 
 void ui_rx(void)
 {
-    unsigned int param_index, setting_data; 
+    uint16_t param_index, setting_data; 
 
     // Read Bluetooth data if available 
     if (hc05_data_status())
@@ -519,7 +522,7 @@ void ui_rx(void)
                &setting_data); 
 
         // Check for a data match if a valid parameter index is provided 
-        if (param_index <= PARAM_BIKE_SET_SR)
+        if (param_index < PARAM_BIKE_SET_NONE)
         {
             param_update_bike_setting((param_bike_set_index_t)param_index, setting_data); 
         }

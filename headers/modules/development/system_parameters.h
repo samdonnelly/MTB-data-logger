@@ -255,9 +255,9 @@ uint8_t param_get_log_index(void);
  * @brief Get bike settings 
  * 
  * @param setting_index : bike setting index to get 
- * @return uint8_t : value of the bike setting on file 
+ * @return uint16_t : value of the bike setting on file 
  */
-uint8_t param_get_bike_setting(param_bike_set_index_t setting_index); 
+uint16_t param_get_bike_setting(param_bike_set_index_t setting_index); 
 
 //=======================================================================================
 

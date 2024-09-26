@@ -50,14 +50,12 @@ void param_init(void)
     mtbdl_param.fork_psi = CLEAR; 
     mtbdl_param.fork_comp = CLEAR; 
     mtbdl_param.fork_reb = CLEAR; 
+    mtbdl_param.fork_travel = CLEAR; 
     mtbdl_param.shock_psi = CLEAR; 
     mtbdl_param.shock_lock = CLEAR; 
     mtbdl_param.shock_reb = CLEAR; 
-
-    // Bike configuration 
-    mtbdl_param.wheel_size = CLEAR; 
-    mtbdl_param.fork_travel = CLEAR; 
     mtbdl_param.shock_travel = CLEAR; 
+    mtbdl_param.wheel_size = CLEAR; 
 
     // System Settings 
     mtbdl_param.accel_x_rest = CLEAR; 
@@ -180,6 +178,15 @@ void param_bike_format_write(void)
              mtbdl_param.shock_lock, 
              mtbdl_param.shock_reb); 
     hw125_puts(mtbdl_param.param_buff); 
+
+    // Write bike configuration 
+    snprintf(mtbdl_param.param_buff, 
+             MTBDL_MAX_STR_LEN, 
+             mtbdl_param_bike_info, 
+             mtbdl_param.fork_travel, 
+             mtbdl_param.shock_travel, 
+             mtbdl_param.wheel_size); 
+    hw125_puts(mtbdl_param.param_buff); 
 }
 
 
@@ -201,6 +208,14 @@ void param_bike_read_format(void)
            &mtbdl_param.shock_psi, 
            &mtbdl_param.shock_lock, 
            &mtbdl_param.shock_reb); 
+
+    // Read bike configuration 
+    hw125_gets(mtbdl_param.param_buff, MTBDL_MAX_STR_LEN); 
+    sscanf(mtbdl_param.param_buff, 
+           mtbdl_param_bike_info, 
+           &mtbdl_param.fork_travel, 
+           &mtbdl_param.shock_travel, 
+           &mtbdl_param.wheel_size); 
 }
 
 
@@ -302,14 +317,14 @@ void param_update_bike_setting(
         case PARAM_BIKE_SET_FC: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
-                mtbdl_param.fork_comp = setting; 
+                mtbdl_param.fork_comp = (uint8_t)setting; 
             }
             break;
 
         case PARAM_BIKE_SET_FR: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
-                mtbdl_param.fork_reb = setting; 
+                mtbdl_param.fork_reb = (uint8_t)setting; 
             }
             break;
 
@@ -330,14 +345,14 @@ void param_update_bike_setting(
         case PARAM_BIKE_SET_SL: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
-                mtbdl_param.shock_lock = setting; 
+                mtbdl_param.shock_lock = (uint8_t)setting; 
             }
             break;
 
         case PARAM_BIKE_SET_SR: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
-                mtbdl_param.shock_reb = setting; 
+                mtbdl_param.shock_reb = (uint8_t)setting; 
             }
             break; 
 
@@ -351,7 +366,7 @@ void param_update_bike_setting(
         case PARAM_BIKE_SET_WS: 
             if (setting <= PARAM_MAX_WHEEL_SIZE)
             {
-                mtbdl_param.wheel_size = setting; 
+                mtbdl_param.wheel_size = (uint8_t)setting; 
             }
             break; 
         
@@ -407,38 +422,50 @@ uint8_t param_get_log_index(void)
 
 
 // Get bike settings 
-uint8_t param_get_bike_setting(param_bike_set_index_t setting_index)
+uint16_t param_get_bike_setting(param_bike_set_index_t setting_index)
 {
-    uint8_t setting = ~CLEAR; 
+    uint16_t setting = ~CLEAR; 
 
     switch (setting_index)
     {
         case PARAM_BIKE_SET_FPSI: 
             setting = mtbdl_param.fork_psi; 
-            break;
+            break; 
 
-        case PARAM_BIKE_SET_FC:
-            setting = mtbdl_param.fork_comp; 
-            break;
+        case PARAM_BIKE_SET_FC: 
+            setting = (uint16_t)mtbdl_param.fork_comp; 
+            break; 
 
-        case PARAM_BIKE_SET_FR:
-            setting = mtbdl_param.fork_reb; 
-            break;
+        case PARAM_BIKE_SET_FR: 
+            setting = (uint16_t)mtbdl_param.fork_reb; 
+            break; 
 
-        case PARAM_BIKE_SET_SPSI:
+        case PARAM_BIKE_SET_FT: 
+            setting = mtbdl_param.fork_travel; 
+            break; 
+
+        case PARAM_BIKE_SET_SPSI: 
             setting = mtbdl_param.shock_psi; 
-            break;
+            break; 
 
-        case PARAM_BIKE_SET_SL:
-            setting = mtbdl_param.shock_lock; 
-            break;
+        case PARAM_BIKE_SET_SL: 
+            setting = (uint16_t)mtbdl_param.shock_lock; 
+            break; 
 
-        case PARAM_BIKE_SET_SR:
-            setting = mtbdl_param.shock_reb; 
-            break;
+        case PARAM_BIKE_SET_SR: 
+            setting = (uint16_t)mtbdl_param.shock_reb; 
+            break; 
+
+        case PARAM_BIKE_SET_ST: 
+            setting = mtbdl_param.shock_travel; 
+            break; 
+
+        case PARAM_BIKE_SET_WS: 
+            setting = (uint16_t)mtbdl_param.wheel_size; 
+            break; 
         
         default: 
-            break;
+            break; 
     }
 
     return setting; 

@@ -33,14 +33,14 @@ hd44780u_msgs_t mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE] =
 // Idle state message and number of data items for each line 
 hd44780u_msgs_t mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE] = 
 {
-    {HD44780U_L1, "F: PSI:%u C:%u R:%u", 0}, 
-    {HD44780U_L2, "S: PSI:%u L:%u R:%u", 0}, 
-    {HD44780U_L3, "SOC:%u NAVSTAT:%c%c", 0}, 
-    {HD44780U_L4, "1:RUN 2:TX/RX 3:CAL", 0} 
-    // {HD44780U_L1, "F: P%u C%u R%u T%u", 0}, 
-    // {HD44780U_L2, "S: P%u L%u R%u T%u", 0}, 
-    // {HD44780U_L3, "W:%u SOC:%u NAV:%c%c", 0}, 
+    // {HD44780U_L1, "F: PSI:%u C:%u R:%u", 0}, 
+    // {HD44780U_L2, "S: PSI:%u L:%u R:%u", 0}, 
+    // {HD44780U_L3, "SOC:%u NAVSTAT:%c%c", 0}, 
     // {HD44780U_L4, "1:RUN 2:TX/RX 3:CAL", 0} 
+    {HD44780U_L1, "F: P%u C%u R%u T%u", 0}, 
+    {HD44780U_L2, "S: P%u L%u R%u T%u", 0}, 
+    {HD44780U_L3, "W:%u SOC:%u NAV:%c%c", 0}, 
+    {HD44780U_L4, "1:RUN 2:TX/RX 3:CAL", 0} 
 }; 
 
 

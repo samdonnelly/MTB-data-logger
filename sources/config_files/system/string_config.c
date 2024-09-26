@@ -42,8 +42,9 @@ mtbdl_log_file[] = "log_%u.txt";
 
 const char 
 // Bike parameter information 
-mtbdl_param_fork_info[] = "Fork: PSI:%u C:%u R:%u\r\n", 
-mtbdl_param_shock_info[] = "Shock: PSI:%u L:%u R:%u\r\n", 
+mtbdl_param_fork_info[] = "Fork: P: %upsi, Comp: %u, Reb: %u\r\n", 
+mtbdl_param_shock_info[] = "Shock: P: %upsi, Lock: %u, Reb: %u\r\n", 
+mtbdl_param_bike_info[] = "Bike: FT: %umm, ST: %umm, Wheel: %uin\r\n", 
 // System parameter information 
 mtbdl_param_index[] = "File Index: %u\r\n", 
 mtbdl_param_accel_rest[] = "IMU Offset: X:%d Y:%d Z:%d\r\n", 

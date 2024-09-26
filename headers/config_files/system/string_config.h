@@ -45,8 +45,9 @@ mtbdl_log_file[];            // Log file name template
 
 extern const char 
 // Bike parameter information 
-mtbdl_param_fork_info[],     // Fork setup parameters 
-mtbdl_param_shock_info[],    // Shock setup parameters 
+mtbdl_param_fork_info[],     // Fork setings 
+mtbdl_param_shock_info[],    // Shock setings 
+mtbdl_param_bike_info[],     // Bike configuration 
 // System parameter information 
 mtbdl_param_index[],         // Log file index 
 mtbdl_param_accel_rest[],    // Resting accelerometer data 

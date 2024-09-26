@@ -25,6 +25,9 @@
 // Macros 
 
 #define PARAM_MAX_SUS_SETTING 20         // Max compression and rebound setting 
+#define PARAM_MAX_SUS_PSI 1000           // Max suspension pressure (psi) 
+#define PARAM_MAX_SUS_TRAVEL 500         // Max suspension travel distance (mm) 
+#define PARAM_MAX_WHEEL_SIZE 40          // Max wheel size/diameter (in) 
 
 //=======================================================================================
 
@@ -50,6 +53,11 @@ void param_init(void)
     mtbdl_param.shock_psi = CLEAR; 
     mtbdl_param.shock_lock = CLEAR; 
     mtbdl_param.shock_reb = CLEAR; 
+
+    // Bike configuration 
+    mtbdl_param.wheel_size = CLEAR; 
+    mtbdl_param.fork_travel = CLEAR; 
+    mtbdl_param.shock_travel = CLEAR; 
 
     // System Settings 
     mtbdl_param.accel_x_rest = CLEAR; 
@@ -280,45 +288,72 @@ void param_update_log_index(param_log_index_change_t log_index_change)
 // Update bike setting 
 void param_update_bike_setting(
     param_bike_set_index_t setting_index, 
-    uint8_t setting)
+    uint16_t setting)
 {
     switch (setting_index)
     {
-        case PARAM_BIKE_SET_FPSI:
-            mtbdl_param.fork_psi = setting; 
+        case PARAM_BIKE_SET_FPSI: 
+            if (setting < PARAM_MAX_SUS_PSI)
+            {
+                mtbdl_param.fork_psi = setting; 
+            }
             break;
 
-        case PARAM_BIKE_SET_FC:
+        case PARAM_BIKE_SET_FC: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.fork_comp = setting; 
             }
             break;
 
-        case PARAM_BIKE_SET_FR:
+        case PARAM_BIKE_SET_FR: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.fork_reb = setting; 
             }
             break;
 
-        case PARAM_BIKE_SET_SPSI:
-            mtbdl_param.shock_psi = setting; 
+        case PARAM_BIKE_SET_FT: 
+            if (setting <= PARAM_MAX_SUS_TRAVEL)
+            {
+                mtbdl_param.fork_travel = setting; 
+            }
+            break; 
+
+        case PARAM_BIKE_SET_SPSI: 
+            if (setting < PARAM_MAX_SUS_PSI)
+            {
+                mtbdl_param.shock_psi = setting; 
+            }
             break;
 
-        case PARAM_BIKE_SET_SL:
+        case PARAM_BIKE_SET_SL: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.shock_lock = setting; 
             }
             break;
 
-        case PARAM_BIKE_SET_SR:
+        case PARAM_BIKE_SET_SR: 
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.shock_reb = setting; 
             }
-            break;
+            break; 
+
+        case PARAM_BIKE_SET_ST: 
+            if (setting <= PARAM_MAX_SUS_TRAVEL)
+            {
+                mtbdl_param.shock_travel = setting; 
+            }
+            break; 
+
+        case PARAM_BIKE_SET_WS: 
+            if (setting <= PARAM_MAX_WHEEL_SIZE)
+            {
+                mtbdl_param.wheel_size = setting; 
+            }
+            break; 
         
         default: 
             break;

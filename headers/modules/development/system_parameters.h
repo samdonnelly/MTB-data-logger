@@ -39,9 +39,12 @@ typedef enum {
     PARAM_BIKE_SET_FPSI,   // Fork PSI 
     PARAM_BIKE_SET_FC,     // Fork compression setting 
     PARAM_BIKE_SET_FR,     // Fork rebound setting 
+    PARAM_BIKE_SET_FT,     // Fork travel distance 
     PARAM_BIKE_SET_SPSI,   // Shock SPI 
     PARAM_BIKE_SET_SL,     // Shock lockout setting 
     PARAM_BIKE_SET_SR,     // Shock rebound setting 
+    PARAM_BIKE_SET_ST,     // Shock travel distance 
+    PARAM_BIKE_SET_WS,     // Wheel size/diameter 
     PARAM_BIKE_SET_NONE    // No setting 
 } param_bike_set_index_t; 
 
@@ -65,13 +68,16 @@ typedef enum {
 // Parameters data record 
 typedef struct mtbdl_param_s 
 {
-    // Bike settings 
-    uint8_t fork_psi;                           // Fork pressure (psi) 
+    // Bike configuration 
+    uint16_t fork_psi;                          // Fork pressure (psi) 
     uint8_t fork_comp;                          // Fork compression setting 
     uint8_t fork_reb;                           // Fork rebound setting 
-    uint8_t shock_psi;                          // Shock pressure (psi) 
+    uint16_t fork_travel;                       // Fork travel distance 
+    uint16_t shock_psi;                         // Shock pressure (psi) 
     uint8_t shock_lock;                         // Shock lockout setting 
     uint8_t shock_reb;                          // Shock rebound setting 
+    uint16_t shock_travel;                      // Shock travel distance 
+    uint8_t wheel_size;                         // Wheel diameter 
 
     // System settings 
     int16_t accel_x_rest;                       // Resting x-axis acceleration offset 
@@ -215,7 +221,7 @@ void param_update_log_index(param_log_index_change_t log_index_change);
  */
 void param_update_bike_setting(
     param_bike_set_index_t setting_index, 
-    uint8_t setting); 
+    uint16_t setting); 
 
 
 /**

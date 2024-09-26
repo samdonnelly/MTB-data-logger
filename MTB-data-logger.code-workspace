@@ -53,7 +53,8 @@
 			"cstdint": "c",
 			"m8q_driver.h": "c",
 			"string_config.h": "c",
-			"hw125_controller.h": "c"
+			"hw125_controller.h": "c",
+			"i2c_comm_mock.h": "c"
 		}
 	}
 }

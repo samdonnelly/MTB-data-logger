@@ -509,7 +509,7 @@ void ui_rx_prep(void)
 // Read user input 
 void ui_rx(void)
 {
-    uint16_t param_index, setting_data; 
+    unsigned int param_index, setting_data; 
 
     // Read Bluetooth data if available 
     if (hc05_data_status())
@@ -524,7 +524,8 @@ void ui_rx(void)
         // Check for a data match if a valid parameter index is provided 
         if (param_index < PARAM_BIKE_SET_NONE)
         {
-            param_update_bike_setting((param_bike_set_index_t)param_index, setting_data); 
+            param_update_bike_setting((param_bike_set_index_t)param_index, 
+                                      (uint16_t)setting_data); 
         }
 
         // Provide a user prompt 

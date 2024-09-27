@@ -2414,6 +2414,9 @@ void mtbdl_fault_state_entry(void)
     // Turn the fault LED on 
     ui_led_colour_change(WS2812_LED_3, mtbdl_led3_1); 
 
+    // Close any file that may be open 
+    hw125_close(); 
+
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
     ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
@@ -2485,6 +2488,7 @@ void mtbdl_reset_state_exit(void)
 {
     // Reset devices 
     hw125_set_reset_flag(); 
+    hc05_clear_status(); 
 }
 
 //=======================================================================================

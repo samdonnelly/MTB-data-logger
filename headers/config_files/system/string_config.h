@@ -72,7 +72,8 @@ mtbdl_data_log_speed[];      // Default + Wheel speed data log message
 extern const char 
 // RX info 
 mtbdl_rx_prompt[],           // User prompt during RX state 
-mtbdl_rx_input[];            // User input during the RX state 
+mtbdl_rx_input[],            // User input during the RX state 
+mtbdl_rx_confirm[];          // Parameter update confirmation for the user 
 
 //=======================================================================================
 

@@ -501,6 +501,7 @@ void ui_set_pretx_msg(void)
 // RX user interface start 
 void ui_rx_prep(void)
 {
+    memset((void *)mtbdl_ui.data_buff, CLEAR, sizeof(mtbdl_ui.data_buff)); 
     hc05_send(mtbdl_rx_prompt); 
     hc05_clear(); 
 }
@@ -509,26 +510,42 @@ void ui_rx_prep(void)
 // Read user input 
 void ui_rx(void)
 {
-    unsigned int param_index, setting_data; 
+    // These are set to their max value so they won't accidentally update any of the 
+    // parameters. They are also unsigned ints because other data types were causing 
+    // scanning issues. 
+    unsigned int param_index = ~CLEAR, setting_data = ~CLEAR; 
 
-    // Read Bluetooth data if available 
+    // Check if Bluetooth data is available 
     if (hc05_data_status())
     {
-        // Read and parse the data from the HC-05 
+        // Read the data from the HC-05 
         hc05_read(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
-        sscanf(mtbdl_ui.data_buff, 
-               mtbdl_rx_input, 
-               &param_index, 
-               &setting_data); 
 
-        // Check for a data match if a valid parameter index is provided 
-        if (param_index < PARAM_BIKE_SET_NONE)
+        // Check if the transmission was successful. If so then parse the input and 
+        // check if the input provided by the user is valid. If it is then send a 
+        // confirmation message back to the user. If the transmission was not 
+        // successful or the input is not valid then ignore the input. If the 
+        // transaction is not successful, we ignore the input and reset the Bluetooth 
+        // module status so the system doesn't enter the fault state as this is not a 
+        // critical fault. 
+        if (!hc05_get_status())
         {
-            param_update_bike_setting((param_bike_set_index_t)param_index, 
-                                      (uint16_t)setting_data); 
+            sscanf(mtbdl_ui.data_buff, 
+                   mtbdl_rx_input, 
+                   &param_index, 
+                   &setting_data); 
+
+            if (param_index < PARAM_BIKE_SET_NONE)
+            {
+                if (param_update_bike_setting((param_bike_set_index_t)param_index, 
+                                              (uint16_t)setting_data))
+                {
+                    hc05_send(mtbdl_rx_confirm); 
+                }
+            }
         }
 
-        // Provide a user prompt 
+        hc05_clear_status(); 
         ui_rx_prep(); 
     }
 }

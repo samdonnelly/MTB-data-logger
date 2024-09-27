@@ -301,16 +301,19 @@ void param_update_log_index(param_log_index_change_t log_index_change)
 
 
 // Update bike setting 
-void param_update_bike_setting(
+uint8_t param_update_bike_setting(
     param_bike_set_index_t setting_index, 
     uint16_t setting)
 {
+    uint8_t update_status = CLEAR_BIT; 
+
     switch (setting_index)
     {
         case PARAM_BIKE_SET_FPSI: 
             if (setting < PARAM_MAX_SUS_PSI)
             {
                 mtbdl_param.fork_psi = setting; 
+                update_status = SET_BIT; 
             }
             break;
 
@@ -318,6 +321,7 @@ void param_update_bike_setting(
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.fork_comp = (uint8_t)setting; 
+                update_status = SET_BIT; 
             }
             break;
 
@@ -325,6 +329,7 @@ void param_update_bike_setting(
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.fork_reb = (uint8_t)setting; 
+                update_status = SET_BIT; 
             }
             break;
 
@@ -332,6 +337,7 @@ void param_update_bike_setting(
             if (setting <= PARAM_MAX_SUS_TRAVEL)
             {
                 mtbdl_param.fork_travel = setting; 
+                update_status = SET_BIT; 
             }
             break; 
 
@@ -339,6 +345,7 @@ void param_update_bike_setting(
             if (setting < PARAM_MAX_SUS_PSI)
             {
                 mtbdl_param.shock_psi = setting; 
+                update_status = SET_BIT; 
             }
             break;
 
@@ -346,6 +353,7 @@ void param_update_bike_setting(
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.shock_lock = (uint8_t)setting; 
+                update_status = SET_BIT; 
             }
             break;
 
@@ -353,6 +361,7 @@ void param_update_bike_setting(
             if (setting <= PARAM_MAX_SUS_SETTING)
             {
                 mtbdl_param.shock_reb = (uint8_t)setting; 
+                update_status = SET_BIT; 
             }
             break; 
 
@@ -360,6 +369,7 @@ void param_update_bike_setting(
             if (setting <= PARAM_MAX_SUS_TRAVEL)
             {
                 mtbdl_param.shock_travel = setting; 
+                update_status = SET_BIT; 
             }
             break; 
 
@@ -367,12 +377,15 @@ void param_update_bike_setting(
             if (setting <= PARAM_MAX_WHEEL_SIZE)
             {
                 mtbdl_param.wheel_size = (uint8_t)setting; 
+                update_status = SET_BIT; 
             }
             break; 
         
         default: 
             break;
     }
+
+    return update_status; 
 }
 
 

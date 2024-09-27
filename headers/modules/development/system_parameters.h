@@ -40,7 +40,7 @@ typedef enum {
     PARAM_BIKE_SET_FC,     // Fork compression setting 
     PARAM_BIKE_SET_FR,     // Fork rebound setting 
     PARAM_BIKE_SET_FT,     // Fork travel distance 
-    PARAM_BIKE_SET_SPSI,   // Shock SPI 
+    PARAM_BIKE_SET_SPSI,   // Shock PSI 
     PARAM_BIKE_SET_SL,     // Shock lockout setting 
     PARAM_BIKE_SET_SR,     // Shock rebound setting 
     PARAM_BIKE_SET_ST,     // Shock travel distance 
@@ -68,14 +68,15 @@ typedef enum {
 // Parameters data record 
 typedef struct mtbdl_param_s 
 {
-    // Bike configuration 
+    // Bike configuration - the order of these matters for scanning the data from the 
+    // SD card. 
     uint16_t fork_psi;                          // Fork pressure (psi) 
     uint8_t fork_comp;                          // Fork compression setting 
     uint8_t fork_reb;                           // Fork rebound setting 
-    uint16_t fork_travel;                       // Fork travel distance 
     uint16_t shock_psi;                         // Shock pressure (psi) 
     uint8_t shock_lock;                         // Shock lockout setting 
     uint8_t shock_reb;                          // Shock rebound setting 
+    uint16_t fork_travel;                       // Fork travel distance 
     uint16_t shock_travel;                      // Shock travel distance 
     uint8_t wheel_size;                         // Wheel diameter 
 
@@ -218,8 +219,9 @@ void param_update_log_index(param_log_index_change_t log_index_change);
  * 
  * @param setting_index : bike setting index to set 
  * @param setting : value of bike setting to write 
+ * @return uint8_t : update status - non-zero if parameter was updated successfully 
  */
-void param_update_bike_setting(
+uint8_t param_update_bike_setting(
     param_bike_set_index_t setting_index, 
     uint16_t setting); 
 

@@ -53,7 +53,7 @@ mtbdl_param_time[] = "UTC: %s %s\r\n",
 mtbdl_param_data[] = "Data: T:%ums RPM_f:%uHz RPM_size:%u\r\n", 
 // Data log information 
 mtbdl_data_log_start[] = "Data log:\r\n", 
-mtbdl_data_log_end[] = "End\r\n\n", 
+mtbdl_data_log_end[] = "Overrun: %u\r\nEnd\r\n\n", 
 // Data order: <trail marker>, <fork pot>, <shock pot>, <wheel speed>, <accelerometer>, <GPS> 
 mtbdl_data_log_default[] = "%u, %u, %u, -, -, -, -, -, -, -\r\n", 
 mtbdl_data_log_adc[] = "%s%s%s%s%u, %u, %u, -, -, -, -, -, -, -\r\n", 
@@ -70,6 +70,7 @@ mtbdl_data_log_speed[] = "%s%s%s%s%u, %u, %u, %u, -, -, -, -, -, -\r\n";
 const char 
 // RX info 
 mtbdl_rx_prompt[] = "\r\n>>> ", 
-mtbdl_rx_input[] = "%u %u"; 
+mtbdl_rx_input[] = "%u %u", 
+mtbdl_rx_confirm[] = "\r\nconfirm\r\n"; 
 
 //=======================================================================================

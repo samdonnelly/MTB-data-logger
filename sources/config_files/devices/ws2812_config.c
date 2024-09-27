@@ -30,7 +30,7 @@ uint32_t mtbdl_led_clear = 0x00000000;
 uint32_t mtbdl_led0_1 = 0x001E0000;   // Run prep, run countdown and run (data logging) 
 
 // LED 1 colours - GPS position lock status 
-uint32_t mtbdl_led1_1 = 0x00FF6600;   // Position lock 
+uint32_t mtbdl_led1_1 = 0x0044EE00;   // Position lock 
 
 // LED 2 colours - various states 
 uint32_t mtbdl_led2_1 = 0x0000001E;   // Bluetooth connection in TX/RX states 

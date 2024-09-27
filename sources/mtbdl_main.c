@@ -2468,6 +2468,7 @@ void mtbdl_reset_state(mtbdl_trackers_t *mtbdl)
 
     // State exit 
     mtbdl->init = SET_BIT; 
+    mtbdl->fault_code = CLEAR; 
     mtbdl_reset_state_exit(); 
 }
 

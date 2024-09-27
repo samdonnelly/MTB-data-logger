@@ -642,7 +642,13 @@ void log_data_end(void)
 
     // Terminate and close the log file then update the log index now that a new log 
     // file has been created, written to and stored. 
-    hw125_puts(mtbdl_data_log_end); 
+
+    snprintf(mtbdl_log.data_str, 
+             LOG_MAX_LOG_LEN, 
+             mtbdl_data_log_end, 
+             mtbdl_log.overrun); 
+    hw125_puts(mtbdl_log.data_str); 
+    // hw125_puts(mtbdl_data_log_end); 
     hw125_close(); 
     param_update_log_index(PARAM_LOG_INDEX_INC); 
 }

@@ -2020,7 +2020,13 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 
     // State operations: 
     // - Update the Bluetooth LED 
+    // - Check for confirmation from the user that they received the data log. 
+
     ui_led_state_update(WS2812_LED_2); 
+
+    // Wait for the confirmation or until a time expires. If there is a confirmation 
+    // then delete the log file. If there is no confirmation when time expires or there 
+    // was a negative confirmation, then don't delete the file. 
 
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))

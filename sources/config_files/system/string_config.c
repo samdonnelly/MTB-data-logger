@@ -71,6 +71,10 @@ const char
 // RX info 
 mtbdl_rx_prompt[] = "\r\n>>> ", 
 mtbdl_rx_input[] = "%u %u", 
-mtbdl_rx_confirm[] = "\r\nconfirm\r\n"; 
+mtbdl_rx_confirm[] = "\r\nconfirm\r\n", 
+// TX info 
+mtbdl_tx_confirm[] = "\r\nlog received? [y/n]: ", 
+mtbdl_tx_complete[] = "y", 
+mtbdl_tx_not_complete[] = "n"; 
 
 //=======================================================================================

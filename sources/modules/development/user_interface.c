@@ -167,10 +167,13 @@ void ui_init(
     // Initialize screen info 
     mtbdl_ui.msg_counter = CLEAR; 
 
+    // TX mode info 
+    mtbdl_ui.tx_send_status = CLEAR_BIT; 
+    mtbdl_ui.tx_hs_status = CLEAR_BIT; 
+
     // Initialize SD card info 
     memset((void *)mtbdl_ui.data_buff, CLEAR, sizeof(mtbdl_ui.data_buff)); 
     memset((void *)mtbdl_ui.filename, CLEAR, sizeof(mtbdl_ui.filename)); 
-    mtbdl_ui.tx_status = CLEAR; 
 }
 
 //=======================================================================================
@@ -604,7 +607,8 @@ uint8_t ui_tx(void)
     // Check for end of file - if true we can stop the transaction 
     if (hw125_eof())
     {
-        mtbdl_ui.tx_status = SET_BIT; 
+        mtbdl_ui.tx_send_status = SET_BIT; 
+        hc05_send(mtbdl_tx_confirm); 
         return TRUE; 
     }
 
@@ -613,17 +617,59 @@ uint8_t ui_tx(void)
 
 
 // End the transmission 
-void ui_tx_end(void)
+uint8_t ui_tx_end(void)
 {
+    // uint8_t hs_status = FALSE; 
+
     hw125_close(); 
 
-    if (mtbdl_ui.tx_status)
+    // // Check for a handshake from the user 
+    // if (hc05_data_status())
+    // {
+    //     hc05_read(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
+
+    //     if (!strcmp(mtbdl_tx_complete, mtbdl_ui.data_buff))
+    //     {
+    //         if (mtbdl_ui.tx_send_status)
+    //         {
+    //             mtbdl_ui.tx_send_status = CLEAR_BIT; 
+    //             hs_status = TRUE; 
+
+    //             // Transaction completed - delete the file and update the log index 
+    //             hw125_unlink(mtbdl_ui.filename); 
+    //             param_update_log_index(PARAM_LOG_INDEX_DEC); 
+    //         }
+    //     }
+    //     else if (!strcmp(mtbdl_tx_not_complete, mtbdl_ui.data_buff))
+    //     {
+    //         hs_status = TRUE; 
+    //     }
+    // }
+
+    // if (mtbdl_ui.tx_send_status && mtbdl_ui.tx_hs_status)
+    // {
+    //     mtbdl_ui.tx_send_status = CLEAR_BIT; 
+    //     mtbdl_ui.tx_hs_status = CLEAR_BIT; 
+
+    //     // Transaction completed - delete the file and update the log index 
+    //     hw125_unlink(mtbdl_ui.filename); 
+    //     param_update_log_index(PARAM_LOG_INDEX_DEC); 
+
+    //     return TRUE; 
+    // }
+
+    // return hs_status; 
+
+    if (mtbdl_ui.tx_send_status)
     {
+        mtbdl_ui.tx_send_status = CLEAR_BIT; 
+
         // Transaction completed - delete the file and update the log index 
         hw125_unlink(mtbdl_ui.filename); 
-        mtbdl_ui.tx_status = CLEAR_BIT; 
         param_update_log_index(PARAM_LOG_INDEX_DEC); 
     }
+
+    return TRUE; 
 }
 
 //=======================================================================================

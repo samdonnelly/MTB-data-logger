@@ -99,10 +99,13 @@ typedef struct mtbdl_ui_s
     // Screen 
     uint16_t msg_counter;                       // Screen message write counter 
 
+    // TX mode 
+    uint8_t tx_send_status : 1;                 // TX log file send status 
+    uint8_t tx_hs_status   : 1;                 // TX log file handshake status 
+
     // SD Card 
     char data_buff[MTBDL_MAX_STR_LEN];          // Buffer for reading and writing 
     char filename[MTBDL_MAX_STR_LEN];           // Buffer for storing a file name 
-    uint8_t tx_status;                          // TX transaction status 
 }
 mtbdl_ui_t; 
 
@@ -281,11 +284,15 @@ uint8_t ui_tx(void);
 /**
  * @brief Close the log file and delete it 
  * 
- * @details Closes the open data log file, and if the transaction completed successfully 
- *          then the log file will be deleted and the log index updated. Note that this 
- *          function should only be called after 'ui_tx' is done being called. 
+ * @details Closes the open data log file and waits for a confirmation response 
+ *          (handshake) from the device connected to the Bluetooth module. If the 
+ *          transaction was completed successfully and a confirmation is received then 
+ *          the log file that was sent gets deleted and the log file index updated. Note 
+ *          that this function should only be called after 'ui_tx' is done being called. 
+ * 
+ * @return uint8_t : handshake status 
  */
-void ui_tx_end(void); 
+uint8_t ui_tx_end(void); 
 
 //=======================================================================================
 

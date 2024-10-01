@@ -111,7 +111,7 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl);
 // Run prep state helper functions 
 void mtbdl_run_prep_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_run_prep_state_exit(void); 
+void mtbdl_run_prep_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -129,8 +129,8 @@ void mtbdl_run_prep_state_exit(void);
 void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl); 
 
 // Run countdown state helper functions 
-void mtbdl_run_countdown_state_entry(void); 
-void mtbdl_run_countdown_state_exit(void); 
+void mtbdl_run_countdown_state_entry(mtbdl_trackers_t *mtbdl); 
+void mtbdl_run_countdown_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -177,7 +177,7 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl);
 
 // Post run state helper functions 
 void mtbdl_postrun_state_entry(mtbdl_trackers_t *mtbdl); 
-void mtbdl_postrun_state_exit(void); 
+void mtbdl_postrun_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -579,21 +579,23 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_PREP_STATE: 
-            if (mtbdl_trackers.fault_code)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            // else if (mtbdl_trackers.low_pwr)
+            // {
+            //     next_state = MTBDL_LOWPWR_STATE; 
+            // }
+            if (mtbdl_trackers.noncrit_fault || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.low_pwr)
-            {
-                next_state = MTBDL_LOWPWR_STATE; 
+                next_state = MTBDL_POSTRUN_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
-            }
-            else if (mtbdl_trackers.noncrit_fault)
-            {
-                next_state = MTBDL_POSTRUN_STATE; 
             }
             else if (mtbdl_trackers.run)
             {
@@ -602,23 +604,25 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_COUNTDOWN_STATE: 
-            if (mtbdl_trackers.fault_code)
-            {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.run)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            if (mtbdl_trackers.run)
             {
                 next_state = MTBDL_RUN_STATE; 
             }
-
             break; 
 
         case MTBDL_RUN_STATE: 
-            if (mtbdl_trackers.fault_code)
-            {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.run || mtbdl_trackers.low_pwr)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            if (mtbdl_trackers.run || 
+                mtbdl_trackers.noncrit_fault || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_POSTRUN_STATE; 
             }
@@ -629,19 +633,20 @@ void mtbdl_app(void)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
-
             break; 
 
         case MTBDL_DATA_SELECT_STATE: 
-            if (mtbdl_trackers.fault_code)
-            {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.low_pwr)
-            {
-                next_state = MTBDL_LOWPWR_STATE; 
-            }
-            else if (mtbdl_trackers.idle)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            // else if (mtbdl_trackers.low_pwr)
+            // {
+            //     next_state = MTBDL_LOWPWR_STATE; 
+            // }
+            if (mtbdl_trackers.idle || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
@@ -656,15 +661,17 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_DEV_SEARCH_STATE: 
-            if (mtbdl_trackers.fault_code)
-            {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.low_pwr)
-            {
-                next_state = MTBDL_LOWPWR_STATE; 
-            }
-            else if (mtbdl_trackers.idle)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            // else if (mtbdl_trackers.low_pwr)
+            // {
+            //     next_state = MTBDL_LOWPWR_STATE; 
+            // }
+            if (mtbdl_trackers.idle || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_IDLE_STATE; 
             }
@@ -679,21 +686,23 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRERX_STATE: 
-            if (mtbdl_trackers.fault_code)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            // else if (mtbdl_trackers.low_pwr)
+            // {
+            //     next_state = MTBDL_LOWPWR_STATE; 
+            // }
+            if (mtbdl_trackers.noncrit_fault || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.low_pwr)
-            {
-                next_state = MTBDL_LOWPWR_STATE; 
+                next_state = MTBDL_POSTRX_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
-            }
-            else if (mtbdl_trackers.noncrit_fault)
-            {
-                next_state = MTBDL_POSTRX_STATE; 
             }
             else if (mtbdl_trackers.rx)
             {
@@ -702,13 +711,14 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RX_STATE: 
-            if (mtbdl_trackers.fault_code)
-            {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.rx || 
-                     mtbdl_trackers.noncrit_fault || 
-                     mtbdl_trackers.low_pwr)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            if (mtbdl_trackers.rx || 
+                mtbdl_trackers.noncrit_fault || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_POSTRX_STATE; 
             }
@@ -722,21 +732,23 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRETX_STATE: 
-            if (mtbdl_trackers.fault_code)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            // else if (mtbdl_trackers.low_pwr)
+            // {
+            //     next_state = MTBDL_LOWPWR_STATE; 
+            // }
+            if (mtbdl_trackers.noncrit_fault || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.low_pwr)
-            {
-                next_state = MTBDL_LOWPWR_STATE; 
+                next_state = MTBDL_POSTTX_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
                 next_state = MTBDL_IDLE_STATE; 
-            }
-            else if (mtbdl_trackers.noncrit_fault)
-            {
-                next_state = MTBDL_POSTTX_STATE; 
             }
             else if (mtbdl_trackers.tx)
             {
@@ -745,13 +757,14 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_TX_STATE: 
-            if (mtbdl_trackers.fault_code)
-            {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.tx || 
-                     mtbdl_trackers.noncrit_fault || 
-                     mtbdl_trackers.low_pwr)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            if (mtbdl_trackers.tx || 
+                mtbdl_trackers.noncrit_fault || 
+                mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
                 next_state = MTBDL_POSTTX_STATE; 
             }
@@ -769,13 +782,18 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRECALIBRATE_STATE: 
-            if (mtbdl_trackers.fault_code)
+            // if (mtbdl_trackers.fault_code)
+            // {
+            //     next_state = MTBDL_FAULT_STATE; 
+            // }
+            // else if (mtbdl_trackers.low_pwr)
+            // {
+            //     next_state = MTBDL_LOWPWR_STATE; 
+            // }
+            if (mtbdl_trackers.fault_code || 
+                mtbdl_trackers.low_pwr)
             {
-                next_state = MTBDL_FAULT_STATE; 
-            }
-            else if (mtbdl_trackers.low_pwr)
-            {
-                next_state = MTBDL_LOWPWR_STATE; 
+                next_state = MTBDL_POSTCALIBRATE_STATE; 
             }
             else if (mtbdl_trackers.idle)
             {
@@ -852,6 +870,11 @@ void system_status_checks(void)
     if ((mtbdl_trackers.state != MTBDL_LOWPWR_STATE) && (ui_get_soc() <= MTBDL_SOC_CUTOFF))
     {
         mtbdl_trackers.low_pwr = SET_BIT; 
+
+        // Only the first line of the low power message is used until the low power state 
+        // is entered. 
+        mtbdl_trackers.msg = mtbdl_low_pwr_msg; 
+        mtbdl_trackers.msg_len = MTBDL_MSG_LEN_1_LINE; 
     } 
 
     // Fault checks 
@@ -874,6 +897,15 @@ void system_status_checks(void)
     if (hc05_get_status())
     {
         mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_4); 
+    }
+
+    // Update screen message if there is a fault 
+    if (mtbdl_trackers.fault_code)
+    {
+        // Only the first line of the fault message is used until the fault state is 
+        // entered. 
+        mtbdl_trackers.msg = mtbdl_fault_msg; 
+        mtbdl_trackers.msg_len = MTBDL_MSG_LEN_1_LINE; 
     }
 }
 
@@ -1091,23 +1123,27 @@ void mtbdl_run_prep_state(mtbdl_trackers_t *mtbdl)
     ui_msg_update(UI_MSG_RUN_PREP); 
 
     // State exit 
-    if (mtbdl->run || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->run || 
+        mtbdl->idle || 
+        mtbdl->noncrit_fault || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_run_prep_state_exit(); 
+        mtbdl_run_prep_state_exit(mtbdl); 
     }
 }
 
 
-// Pre run (run prep) state entry 
+// Run prep state entry 
 void mtbdl_run_prep_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->run = CLEAR_BIT; 
+
     // Check the log file name 
     if (log_data_name_prep()) 
     {
         // New file name created - display the run prep state message 
         ui_set_run_prep_msg(); 
-        mtbdl->run = CLEAR_BIT; 
 
         // Make sure the M8Q is out of low power mode 
         m8q_clear_low_pwr_flag(); 
@@ -1134,7 +1170,7 @@ void mtbdl_run_prep_state_entry(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Pre-run state user button input check 
+// Run prep state user button input check 
 void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl)
 {
     switch (mtbdl->btn_press)
@@ -1155,9 +1191,11 @@ void mtbdl_run_prep_user_input_check(mtbdl_trackers_t *mtbdl)
 }
 
 
-// Pre run (run prep) state exit 
-void mtbdl_run_prep_state_exit(void)
+// Run prep state exit 
+void mtbdl_run_prep_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+
     // Clear the run prep state message 
     hd44780u_set_clear_flag(); 
 
@@ -1177,23 +1215,22 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->run)
     {
-        mtbdl->run = CLEAR_BIT; 
-        mtbdl_run_countdown_state_entry(); 
+        mtbdl_run_countdown_state_entry(mtbdl); 
     }
 
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
-        mtbdl->run = SET_BIT; 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_run_countdown_state_exit(); 
+        mtbdl_run_countdown_state_exit(mtbdl); 
     }
 }
 
 
 // Run countdown state entry 
-void mtbdl_run_countdown_state_entry(void)
+void mtbdl_run_countdown_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->run = CLEAR_BIT; 
+
     // Display the run countdown state message 
     hd44780u_set_msg(mtbdl_run_countdown_msg, MTBDL_MSG_LEN_1_LINE); 
 
@@ -1218,8 +1255,11 @@ void mtbdl_run_countdown_state_entry(void)
 
 
 // Run countdown state exit 
-void mtbdl_run_countdown_state_exit(void)
+void mtbdl_run_countdown_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->run = SET_BIT; 
+    mtbdl->delay_timer.time_start = SET_BIT; 
+
     // Put the screen in low power mode 
     hd44780u_set_low_pwr_flag(); 
 
@@ -1343,9 +1383,7 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_postrun_state_exit(); 
+        mtbdl_postrun_state_exit(mtbdl); 
     }
 }
 
@@ -1353,15 +1391,13 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 // Post run state entry 
 void mtbdl_postrun_state_entry(mtbdl_trackers_t *mtbdl)
 {
-    // Close the open data log file if there was no non-critical faults 
-    if (!mtbdl->noncrit_fault)
-    {
-        log_data_end(); 
-    }
-
-    hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
     mtbdl->noncrit_fault = CLEAR_BIT; 
     mtbdl->run = CLEAR_BIT; 
+
+    // Terminate a possible open log file and update the screen message with the 
+    // system status. 
+    log_data_end(); 
+    hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
     
     // Put the M8Q back into a continuous read state 
     m8q_set_read_flag(); 
@@ -1378,8 +1414,11 @@ void mtbdl_postrun_state_entry(mtbdl_trackers_t *mtbdl)
 
 
 // Post run state exit 
-void mtbdl_postrun_state_exit(void)
+void mtbdl_postrun_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->idle = SET_BIT; 
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    
     // Clear the post run state message 
     hd44780u_set_clear_flag(); 
 
@@ -2331,7 +2370,7 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
 void mtbdl_lowpwr_state_entry(void)
 {
     // Display the low power state message 
-    hd44780u_set_msg(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_2_LINE); 
+    hd44780u_set_msg(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_3_LINE); 
 
     // Put the screen into power save mode 
     hd44780u_set_pwr_save_flag(); 

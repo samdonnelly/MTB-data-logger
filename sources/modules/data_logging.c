@@ -640,17 +640,22 @@ void log_data_end(void)
     NVIC_DisableIRQ(mtbdl_log.rpm_irq);   // Wheel speed 
     NVIC_DisableIRQ(mtbdl_log.log_irq);   // Log sample period 
 
-    // Terminate and close the log file then update the log index now that a new log 
-    // file has been created, written to and stored. 
+    // If there is an open log file, terminate and close it then update the log index now 
+    // that a new log file has been created, written to and stored. The code checks for 
+    // an open log file first because this function is called in the post run state which 
+    // is executed even when low power or fault events occur. 
 
-    snprintf(mtbdl_log.data_str, 
-             LOG_MAX_LOG_LEN, 
-             mtbdl_data_log_end, 
-             mtbdl_log.overrun); 
-    hw125_puts(mtbdl_log.data_str); 
-    // hw125_puts(mtbdl_data_log_end); 
-    hw125_close(); 
-    param_update_log_index(PARAM_LOG_INDEX_INC); 
+    if (hw125_get_file_status())
+    {
+        snprintf(mtbdl_log.data_str, 
+                 LOG_MAX_LOG_LEN, 
+                 mtbdl_data_log_end, 
+                 mtbdl_log.overrun); 
+        hw125_puts(mtbdl_log.data_str); 
+
+        hw125_close(); 
+        param_update_log_index(PARAM_LOG_INDEX_INC); 
+    }
 }
 
 //=======================================================================================

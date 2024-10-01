@@ -57,7 +57,7 @@ mtbdl_posttx_msg[MTBDL_MSG_LEN_3_LINE],          // Post data send (TX) state me
 mtbdl_precal_msg[MTBDL_MSG_LEN_4_LINE],          // Pre calibration state message 
 mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE],             // Calibration state message 
 mtbdl_postcal_msg[MTBDL_MSG_LEN_1_LINE],         // Post calibration state message 
-mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE],         // Low power state state message 
+mtbdl_low_pwr_msg[MTBDL_MSG_LEN_3_LINE],         // Low power state state message 
 mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE];           // Fault state state message 
 
 

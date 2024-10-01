@@ -156,15 +156,16 @@ hd44780u_msgs_t mtbdl_postcal_msg[MTBDL_MSG_LEN_1_LINE] =
 }; 
 
 
-// Low power state state message 
-hd44780u_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_2_LINE] = 
+// Low power state message 
+hd44780u_msgs_t mtbdl_low_pwr_msg[MTBDL_MSG_LEN_3_LINE] = 
 {
-    {HD44780U_L1, "SOC low. Shut down", 0}, 
-    {HD44780U_L2, "and charge battery.", 0} 
+    {HD44780U_L1, "SOC low.", 0}, 
+    {HD44780U_L3, "Shut down and", 0}, 
+    {HD44780U_L4, "charge battery.", 0} 
 }; 
 
 
-// Fault state state message 
+// Fault state message 
 hd44780u_msgs_t mtbdl_fault_msg[MTBDL_MSG_LEN_2_LINE] = 
 {
     {HD44780U_L1, "System Fault.", 0}, 

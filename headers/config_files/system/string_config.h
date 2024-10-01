@@ -75,7 +75,8 @@ mtbdl_rx_prompt[],           // User prompt during RX state
 mtbdl_rx_input[],            // User input during the RX state 
 mtbdl_rx_confirm[],          // Parameter update confirmation for the user 
 // TX info 
-mtbdl_tx_confirm[],          // TX mode - user prompt for handshake 
+mtbdl_tx_ui_init[],          // TX mode - user interface init 
+mtbdl_tx_prompt[],           // TX mode - user prompt for handshake 
 mtbdl_tx_complete[],         // TX mode - log file sent confirmation 
 mtbdl_tx_not_complete[];     // TX mode - log file not sent feedback 
 

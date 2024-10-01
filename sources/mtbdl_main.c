@@ -26,7 +26,8 @@
 // Timing info 
 #define MTBDL_LCD_SLEEP 10000000         // (us) Inactive time before screen backlight off 
 #define MTBDL_LCD_LP_SLEEP 3000000       // (us) Low power state message display time 
-#define MTBDL_STATE_CHECK_SLOW 5000000   // (us) Long period time for non-blocking timer 
+#define MTBDL_STATE_EXIT_TIMER 5000000   // (us) Standard state exit time count 
+#define MTBDL_STATE_EXIT_WAIT 30000000   // (us) State exit wait timer count 
 
 // Battery Voltage 
 #define MTBDL_SOC_CUTOFF 15              // Low power enter cutoff battery SOC 
@@ -906,7 +907,7 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
@@ -1181,7 +1182,7 @@ void mtbdl_run_countdown_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
         mtbdl->run = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
@@ -1340,7 +1341,7 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
     }
     
     // State exit 
-    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
@@ -1423,6 +1424,10 @@ void mtbdl_data_select_state_entry(void)
 {
     // Display the data select state message 
     hd44780u_set_msg(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
+
+    // Take the HC-05 out of low power mode. The device is turned on here to prevent any 
+    // possible read errors. 
+    hc05_on(); 
 
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led7_1); 
@@ -1518,9 +1523,6 @@ void mtbdl_dev_search_state_entry(void)
 {
     // Display the device connection search state message 
     hd44780u_set_msg(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
-
-    // Take the HC-05 out of low power mode 
-    hc05_on(); 
 
     // Set the Bluetooth LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
@@ -1763,7 +1765,7 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
     ui_led_state_update(WS2812_LED_2); 
 
     // State exit 
-    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
@@ -1924,7 +1926,7 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
     if (mtbdl->tx)
     {
         mtbdl->msg = mtbdl_posttx_msg; 
-        mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
+        mtbdl->msg_len = MTBDL_MSG_LEN_3_LINE; 
         mtbdl->tx = CLEAR_BIT; 
         mtbdl_tx_state_entry(); 
     }
@@ -2011,25 +2013,26 @@ void mtbdl_tx_state_exit(void)
 
 void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 {
+    static uint32_t exit_timer = CLEAR; 
+
     // State entry 
     if (mtbdl->tx)
     {
         mtbdl->tx = CLEAR_BIT; 
+        exit_timer = mtbdl->noncrit_fault ? MTBDL_STATE_EXIT_TIMER : MTBDL_STATE_EXIT_WAIT; 
         mtbdl_posttx_state_entry(mtbdl); 
     }
 
     // State operations: 
     // - Update the Bluetooth LED 
-    // - Check for confirmation from the user that they received the data log. 
+    // - Continuously call the TX mode end function while waiting for the state end timer 
+    //   to expire. This checks for a response from the user after a log file has been 
+    //   fully sent. 
 
     ui_led_state_update(WS2812_LED_2); 
 
-    // Wait for the confirmation or until a time expires. If there is a confirmation 
-    // then delete the log file. If there is no confirmation when time expires or there 
-    // was a negative confirmation, then don't delete the file. 
-
     // State exit 
-    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
+    if (mtbdl_nonblocking_delay(mtbdl, exit_timer) || ui_tx_end())
     {
         mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_posttx_state_exit(mtbdl); 
@@ -2043,8 +2046,8 @@ void mtbdl_posttx_state_entry(mtbdl_trackers_t *mtbdl)
     // Set the post TX state message 
     hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
 
-    // End the transaction 
-    ui_tx_end(); 
+    // // End the transaction 
+    // ui_tx_end(); 
 
     // Set the Bluetooth LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
@@ -2184,7 +2187,7 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
     log_calibration(); 
 
     // State exit 
-    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
         mtbdl->calibrate = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 
@@ -2246,7 +2249,7 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
     ui_led_state_update(WS2812_LED_2); 
 
     // State exit 
-    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_CHECK_SLOW))
+    if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
         mtbdl->idle = SET_BIT; 
         mtbdl->delay_timer.time_start = SET_BIT; 

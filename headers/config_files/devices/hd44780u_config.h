@@ -27,10 +27,12 @@
 // Macros 
 
 // Message lengths 
-#define MTBDL_MSG_LEN_1_LINE 1        // Screen message is 1 line long 
-#define MTBDL_MSG_LEN_2_LINE 2        // Screen message is 2 line long 
-#define MTBDL_MSG_LEN_3_LINE 3        // Screen message is 3 line long 
-#define MTBDL_MSG_LEN_4_LINE 4        // Screen message is 4 line long 
+typedef enum {
+    MTBDL_MSG_LEN_1_LINE = 1,   // Screen message is 1 line long 
+    MTBDL_MSG_LEN_2_LINE,       // Screen message is 2 line long 
+    MTBDL_MSG_LEN_3_LINE,       // Screen message is 3 line long 
+    MTBDL_MSG_LEN_4_LINE        // Screen message is 4 line long 
+} msg_num_lines_t; 
 
 //=======================================================================================
 
@@ -51,7 +53,7 @@ mtbdl_rx_msg[MTBDL_MSG_LEN_2_LINE],              // Data receive (RX) state mess
 mtbdl_postrx_msg[MTBDL_MSG_LEN_1_LINE],          // Post data receive (RX) state message 
 mtbdl_pretx_msg[MTBDL_MSG_LEN_4_LINE],           // Pre data send (TX) state message 
 mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE],              // Data send (TX) state message 
-mtbdl_posttx_msg[MTBDL_MSG_LEN_1_LINE],          // Post data send (TX) state message 
+mtbdl_posttx_msg[MTBDL_MSG_LEN_3_LINE],          // Post data send (TX) state message 
 mtbdl_precal_msg[MTBDL_MSG_LEN_4_LINE],          // Pre calibration state message 
 mtbdl_cal_msg[MTBDL_MSG_LEN_1_LINE],             // Calibration state message 
 mtbdl_postcal_msg[MTBDL_MSG_LEN_1_LINE],         // Post calibration state message 

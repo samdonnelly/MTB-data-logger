@@ -124,9 +124,11 @@ hd44780u_msgs_t mtbdl_tx_msg[MTBDL_MSG_LEN_2_LINE] =
 
 
 // Post data send (TX) state message 
-hd44780u_msgs_t mtbdl_posttx_msg[MTBDL_MSG_LEN_1_LINE] = 
+hd44780u_msgs_t mtbdl_posttx_msg[MTBDL_MSG_LEN_3_LINE] = 
 {
-    {HD44780U_L1, "Send Complete", 0} 
+    {HD44780U_L1, "Send Complete", 0}, 
+    {HD44780U_L3, "Waiting for", 0}, 
+    {HD44780U_L4, "confirmation...", 0} 
 }; 
 
 

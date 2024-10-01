@@ -564,6 +564,9 @@ uint8_t ui_tx_prep(void)
 {
     uint8_t log_index = param_get_log_index(); 
 
+    // Clear any leftover data that might be in the Bluetooth devices UART register. 
+    hc05_clear(); 
+
     // Check if there are no log files 
     if (!log_index)
     {
@@ -590,8 +593,11 @@ uint8_t ui_tx_prep(void)
         return FALSE; 
     }
 
-    // Open the file 
     hw125_open(mtbdl_ui.filename, HW125_MODE_OAWR); 
+
+    // Initialize the user interface for sending a log file. This is helpful when 
+    // multiple log files are sent and they need seperation between one another. 
+    hc05_send(mtbdl_tx_ui_init); 
 
     return TRUE; 
 }
@@ -608,7 +614,7 @@ uint8_t ui_tx(void)
     if (hw125_eof())
     {
         mtbdl_ui.tx_send_status = SET_BIT; 
-        hc05_send(mtbdl_tx_confirm); 
+        hc05_send(mtbdl_tx_prompt); 
         return TRUE; 
     }
 
@@ -619,57 +625,53 @@ uint8_t ui_tx(void)
 // End the transmission 
 uint8_t ui_tx_end(void)
 {
-    // uint8_t hs_status = FALSE; 
+    uint8_t hs_status = FALSE; 
+
+    // Close the log file then check for a response from the connected device that the 
+    // data log file was successfully received or not. Responses that don't match the 
+    // predefined confirmations will be ignored. The log file must have been fully sent 
+    // without interruption and a positive confirmation must be received for the log file 
+    // to be deleted and the log index updated. A negative confirmation will return the 
+    // same status as a positive one but the log file will not be deleted. Special cases 
+    // such as a lost Bluetooth connection or a fault will simply close the log file and 
+    // ignore the feedback from the connected device. 
 
     hw125_close(); 
 
-    // // Check for a handshake from the user 
-    // if (hc05_data_status())
-    // {
-    //     hc05_read(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
+    if (hc05_data_status())
+    {
+        hc05_read(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
+        const char *user_msg = mtbdl_rx_confirm; 
 
-    //     if (!strcmp(mtbdl_tx_complete, mtbdl_ui.data_buff))
-    //     {
-    //         if (mtbdl_ui.tx_send_status)
-    //         {
-    //             mtbdl_ui.tx_send_status = CLEAR_BIT; 
-    //             hs_status = TRUE; 
+        if (!strcmp(mtbdl_tx_complete, mtbdl_ui.data_buff))
+        {
+            mtbdl_ui.tx_hs_status = SET_BIT; 
+        }
+        else if (!strcmp(mtbdl_tx_not_complete, mtbdl_ui.data_buff))
+        {
+            hs_status = TRUE; 
+        }
+        else 
+        {
+            user_msg = mtbdl_tx_prompt; 
+        }
 
-    //             // Transaction completed - delete the file and update the log index 
-    //             hw125_unlink(mtbdl_ui.filename); 
-    //             param_update_log_index(PARAM_LOG_INDEX_DEC); 
-    //         }
-    //     }
-    //     else if (!strcmp(mtbdl_tx_not_complete, mtbdl_ui.data_buff))
-    //     {
-    //         hs_status = TRUE; 
-    //     }
-    // }
+        hc05_send(user_msg); 
+    }
 
-    // if (mtbdl_ui.tx_send_status && mtbdl_ui.tx_hs_status)
-    // {
-    //     mtbdl_ui.tx_send_status = CLEAR_BIT; 
-    //     mtbdl_ui.tx_hs_status = CLEAR_BIT; 
-
-    //     // Transaction completed - delete the file and update the log index 
-    //     hw125_unlink(mtbdl_ui.filename); 
-    //     param_update_log_index(PARAM_LOG_INDEX_DEC); 
-
-    //     return TRUE; 
-    // }
-
-    // return hs_status; 
-
-    if (mtbdl_ui.tx_send_status)
+    if (mtbdl_ui.tx_send_status && mtbdl_ui.tx_hs_status)
     {
         mtbdl_ui.tx_send_status = CLEAR_BIT; 
+        mtbdl_ui.tx_hs_status = CLEAR_BIT; 
 
         // Transaction completed - delete the file and update the log index 
         hw125_unlink(mtbdl_ui.filename); 
         param_update_log_index(PARAM_LOG_INDEX_DEC); 
+
+        hs_status = TRUE; 
     }
 
-    return TRUE; 
+    return hs_status; 
 }
 
 //=======================================================================================

@@ -537,15 +537,7 @@ void mtbdl_app(void)
 {
     mtbdl_states_t next_state = mtbdl_trackers.state; 
 
-    // User interface update 
-    mtbdl_trackers.btn_press = ui_status_update(); 
-
-    // System status checks 
-    system_status_checks(); 
-
-    //===================================================
     // System state machine 
-
     switch (next_state)
     {
         case MTBDL_INIT_STATE: 
@@ -785,7 +777,12 @@ void mtbdl_app(void)
             break; 
     }
 
-    //===================================================
+    // Update the user interface and check the system status. System status checks are 
+    // done specifically after the state machine and before the execution of the state. 
+    // This is done so that if a fault or low power event occurs, these flags can be set 
+    // without changing state before the current state has a chance to run its exit code. 
+    mtbdl_trackers.btn_press = ui_status_update(); 
+    system_status_checks(); 
 
     // Execute the state function then update the record 
     mtbdl_state_table[next_state](&mtbdl_trackers); 

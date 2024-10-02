@@ -42,7 +42,7 @@ typedef enum {
 
 extern hd44780u_msgs_t 
 mtbdl_welcome_msg[MTBDL_MSG_LEN_1_LINE],         // Init state message 
-mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE],            // Idle state message and data items per message line 
+mtbdl_idle_msg[MTBDL_MSG_LEN_4_LINE],            // Idle state message 
 mtbdl_run_prep_msg[MTBDL_MSG_LEN_3_LINE],        // Run prep state message 
 mtbdl_run_countdown_msg[MTBDL_MSG_LEN_1_LINE],   // Run countdown state message 
 mtbdl_postrun_msg[MTBDL_MSG_LEN_2_LINE],         // Post run state message 

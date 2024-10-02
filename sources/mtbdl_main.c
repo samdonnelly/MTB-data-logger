@@ -63,9 +63,9 @@ void system_status_checks(void);
 void mtbdl_init_state(mtbdl_trackers_t *mtbdl); 
 
 // Init state helper functions 
-void mtbdl_init_state_entry(void); 
+void mtbdl_init_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_init_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_init_state_exit(void); 
+void mtbdl_init_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -84,9 +84,9 @@ void mtbdl_init_state_exit(void);
 void mtbdl_idle_state(mtbdl_trackers_t *mtbdl); 
 
 // Idle state helper functions 
-void mtbdl_idle_state_entry(void); 
+void mtbdl_idle_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_idle_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_idle_state_exit(void); 
+void mtbdl_idle_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -155,9 +155,9 @@ void mtbdl_run_countdown_state_exit(mtbdl_trackers_t *mtbdl);
 void mtbdl_run_state(mtbdl_trackers_t *mtbdl); 
 
 // Run state helper functions 
-void mtbdl_run_state_entry(void); 
+void mtbdl_run_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_run_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_run_state_exit(void); 
+void mtbdl_run_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -200,9 +200,9 @@ void mtbdl_postrun_state_exit(mtbdl_trackers_t *mtbdl);
 void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl); 
 
 // Data transfer selection state helper functions 
-void mtbdl_data_select_state_entry(void); 
+void mtbdl_data_select_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_data_select_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_data_select_state_exit(void); 
+void mtbdl_data_select_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -222,9 +222,9 @@ void mtbdl_data_select_state_exit(void);
 void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl); 
 
 // Device search state helper functions 
-void mtbdl_dev_search_state_entry(void); 
+void mtbdl_dev_search_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_dev_search_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_dev_search_state_exit(void); 
+void mtbdl_dev_search_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -244,9 +244,9 @@ void mtbdl_dev_search_state_exit(void);
 void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl); 
 
 // Pre-RX state helper functions 
-void mtbdl_prerx_state_entry(void); 
+void mtbdl_prerx_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_prerx_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_prerx_state_exit(void); 
+void mtbdl_prerx_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -268,9 +268,9 @@ void mtbdl_prerx_state_exit(void);
 void mtbdl_rx_state(mtbdl_trackers_t *mtbdl); 
 
 // RX state helper functions 
-void mtbdl_rx_state_entry(void); 
+void mtbdl_rx_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_rx_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_rx_state_exit(void); 
+void mtbdl_rx_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -290,7 +290,7 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl);
 
 // Post-RX state helper functions 
 void mtbdl_postrx_state_entry(mtbdl_trackers_t *mtbdl); 
-void mtbdl_postrx_state_exit(void); 
+void mtbdl_postrx_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -315,7 +315,7 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl);
 // Pre-TX state helper functions 
 void mtbdl_pretx_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_pretx_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_pretx_state_exit(void); 
+void mtbdl_pretx_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -335,9 +335,9 @@ void mtbdl_pretx_state_exit(void);
 void mtbdl_tx_state(mtbdl_trackers_t *mtbdl); 
 
 // TX state helper functions 
-void mtbdl_tx_state_entry(void); 
+void mtbdl_tx_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_tx_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_tx_state_exit(void); 
+void mtbdl_tx_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -375,9 +375,9 @@ void mtbdl_posttx_state_exit(mtbdl_trackers_t *mtbdl);
 void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl); 
 
 // Pre-calibration state helper functions 
-void mtbdl_precalibrate_state_entry(void); 
+void mtbdl_precalibrate_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_precalibrate_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_precalibrate_state_exit(void); 
+void mtbdl_precalibrate_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -399,9 +399,9 @@ void mtbdl_precalibrate_state_exit(void);
 void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl); 
 
 // Calibration state helper functions 
-void mtbdl_calibrate_state_entry(void); 
+void mtbdl_calibrate_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_lowpwr_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_calibrate_state_exit(void); 
+void mtbdl_calibrate_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -417,8 +417,8 @@ void mtbdl_calibrate_state_exit(void);
 void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl); 
 
 // Post-calibration state helper functions 
-void mtbdl_postcalibrate_state_entry(void); 
-void mtbdl_postcalibrate_state_exit(void); 
+void mtbdl_postcalibrate_state_entry(mtbdl_trackers_t *mtbdl); 
+void mtbdl_postcalibrate_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -440,8 +440,8 @@ void mtbdl_postcalibrate_state_exit(void);
 void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl); 
 
 // Low power state helper functions 
-void mtbdl_lowpwr_state_entry(void); 
-void mtbdl_lowpwr_state_exit(void); 
+void mtbdl_lowpwr_state_entry(mtbdl_trackers_t *mtbdl); 
+void mtbdl_lowpwr_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -459,9 +459,9 @@ void mtbdl_lowpwr_state_exit(void);
 void mtbdl_fault_state(mtbdl_trackers_t *mtbdl); 
 
 // Fault state helper functions 
-void mtbdl_fault_state_entry(void); 
+void mtbdl_fault_state_entry(mtbdl_trackers_t *mtbdl); 
 void mtbdl_fault_user_input_check(mtbdl_trackers_t *mtbdl); 
-void mtbdl_fault_state_exit(void); 
+void mtbdl_fault_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -477,8 +477,8 @@ void mtbdl_fault_state_exit(void);
 void mtbdl_reset_state(mtbdl_trackers_t *mtbdl); 
 
 // Reset state helper functions 
-void mtbdl_reset_state_entry(void); 
-void mtbdl_reset_state_exit(void); 
+void mtbdl_reset_state_entry(mtbdl_trackers_t *mtbdl); 
+void mtbdl_reset_state_exit(mtbdl_trackers_t *mtbdl); 
 
 
 /**
@@ -579,14 +579,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_PREP_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
-            // else if (mtbdl_trackers.low_pwr)
-            // {
-            //     next_state = MTBDL_LOWPWR_STATE; 
-            // }
             if (mtbdl_trackers.noncrit_fault || 
                 mtbdl_trackers.fault_code || 
                 mtbdl_trackers.low_pwr)
@@ -604,10 +596,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_COUNTDOWN_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
             if (mtbdl_trackers.run)
             {
                 next_state = MTBDL_RUN_STATE; 
@@ -615,10 +603,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RUN_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
             if (mtbdl_trackers.run || 
                 mtbdl_trackers.noncrit_fault || 
                 mtbdl_trackers.fault_code || 
@@ -636,14 +620,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_DATA_SELECT_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
-            // else if (mtbdl_trackers.low_pwr)
-            // {
-            //     next_state = MTBDL_LOWPWR_STATE; 
-            // }
             if (mtbdl_trackers.idle || 
                 mtbdl_trackers.fault_code || 
                 mtbdl_trackers.low_pwr)
@@ -661,14 +637,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_DEV_SEARCH_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
-            // else if (mtbdl_trackers.low_pwr)
-            // {
-            //     next_state = MTBDL_LOWPWR_STATE; 
-            // }
             if (mtbdl_trackers.idle || 
                 mtbdl_trackers.fault_code || 
                 mtbdl_trackers.low_pwr)
@@ -686,14 +654,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRERX_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
-            // else if (mtbdl_trackers.low_pwr)
-            // {
-            //     next_state = MTBDL_LOWPWR_STATE; 
-            // }
             if (mtbdl_trackers.noncrit_fault || 
                 mtbdl_trackers.fault_code || 
                 mtbdl_trackers.low_pwr)
@@ -711,10 +671,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_RX_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
             if (mtbdl_trackers.rx || 
                 mtbdl_trackers.noncrit_fault || 
                 mtbdl_trackers.fault_code || 
@@ -732,14 +688,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRETX_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
-            // else if (mtbdl_trackers.low_pwr)
-            // {
-            //     next_state = MTBDL_LOWPWR_STATE; 
-            // }
             if (mtbdl_trackers.noncrit_fault || 
                 mtbdl_trackers.fault_code || 
                 mtbdl_trackers.low_pwr)
@@ -757,10 +705,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_TX_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
             if (mtbdl_trackers.tx || 
                 mtbdl_trackers.noncrit_fault || 
                 mtbdl_trackers.fault_code || 
@@ -782,14 +726,6 @@ void mtbdl_app(void)
             break; 
 
         case MTBDL_PRECALIBRATE_STATE: 
-            // if (mtbdl_trackers.fault_code)
-            // {
-            //     next_state = MTBDL_FAULT_STATE; 
-            // }
-            // else if (mtbdl_trackers.low_pwr)
-            // {
-            //     next_state = MTBDL_LOWPWR_STATE; 
-            // }
             if (mtbdl_trackers.fault_code || 
                 mtbdl_trackers.low_pwr)
             {
@@ -920,8 +856,7 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->init)
     {
-        mtbdl->init = CLEAR_BIT; 
-        mtbdl_init_state_entry(); 
+        mtbdl_init_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -941,16 +876,16 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_init_state_exit(); 
+        mtbdl_init_state_exit(mtbdl); 
     }
 }
 
 
 // Init state entry 
-void mtbdl_init_state_entry(void)
+void mtbdl_init_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->init = CLEAR_BIT; 
+
     // Display the startup message 
     hd44780u_set_msg(mtbdl_welcome_msg, MTBDL_MSG_LEN_1_LINE); 
 
@@ -984,8 +919,11 @@ void mtbdl_init_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Init state exit 
-void mtbdl_init_state_exit(void)
+void mtbdl_init_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->idle = SET_BIT; 
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    
     // Clear the screen startup message 
     hd44780u_set_clear_flag(); 
 
@@ -1004,8 +942,7 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->idle)
     {
-        mtbdl->idle = CLEAR_BIT; 
-        mtbdl_idle_state_entry(); 
+        mtbdl_idle_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1018,18 +955,22 @@ void mtbdl_idle_state(mtbdl_trackers_t *mtbdl)
     ui_msg_update(UI_MSG_IDLE); 
 
     // State exit 
-    if (mtbdl->run || mtbdl->data_select || mtbdl->calibrate || 
-        mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->run || 
+        mtbdl->data_select || 
+        mtbdl->calibrate || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_idle_state_exit(); 
+        mtbdl_idle_state_exit(mtbdl); 
     }
 }
 
 
 // Idle state entry 
-void mtbdl_idle_state_entry(void)
+void mtbdl_idle_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->idle = CLEAR_BIT; 
+
     // Display the idle state message 
     ui_set_idle_msg(); 
 
@@ -1087,8 +1028,10 @@ void mtbdl_idle_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Idle state exit 
-void mtbdl_idle_state_exit(void)
+void mtbdl_idle_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+
     // Clear the idle state message and take the screen out of power save mode 
     hd44780u_set_clear_flag(); 
     hd44780u_clear_pwr_save_flag(); 
@@ -1289,8 +1232,7 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->run)
     {
-        mtbdl->run = CLEAR_BIT; 
-        mtbdl_run_state_entry(); 
+        mtbdl_run_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1307,16 +1249,16 @@ void mtbdl_run_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl->run || mtbdl->fault_code || mtbdl->low_pwr)
     {
-        mtbdl->msg = mtbdl_postrun_msg; 
-        mtbdl->msg_len = MTBDL_MSG_LEN_2_LINE; 
-        mtbdl_run_state_exit(); 
+        mtbdl_run_state_exit(mtbdl); 
     }
 }
 
 
 // Run state entry 
-void mtbdl_run_state_entry(void)
+void mtbdl_run_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->run = CLEAR_BIT; 
+
     // Set the colour and blink rate of the data logging and GPS LEDs 
     ui_led_colour_set(WS2812_LED_0, mtbdl_led0_1); 
     ui_led_colour_set(WS2812_LED_1, mtbdl_led1_1); 
@@ -1356,8 +1298,11 @@ void mtbdl_run_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Run state exit 
-void mtbdl_run_state_exit(void)
+void mtbdl_run_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->msg = mtbdl_postrun_msg; 
+    mtbdl->msg_len = MTBDL_MSG_LEN_2_LINE; 
+    
     // Take the screen out of low power mode 
     hd44780u_clear_low_pwr_flag(); 
 
@@ -1391,8 +1336,8 @@ void mtbdl_postrun_state(mtbdl_trackers_t *mtbdl)
 // Post run state entry 
 void mtbdl_postrun_state_entry(mtbdl_trackers_t *mtbdl)
 {
-    mtbdl->noncrit_fault = CLEAR_BIT; 
     mtbdl->run = CLEAR_BIT; 
+    mtbdl->noncrit_fault = CLEAR_BIT; 
 
     // Terminate a possible open log file and update the screen message with the 
     // system status. 
@@ -1441,8 +1386,7 @@ void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->data_select)
     {
-        mtbdl->data_select = CLEAR_BIT; 
-        mtbdl_data_select_state_entry(); 
+        mtbdl_data_select_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1450,17 +1394,22 @@ void mtbdl_data_select_state(mtbdl_trackers_t *mtbdl)
     mtbdl_data_select_user_input_check(mtbdl); 
 
     // State exit 
-    if (mtbdl->data_select || mtbdl->tx || mtbdl->idle || 
-        mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->data_select || 
+        mtbdl->tx || 
+        mtbdl->idle || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl_data_select_state_exit(); 
+        mtbdl_data_select_state_exit(mtbdl); 
     }
 }
 
 
 // Data selection state entry 
-void mtbdl_data_select_state_entry(void)
+void mtbdl_data_select_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->data_select = CLEAR_BIT; 
+
     // Display the data select state message 
     hd44780u_set_msg(mtbdl_data_select_msg, MTBDL_MSG_LEN_3_LINE); 
 
@@ -1513,7 +1462,7 @@ void mtbdl_data_select_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Data selection state exit 
-void mtbdl_data_select_state_exit(void)
+void mtbdl_data_select_state_exit(mtbdl_trackers_t *mtbdl)
 {
     // Clear the data select state message 
     hd44780u_set_clear_flag(); 
@@ -1530,8 +1479,7 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->data_select)
     {
-        mtbdl->data_select = CLEAR_BIT; 
-        mtbdl_dev_search_state_entry(); 
+        mtbdl_dev_search_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1548,18 +1496,21 @@ void mtbdl_dev_search_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl->idle || mtbdl->data_select || mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->idle || 
+        mtbdl->data_select || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl->led_state = CLEAR; 
-        mtbdl_dev_search_state_exit(); 
+        mtbdl_dev_search_state_exit(mtbdl); 
     }
 }
 
 
 // Device search state entry 
-void mtbdl_dev_search_state_entry(void)
+void mtbdl_dev_search_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->data_select = CLEAR_BIT; 
+
     // Display the device connection search state message 
     hd44780u_set_msg(mtbdl_dev_search_msg, MTBDL_MSG_LEN_2_LINE); 
 
@@ -1592,8 +1543,11 @@ void mtbdl_dev_search_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Device search state exit 
-void mtbdl_dev_search_state_exit(void)
+void mtbdl_dev_search_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    mtbdl->led_state = CLEAR; 
+    
     // Clear the device connection search state message 
     hd44780u_set_clear_flag(); 
 
@@ -1612,9 +1566,7 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->rx)
     {
-        mtbdl->rx = CLEAR_BIT; 
-        mtbdl->data_select = CLEAR_BIT; 
-        mtbdl_prerx_state_entry(); 
+        mtbdl_prerx_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1634,18 +1586,23 @@ void mtbdl_prerx_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl->rx || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->rx || 
+        mtbdl->noncrit_fault || 
+        mtbdl->idle || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl->led_state = CLEAR; 
-        mtbdl_prerx_state_exit(); 
+        mtbdl_prerx_state_exit(mtbdl); 
     }
 }
 
 
 // Pre RX state entry 
-void mtbdl_prerx_state_entry(void)
+void mtbdl_prerx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->rx = CLEAR_BIT; 
+    mtbdl->data_select = CLEAR_BIT; 
+
     // Display the pre rx state message 
     hd44780u_set_msg(mtbdl_prerx_msg, MTBDL_MSG_LEN_3_LINE); 
 
@@ -1683,8 +1640,11 @@ void mtbdl_prerx_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Pre RX state exit 
-void mtbdl_prerx_state_exit(void)
+void mtbdl_prerx_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    mtbdl->led_state = CLEAR; 
+
     // Clear the pre rx state message 
     hd44780u_set_clear_flag(); 
 
@@ -1703,8 +1663,7 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->rx)
     {
-        mtbdl->rx = CLEAR_BIT; 
-        mtbdl_rx_state_entry(); 
+        mtbdl_rx_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1726,18 +1685,21 @@ void mtbdl_rx_state(mtbdl_trackers_t *mtbdl)
     ui_rx(); 
 
     // State exit 
-    if (mtbdl->rx || mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->rx || 
+        mtbdl->noncrit_fault || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl->led_state = CLEAR; 
-        mtbdl_rx_state_exit(); 
+        mtbdl_rx_state_exit(mtbdl); 
     }
 }
 
 
 // RX state entry 
-void mtbdl_rx_state_entry(void)
+void mtbdl_rx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->rx = CLEAR_BIT; 
+
     // Display the rx state message 
     hd44780u_set_msg(mtbdl_rx_msg, MTBDL_MSG_LEN_2_LINE); 
 
@@ -1774,8 +1736,11 @@ void mtbdl_rx_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // RX state exit 
-void mtbdl_rx_state_exit(void)
+void mtbdl_rx_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    mtbdl->led_state = CLEAR; 
+
     // Clear the rx state message 
     hd44780u_set_clear_flag(); 
 
@@ -1794,8 +1759,6 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->rx)
     {
-        mtbdl->noncrit_fault = CLEAR_BIT; 
-        mtbdl->rx = CLEAR_BIT; 
         mtbdl_postrx_state_entry(mtbdl); 
     }
 
@@ -1806,9 +1769,7 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_postrx_state_exit(); 
+        mtbdl_postrx_state_exit(mtbdl); 
     }
 }
 
@@ -1816,6 +1777,9 @@ void mtbdl_postrx_state(mtbdl_trackers_t *mtbdl)
 // Post RX state entry 
 void mtbdl_postrx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->noncrit_fault = CLEAR_BIT; 
+    mtbdl->rx = CLEAR_BIT; 
+    
     // Update the screen message 
     hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
     
@@ -1835,8 +1799,11 @@ void mtbdl_postrx_state_entry(mtbdl_trackers_t *mtbdl)
 
 
 // Post RX state exit 
-void mtbdl_postrx_state_exit(void)
+void mtbdl_postrx_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->idle = SET_BIT; 
+    mtbdl->delay_timer.time_start = SET_BIT; 
+
     // Clear the post rx state message 
     hd44780u_set_clear_flag(); 
 
@@ -1855,7 +1822,6 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->tx)
     {
-        mtbdl->data_select = CLEAR_BIT; 
         mtbdl_pretx_state_entry(mtbdl); 
     }
 
@@ -1882,11 +1848,13 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl->tx || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->tx || 
+        mtbdl->idle || 
+        mtbdl->noncrit_fault || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl->led_state = CLEAR; 
-        mtbdl_pretx_state_exit(); 
+        mtbdl_pretx_state_exit(mtbdl); 
     }
 }
 
@@ -1894,6 +1862,8 @@ void mtbdl_pretx_state(mtbdl_trackers_t *mtbdl)
 // Pre TX state entry 
 void mtbdl_pretx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->data_select = CLEAR_BIT; 
+
     // Prepare the log file to send 
     if (ui_tx_prep())
     {
@@ -1943,8 +1913,11 @@ void mtbdl_pretx_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Pre TX state exit 
-void mtbdl_pretx_state_exit(void)
+void mtbdl_pretx_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    mtbdl->led_state = CLEAR; 
+
     // Clear the pre rx state message 
     hd44780u_set_clear_flag(); 
 
@@ -1964,10 +1937,7 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->tx)
     {
-        mtbdl->msg = mtbdl_posttx_msg; 
-        mtbdl->msg_len = MTBDL_MSG_LEN_3_LINE; 
-        mtbdl->tx = CLEAR_BIT; 
-        mtbdl_tx_state_entry(); 
+        mtbdl_tx_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -1992,18 +1962,23 @@ void mtbdl_tx_state(mtbdl_trackers_t *mtbdl)
     }
 
     // State exit 
-    if (mtbdl->tx || mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->tx || 
+        mtbdl->noncrit_fault || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl->led_state = CLEAR; 
-        mtbdl_tx_state_exit(); 
+        mtbdl_tx_state_exit(mtbdl); 
     }
 }
 
 
 // TX state entry 
-void mtbdl_tx_state_entry(void)
+void mtbdl_tx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->tx = CLEAR_BIT; 
+    mtbdl->msg = mtbdl_posttx_msg; 
+    mtbdl->msg_len = MTBDL_MSG_LEN_3_LINE; 
+
     // Display the tx state message 
     hd44780u_set_msg(mtbdl_tx_msg, MTBDL_MSG_LEN_2_LINE); 
     
@@ -2035,8 +2010,11 @@ void mtbdl_tx_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // TX state exit 
-void mtbdl_tx_state_exit(void)
+void mtbdl_tx_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    mtbdl->led_state = CLEAR; 
+
     // Clear the tx state message 
     hd44780u_set_clear_flag(); 
 
@@ -2057,7 +2035,6 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->tx)
     {
-        mtbdl->tx = CLEAR_BIT; 
         exit_timer = mtbdl->noncrit_fault ? MTBDL_STATE_EXIT_TIMER : MTBDL_STATE_EXIT_WAIT; 
         mtbdl_posttx_state_entry(mtbdl); 
     }
@@ -2073,7 +2050,6 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, exit_timer) || ui_tx_end())
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
         mtbdl_posttx_state_exit(mtbdl); 
     }
 }
@@ -2082,11 +2058,10 @@ void mtbdl_posttx_state(mtbdl_trackers_t *mtbdl)
 // Post TX state entry 
 void mtbdl_posttx_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->tx = CLEAR_BIT; 
+
     // Set the post TX state message 
     hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
-
-    // // End the transaction 
-    // ui_tx_end(); 
 
     // Set the Bluetooth LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
@@ -2103,6 +2078,8 @@ void mtbdl_posttx_state_entry(mtbdl_trackers_t *mtbdl)
 // Post TX state exit 
 void mtbdl_posttx_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+
     // Go back to the pre-tx state if the connection was not lost 
     if (mtbdl->noncrit_fault)
     {
@@ -2133,8 +2110,7 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->calibrate)
     {
-        mtbdl->calibrate = CLEAR_BIT; 
-        mtbdl_precalibrate_state_entry(); 
+        mtbdl_precalibrate_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -2145,18 +2121,21 @@ void mtbdl_precalibrate_state(mtbdl_trackers_t *mtbdl)
     ui_led_state_update(WS2812_LED_2); 
 
     // State exit 
-    if (mtbdl->calibrate || mtbdl->idle || mtbdl->fault_code || mtbdl->low_pwr)
+    if (mtbdl->calibrate || 
+        mtbdl->idle || 
+        mtbdl->fault_code || 
+        mtbdl->low_pwr)
     {
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl->led_state = CLEAR; 
-        mtbdl_precalibrate_state_exit(); 
+        mtbdl_precalibrate_state_exit(mtbdl); 
     }
 }
 
 
 // Pre-calibration state entry 
-void mtbdl_precalibrate_state_entry(void)
+void mtbdl_precalibrate_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->calibrate = CLEAR_BIT; 
+
     // Display the calibration state message 
     hd44780u_set_msg(mtbdl_precal_msg, MTBDL_MSG_LEN_4_LINE); 
 
@@ -2197,8 +2176,11 @@ void mtbdl_precalibrate_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Pre-calibration state exit 
-void mtbdl_precalibrate_state_exit(void)
+void mtbdl_precalibrate_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    mtbdl->led_state = CLEAR; 
+
     // Turn the calibration LED off 
     ui_led_colour_change(WS2812_LED_2, mtbdl_led_clear); 
 
@@ -2217,8 +2199,7 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->calibrate)
     {
-        mtbdl->calibrate = CLEAR_BIT; 
-        mtbdl_calibrate_state_entry(); 
+        mtbdl_calibrate_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -2228,16 +2209,18 @@ void mtbdl_calibrate_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
-        mtbdl->calibrate = SET_BIT; 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_calibrate_state_exit(); 
+        mtbdl_calibrate_state_exit(mtbdl); 
     }
 }
 
 
 // Calibration state entry 
-void mtbdl_calibrate_state_entry(void)
+void mtbdl_calibrate_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->calibrate = CLEAR_BIT; 
+    mtbdl->msg = mtbdl_postcal_msg; 
+    mtbdl->msg_len = MTBDL_MSG_LEN_1_LINE; 
+
     // Display the calibration state message 
     hd44780u_set_msg(mtbdl_cal_msg, MTBDL_MSG_LEN_1_LINE); 
 
@@ -2256,8 +2239,11 @@ void mtbdl_calibrate_state_entry(void)
 
 
 // Calibration state exit 
-void mtbdl_calibrate_state_exit(void)
+void mtbdl_calibrate_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->calibrate = SET_BIT; 
+    mtbdl->delay_timer.time_start = SET_BIT; 
+
     // Calculate the calibration values 
     log_calibration_calculation(); 
 
@@ -2279,8 +2265,7 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->calibrate)
     {
-        mtbdl->calibrate = CLEAR_BIT; 
-        mtbdl_postcalibrate_state_entry(); 
+        mtbdl_postcalibrate_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -2290,18 +2275,18 @@ void mtbdl_postcalibrate_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl_nonblocking_delay(mtbdl, MTBDL_STATE_EXIT_TIMER))
     {
-        mtbdl->idle = SET_BIT; 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl_postcalibrate_state_exit(); 
+        mtbdl_postcalibrate_state_exit(mtbdl); 
     }
 }
 
 
 // Post calibration state entry 
-void mtbdl_postcalibrate_state_entry(void)
+void mtbdl_postcalibrate_state_entry(mtbdl_trackers_t *mtbdl)
 {
-    // Display the post calibration message and record the calibration data
-    hd44780u_set_msg(mtbdl_postcal_msg, MTBDL_MSG_LEN_1_LINE); 
+    mtbdl->calibrate = CLEAR_BIT; 
+
+    // Display the post calibration message 
+    hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
 
     // Set the calibration LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_2); 
@@ -2316,8 +2301,11 @@ void mtbdl_postcalibrate_state_entry(void)
 
 
 // Post calibration state exit 
-void mtbdl_postcalibrate_state_exit(void)
+void mtbdl_postcalibrate_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->idle = SET_BIT; 
+    mtbdl->delay_timer.time_start = SET_BIT; 
+
     // Clear the post calibration message 
     hd44780u_set_clear_flag(); 
 
@@ -2337,8 +2325,7 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->low_pwr)
     {
-        mtbdl->low_pwr = CLEAR_BIT; 
-        mtbdl_lowpwr_state_entry(); 
+        mtbdl_lowpwr_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -2357,18 +2344,16 @@ void mtbdl_lowpwr_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl->low_pwr)
     {
-        mtbdl->low_pwr = CLEAR_BIT; 
-        mtbdl->idle = SET_BIT; 
-        mtbdl->delay_timer.time_start = SET_BIT; 
-        mtbdl->led_state = CLEAR; 
-        mtbdl_lowpwr_state_exit(); 
+        mtbdl_lowpwr_state_exit(mtbdl); 
     }
 }
 
 
 // Low power state entry 
-void mtbdl_lowpwr_state_entry(void)
+void mtbdl_lowpwr_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->low_pwr = CLEAR_BIT; 
+
     // Display the low power state message 
     hd44780u_set_msg(mtbdl_low_pwr_msg, MTBDL_MSG_LEN_3_LINE); 
 
@@ -2412,8 +2397,13 @@ void mtbdl_lowpwr_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Low power state exit 
-void mtbdl_lowpwr_state_exit(void)
+void mtbdl_lowpwr_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->low_pwr = CLEAR_BIT; 
+    mtbdl->idle = SET_BIT; 
+    mtbdl->delay_timer.time_start = SET_BIT; 
+    mtbdl->led_state = CLEAR; 
+
     // Clear the idle state message and take devices out of low power mode 
     hd44780u_set_clear_flag(); 
     hd44780u_clear_pwr_save_flag(); 
@@ -2434,8 +2424,7 @@ void mtbdl_fault_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (!mtbdl->fault)
     {
-        mtbdl->fault = SET_BIT; 
-        mtbdl_fault_state_entry(); 
+        mtbdl_fault_state_entry(mtbdl); 
     }
 
     // State operations: 
@@ -2445,16 +2434,16 @@ void mtbdl_fault_state(mtbdl_trackers_t *mtbdl)
     // State exit 
     if (mtbdl->reset || mtbdl->low_pwr)
     {
-        mtbdl->fault_code = CLEAR; 
-        mtbdl->fault = CLEAR_BIT; 
-        mtbdl_fault_state_exit(); 
+        mtbdl_fault_state_exit(mtbdl); 
     }
 }
 
 
 // Fault state entry 
-void mtbdl_fault_state_entry(void)
+void mtbdl_fault_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->fault = SET_BIT; 
+
     // Display the fault state message and take screen out of power save mode 
     hd44780u_set_msg(mtbdl_fault_msg, MTBDL_MSG_LEN_2_LINE); 
     hd44780u_clear_pwr_save_flag(); 
@@ -2490,8 +2479,11 @@ void mtbdl_fault_user_input_check(mtbdl_trackers_t *mtbdl)
 
 
 // Fault state exit 
-void mtbdl_fault_state_exit(void)
+void mtbdl_fault_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->fault_code = CLEAR; 
+    mtbdl->fault = CLEAR_BIT; 
+        
     // Clear the fault state message 
     hd44780u_set_clear_flag(); 
 
@@ -2510,20 +2502,19 @@ void mtbdl_reset_state(mtbdl_trackers_t *mtbdl)
     // State entry 
     if (mtbdl->reset)
     {
-        mtbdl->reset = CLEAR_BIT; 
-        mtbdl_reset_state_entry(); 
+        mtbdl_reset_state_entry(mtbdl); 
     }
 
     // State exit 
-    mtbdl->init = SET_BIT; 
-    mtbdl->fault_code = CLEAR; 
-    mtbdl_reset_state_exit(); 
+    mtbdl_reset_state_exit(mtbdl); 
 }
 
 
 // Reset state entry 
-void mtbdl_reset_state_entry(void)
+void mtbdl_reset_state_entry(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->reset = CLEAR_BIT; 
+
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
     ui_led_colour_set(WS2812_LED_6, mtbdl_led_clear); 
@@ -2533,8 +2524,11 @@ void mtbdl_reset_state_entry(void)
 
 
 // Reset state exit 
-void mtbdl_reset_state_exit(void)
+void mtbdl_reset_state_exit(mtbdl_trackers_t *mtbdl)
 {
+    mtbdl->init = SET_BIT; 
+    mtbdl->fault_code = CLEAR; 
+
     // Reset devices 
     hw125_set_reset_flag(); 
     hc05_clear_status(); 

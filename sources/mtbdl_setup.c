@@ -360,6 +360,9 @@ void mtbdl_init()
     mtbdl_trackers.fault = CLEAR_BIT; 
     mtbdl_trackers.reset = CLEAR_BIT; 
 
+    // Create a directory for logging fault codes if it does not already exit 
+    hw125_mkdir(mtbdl_fault_dir); 
+
     //==================================================
 
     //==================================================

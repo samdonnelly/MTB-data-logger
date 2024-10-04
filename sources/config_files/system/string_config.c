@@ -29,10 +29,12 @@ mtbdl_dir[] = "mtbdl",
 // Sub-directories 
 mtbdl_param_dir[] = "parameters", 
 mtbdl_data_dir[] = "data", 
+mtbdl_fault_dir[] = "faults", 
 // File names 
 mtbdl_bike_param_file[] = "bike_params.txt", 
 mtbdl_sys_param_file[] = "sys_params.txt", 
-mtbdl_log_file[] = "log_%u.txt"; 
+mtbdl_log_file[] = "log_%u.txt", 
+mtbdl_fault_file[] = "fault.txt"; 
 
 //=======================================================================================
 
@@ -51,6 +53,8 @@ mtbdl_param_accel_rest[] = "IMU Offset: X:%d Y:%d Z:%d\r\n",
 mtbdl_param_pot_rest[] = "Pot Offset: F:%u S:%u\r\n", 
 mtbdl_param_time[] = "UTC: %s %s\r\n", 
 mtbdl_param_data[] = "Data: T:%ums RPM_f:%uHz RPM_size:%u\r\n", 
+// Fault information 
+mtbdl_fault_info[] = "Fault code: %u", 
 // Data log information 
 mtbdl_data_log_start[] = "Data log:\r\n", 
 mtbdl_data_log_end[] = "Overrun: %u\r\nEnd\r\n\n", 

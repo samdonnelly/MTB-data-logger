@@ -47,6 +47,9 @@ typedef void (*mtbdl_func_ptr_t)(mtbdl_trackers_t *mtbdl);
 
 /**
  * @brief System status checks 
+ * 
+ * @details Checks for faults in the system. This includes issues with reading from 
+ *          devices and low battery voltage. 
  */
 void system_status_checks(void); 
 
@@ -2449,6 +2452,14 @@ void mtbdl_fault_state_entry(mtbdl_trackers_t *mtbdl)
     ui_led_colour_change(WS2812_LED_3, mtbdl_led3_1); 
 
     // Close any file that may be open 
+    hw125_close(); 
+
+    // Write the fault code to a file on the SD card 
+    char fault_str_buff[MTBDL_MAX_STR_LEN]; 
+    hw125_set_dir(mtbdl_fault_dir); 
+    hw125_open(mtbdl_bike_param_file, HW125_MODE_W); 
+    snprintf(fault_str_buff, MTBDL_MAX_STR_LEN, mtbdl_fault_info, mtbdl->fault_code); 
+    hw125_puts(fault_str_buff); 
     hw125_close(); 
 
     // Set user button LED colours 

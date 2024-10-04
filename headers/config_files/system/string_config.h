@@ -32,10 +32,12 @@ mtbdl_dir[],
 // Sub-directories 
 mtbdl_param_dir[],           // Parameters sub-directory 
 mtbdl_data_dir[],            // Data logging sub-directory 
+mtbdl_fault_dir[],           // Fault sub-directory 
 // File names 
 mtbdl_bike_param_file[],     // Bike parameters file 
 mtbdl_sys_param_file[],      // System parameters file 
-mtbdl_log_file[];            // Log file name template 
+mtbdl_log_file[],            // Log file name template 
+mtbdl_fault_file[];          // Fault record file 
 
 //=======================================================================================
 
@@ -54,6 +56,8 @@ mtbdl_param_accel_rest[],    // Resting accelerometer data
 mtbdl_param_pot_rest[],      // Resting potentiometer data 
 mtbdl_param_time[],          // Time of file creation 
 mtbdl_param_data[],          // Data logging info 
+// Fault information 
+mtbdl_fault_info[],          // Fault information 
 // Data log information 
 mtbdl_data_log_start[],      // Signifies the start of the logging info 
 mtbdl_data_log_end[],        // End of the log file 

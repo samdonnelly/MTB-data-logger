@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../STM32F4-driver-library"
+		},
+		{
+			"path": "../cpputest"
 		}
 	],
 	"settings": {

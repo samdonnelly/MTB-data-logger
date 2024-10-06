@@ -29,14 +29,8 @@ endif
 # ------------ SYSTEM --------------
 
 # MAIN 
-SRC_FILES += ./../../sources/devices/lsm303agr_driver.c       # Production code 
-SRC_DIRS += tests/lsm303agr                                   # Test doubles 
-
-# ----------------------------------
-
-# ------------- TOOLS --------------
-
-SRC_FILES += ./../../sources/tools/tools.c                    # Production code 
+SRC_FILES += ./../../sources/mtbdl_main.c
+SRC_DIRS += tests/main
 
 # ----------------------------------
 
@@ -59,7 +53,7 @@ TEST_SRC_FILES +=
 # ------------ SYSTEM --------------
 
 # MAIN 
-TEST_SRC_DIRS += tests/lsm303agr                         # Unit tests 
+TEST_SRC_DIRS += tests/main
 TEST_SRC_FILES += 
 
 # ----------------------------------
@@ -93,14 +87,33 @@ CPPUTEST_USE_EXTENSIONS = Y
 INCLUDE_DIRS += $(CPPUTEST_HOME)/include
 
 # stmcode headers needed to get the tests to build 
-INCLUDE_DIRS += ./../../stmcode/Drivers/CMSIS/Device/ST/STM32F4xx/Include
-INCLUDE_DIRS += ./../../stmcode/Drivers/CMSIS/Core/Include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/FATFS/Target
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/FATFS/App
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
 
-INCLUDE_DIRS += ./../../headers/devices            # Production code 
-INCLUDE_DIRS += ./../../headers/peripherals        # Production code 
-INCLUDE_DIRS += ./../../headers/tools              # Production code 
-INCLUDE_DIRS += mocks                              # Mocks 
-INCLUDE_DIRS += tests/main                         # Test doubles 
+# Driver library 
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/headers/devices
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/headers/peripherals
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/headers/tools
+
+# MTBDL 
+INCLUDE_DIRS += mocks
+INCLUDE_DIRS += tests/main
+INCLUDE_DIRS += ./../../headers
+INCLUDE_DIRS += ./../../headers/core
+INCLUDE_DIRS += ./../../headers/config_files
+INCLUDE_DIRS += ./../../headers/config_files/devices
+INCLUDE_DIRS += ./../../headers/config_files/system
+INCLUDE_DIRS += ./../../headers/includes
+INCLUDE_DIRS += ./../../headers/modules
+INCLUDE_DIRS += ./../../headers/modules/development
 
 # --------------------------------------------------------------------
 

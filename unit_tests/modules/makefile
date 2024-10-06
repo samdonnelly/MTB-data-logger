@@ -26,26 +26,20 @@ endif
 # production code C and CPP files.
 #
 
-# ------------ DEVICES -------------
 
-# LSM303AGR 
-SRC_FILES += ./../../sources/devices/lsm303agr_driver.c       # Production code 
-SRC_DIRS += tests/lsm303agr                                   # Test doubles 
+# ------------ MODULES -------------
 
-# M8Q 
-SRC_FILES += ./../../sources/devices/m8q_driver.c             # Production code 
-SRC_FILES += ./../../sources/devices/m8q_controller.c         # Production code 
-SRC_DIRS += tests/m8q                                         # Test doubles 
+# DATA LOGGING 
+SRC_FILES += ./../../sources/modules/data_logging.c
+SRC_DIRS += tests/data_logging
 
-# nRF24L01 
-SRC_FILES += ./../../sources/devices/nrf24l01_driver.c        # Production code 
-SRC_DIRS += tests/nRF24L01                                    # Test doubles 
+# SYSTEM PARAMETERS 
+SRC_FILES += ./../../sources/modules/system_parameters.c
+SRC_DIRS += tests/system_parameters
 
-# ----------------------------------
-
-# ------------- TOOLS --------------
-
-SRC_FILES += ./../../sources/tools/tools.c                    # Production code 
+# USER INTERFACE 
+SRC_FILES += ./../../sources/modules/user_interface.c
+SRC_DIRS += tests/user_interface
 
 # ----------------------------------
 
@@ -65,18 +59,18 @@ SRC_FILES += ./../../sources/tools/tools.c                    # Production code
 TEST_SRC_DIRS += tests
 TEST_SRC_FILES += 
 
-# ------------ DEVICES -------------
+# ------------ MODULES ------------
 
-# LSM303AGR 
-TEST_SRC_DIRS += tests/lsm303agr                         # Unit tests 
+# DATA LOGGING 
+TEST_SRC_DIRS += tests/data_logging
 TEST_SRC_FILES += 
 
-# M8Q 
-TEST_SRC_DIRS += tests/m8q                               # Unit tests 
+# SYSTEM PARAMETERS 
+TEST_SRC_DIRS += tests/system_parameters
 TEST_SRC_FILES += 
 
-# nRF24L01 
-TEST_SRC_DIRS += tests/nrf24l01                          # Unit tests 
+# USER INTERFACE 
+TEST_SRC_DIRS += tests/user_interface
 TEST_SRC_FILES += 
 
 # ----------------------------------
@@ -110,16 +104,33 @@ CPPUTEST_USE_EXTENSIONS = Y
 INCLUDE_DIRS += $(CPPUTEST_HOME)/include
 
 # stmcode headers needed to get the tests to build 
-INCLUDE_DIRS += ./../../stmcode/Drivers/CMSIS/Device/ST/STM32F4xx/Include
-INCLUDE_DIRS += ./../../stmcode/Drivers/CMSIS/Core/Include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/FATFS/Target
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/FATFS/App
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Device/ST/STM32F4xx/Include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Include
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
 
-INCLUDE_DIRS += ./../../headers/devices            # Production code 
-INCLUDE_DIRS += ./../../headers/peripherals        # Production code 
-INCLUDE_DIRS += ./../../headers/tools              # Production code 
-INCLUDE_DIRS += mocks                              # Mocks 
-INCLUDE_DIRS += tests/lsm303agr                    # Test doubles 
-INCLUDE_DIRS += tests/m8q                          # Test doubles 
-INCLUDE_DIRS += tests/nrf24l01                     # Test doubles 
+# Driver library 
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/headers/devices
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/headers/peripherals
+INCLUDE_DIRS += ./../../../STM32F4-driver-library/headers/tools
+
+# MTBDL 
+INCLUDE_DIRS += mocks
+INCLUDE_DIRS += tests/main
+INCLUDE_DIRS += ./../../headers
+INCLUDE_DIRS += ./../../headers/core
+INCLUDE_DIRS += ./../../headers/config_files
+INCLUDE_DIRS += ./../../headers/config_files/devices
+INCLUDE_DIRS += ./../../headers/config_files/system
+INCLUDE_DIRS += ./../../headers/includes
+INCLUDE_DIRS += ./../../headers/modules
+INCLUDE_DIRS += ./../../headers/modules/development
 
 # --------------------------------------------------------------------
 

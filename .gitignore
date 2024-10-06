@@ -15,3 +15,19 @@ analysis/logs/
 # Hidden files 
 .DS_Store 
 __pycache__/
+
+
+# Unit tests 
+unit_tests/modules/test-lib
+unit_tests/modules/test-obj
+unit_tests/modules/sources
+unit_tests/modules/your_tests
+unit_tests/modules/*.exe
+unit_tests/modules/*.exe.stackdump
+
+unit_tests/system/test-lib
+unit_tests/system/test-obj
+unit_tests/system/sources
+unit_tests/system/your_tests
+unit_tests/system/*.exe
+unit_tests/system/*.exe.stackdump

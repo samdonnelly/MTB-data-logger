@@ -187,7 +187,6 @@ CPPUTEST_CXXFLAGS += -Wno-c++98-compat-pedantic
 CPPUTEST_CXXFLAGS += -Wno-c++98-compat
 
 # Additional exceptions added by me 
-CPPUTEST_WARNINGFLAGS += -Wno-int-to-pointer-cast
 
 # Coloroze output
 CPPUTEST_EXE_FLAGS += -c

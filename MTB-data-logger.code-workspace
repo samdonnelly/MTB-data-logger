@@ -58,7 +58,9 @@
 			"string_config.h": "c",
 			"hw125_controller.h": "c",
 			"i2c_comm_mock.h": "c",
-			"hd44780u_config.h": "c"
+			"hd44780u_config.h": "c",
+			"core_cm4_mock.h": "c",
+			"core_cm4.h": "c"
 		}
 	}
 }

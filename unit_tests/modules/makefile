@@ -104,6 +104,10 @@ CPPUTEST_USE_EXTENSIONS = Y
 INCLUDE_DIRS += $(CPPUTEST_HOME)/include
 
 # stmcode headers needed to get the tests to build 
+# Notes: 
+# - The "core_cm4.h" file is purposely not included from the stmcode because it caused 
+#   issues with the unit test compiler. Instead, there is a copy of the file made and 
+#   included in the mocks folder. 
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/FATFS/Target
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/FATFS/App
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FatFs/src
@@ -111,7 +115,6 @@ INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Part
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/include
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Device/ST/STM32F4xx/Include
-INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Include
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
 
@@ -203,7 +206,8 @@ CPPUTEST_CXXFLAGS += -Wno-c++98-compat-pedantic
 CPPUTEST_CXXFLAGS += -Wno-c++98-compat
 
 # Additional exceptions added by me 
-CPPUTEST_WARNINGFLAGS += -Wno-int-to-pointer-cast
+CPPUTEST_WARNINGFLAGS += -Wno-error=comment
+CPPUTEST_WARNINGFLAGS += -Wno-comment
 
 # Coloroze output
 CPPUTEST_EXE_FLAGS += -c

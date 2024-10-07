@@ -233,12 +233,19 @@ void log_init(
     // Debugging / log checking 
     mtbdl_log.overrun = CLEAR; 
 
-    // Configure the DMA stream 
+    // Configure the DMA stream. The address of the DMA read and write locations are cast 
+    // to integers so the DMA registers can be set. The address is cast to size_t first 
+    // before being cast again to uint32_t to satisfy the unit test compiler. 
+    size_t 
+    peripheral_addr = (size_t)(&mtbdl_log.adc->DR), 
+    memory0_addr = (size_t)mtbdl_log.adc_buff, 
+    memory1_addr = (size_t)NULL; 
+
     dma_stream_config(
         mtbdl_log.dma_stream, 
-        (uint32_t)(&mtbdl_log.adc->DR), 
-        (uint32_t)mtbdl_log.adc_buff, 
-        (uint32_t)NULL, 
+        (uint32_t)peripheral_addr, 
+        (uint32_t)memory0_addr, 
+        (uint32_t)memory1_addr, 
         (uint16_t)ADC_BUFF_SIZE); 
 }
 

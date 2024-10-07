@@ -130,7 +130,6 @@ INCLUDE_DIRS += ./../../headers/config_files/devices
 INCLUDE_DIRS += ./../../headers/config_files/system
 INCLUDE_DIRS += ./../../headers/includes
 INCLUDE_DIRS += ./../../headers/modules
-INCLUDE_DIRS += ./../../headers/modules/development
 
 # --------------------------------------------------------------------
 

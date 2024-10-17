@@ -186,10 +186,15 @@ void ui_msg_update(ui_msg_update_index_t msg_index);
 /**
  * @brief Format the idle state message 
  * 
- * @details The idle state message contains system values that are relevant to the user 
- *          and these values can change, This function updates the values of the idle 
- *          state message and triggers a write of this message to the screen. A list of 
- *          the values that the message contains are listed in the parameters below. 
+ * @details The idle state message contains information relevant to the user that can 
+ *          change based on the state of the system. This function updates the values of 
+ *          the idle state message and triggers a write of this message to the screen. 
+ *          Information in the idle state message includes: 
+ *          - Fork settings & travel (set manually by the user) 
+ *          - Shock settings & travel (set manually by the user) 
+ *          - Wheel size (manually set by the user) 
+ *          - Battery SOC 
+ *          - GPS position lock status 
  */
 void ui_set_idle_msg(void); 
 

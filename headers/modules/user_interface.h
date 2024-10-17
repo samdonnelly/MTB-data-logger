@@ -159,6 +159,8 @@ ui_btn_num_t ui_status_update(void);
 /**
  * @brief Change the state of the LED 
  * 
+ * @details 
+ * 
  * @param led : LED to update 
  */
 void ui_led_state_update(ws2812_led_index_t led); 
@@ -308,6 +310,13 @@ uint8_t ui_tx_end(void);
 /**
  * @brief Store the LED colour to use 
  * 
+ * @details This function does not write the new colour to the LED. Instead it saves the 
+ *          colour so an LED can be changed to this colour in future write events. This is 
+ *          used for cases where an LED changes between on and off states based on other 
+ *          events. This includes user buttons LEDs that light up when buttons are pressed 
+ *          and strobe/flashing LEDs that change on a timer. This colour is saved until 
+ *          updated next. 
+ * 
  * @param led_num : LED to set 
  * @param colour : LED colour to set 
  */
@@ -319,6 +328,12 @@ void ui_led_colour_set(
 /**
  * @brief Change the LED colour to write next 
  * 
+ * @details This function effectively writes the new colout to the LED. The state of all 
+ *          LEDs gets updated at a fixed period and the colour set in this function will 
+ *          be reflected in the next write event. The period at which the LEDs are 
+ *          updated is fast enough so that a user would not notice a delay between 
+ *          this function call and a colour change. 
+ * 
  * @param led_num : LED to change 
  * @param colour : LED colour to set 
  */
@@ -329,6 +344,13 @@ void ui_led_colour_change(
 
 /**
  * @brief Update the blinking LED duty cycle 
+ * 
+ * @details Some LEDs in the system are set to blink/flash/stobe and this function 
+ *          changes the amount of time they spend lit up. The period at which they 
+ *          flash is fixed. 
+ *          
+ *          Note that only system LEDs 0-3 (non-user button LEDs) are able to flash. 
+ *          Specifying an LED number greater than this will be ignored. 
  * 
  * @param led_num : LED to set 
  * @param duty_cycle : on time of the LED 

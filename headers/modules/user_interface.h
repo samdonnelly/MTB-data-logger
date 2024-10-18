@@ -144,7 +144,14 @@ void ui_init(
 // Device update 
 
 /**
- * @brief Button status update 
+ * @brief Periodic UI update 
+ * 
+ * @details Periodically checks user button press/release, updates an LED flashing 
+ *          counter, calculates battery SOC and updates a screen message refresh counter. 
+ *          The period of the check is controlled by a periodic interrupt and the checks 
+ *          called from this function may have their own counter threshold to divide the 
+ *          period further. This function is called continuously regardless of the system 
+ *          state. 
  * 
  * @return ui_btn_num_t : button currently being pressed 
  */
@@ -159,7 +166,17 @@ ui_btn_num_t ui_status_update(void);
 /**
  * @brief Change the state of the LED 
  * 
- * @details 
+ * @details Used to toggle an LED in a flashing/strobing/blinking pattern. This function 
+ *          must be repeatedly called in order for the pattern to maintain consistant 
+ *          timing. The LED will be alternated between the colour set using 
+ *          ui_led_colour_set and off with a duty cycle that can be set using 
+ *          ui_led_duty_set. The function checks the state of a counter to know when 
+ *          and what colour to update the LED to and this counter is controlled by the 
+ *          ui_status_update function. 
+ * 
+ * @see ui_status_update 
+ * @see ui_led_duty_set 
+ * @see ui_led_colour_set 
  * 
  * @param led : LED to update 
  */
@@ -167,7 +184,13 @@ void ui_led_state_update(ws2812_led_index_t led);
 
 
 /**
- * @brief Update GPS position status 
+ * @brief Update GPS position status LED 
+ * 
+ * @details Checks for a GPS position lock and updates the GPS LED accordingly. If there 
+ *          is a position lock then ui_led_state_update will be used to strobe the GPS 
+ *          LED. If there is no position lock then the LED will be forced off. This 
+ *          function must be called continuously for the LED to accurately reflect the 
+ *          GPS status. 
  */
 void ui_gps_led_status_update(void); 
 
@@ -179,6 +202,17 @@ void ui_gps_led_status_update(void);
 
 /**
  * @brief Update screen message output 
+ * 
+ * @details This function is used to update screen messages that have dynamic information 
+ *          (i.e. info that changes within a given screen message). It uses the periodic 
+ *          interrpt for user interface updates to control the frequency at which the 
+ *          specified message gets refreshed. This function is used in states such as the 
+ *          idle state which contains info about GPS lock and battery SOC. This function 
+ *          must be repeatedly called for updates to happen on schedule. States that don't 
+ *          have dynamic messages (i.e. states not available as arguments) don't need 
+ *          and can't use this function. 
+ * 
+ * @see ui_status_update 
  * 
  * @param msg_index : message to update 
  */
@@ -367,6 +401,10 @@ void ui_led_duty_set(
 
 /**
  * @brief Get battery SOC 
+ * 
+ * @details The battery SOC gets updated using the ui_status_update function. 
+ * 
+ * @see ui_status_update 
  * 
  * @return uint8_t : battery SOC 
  */

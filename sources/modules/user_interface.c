@@ -58,6 +58,16 @@ typedef void (*ui_screen_msg_func_ptr)(void);
 /**
  * @brief Button press check 
  * 
+ * @details Called by the ui_status_update function using a periodic interrupt. 
+ *          Checks the state of each of the user buttons using the switch debouncer to 
+ *          see if the button is pressed. If a button is seen to be pressed then the 
+ *          button pressed will be returned and the LED corresponding to the button 
+ *          will light up. Only one button press will be acknowledged at a given time 
+ *          meaning pressing two or more buttons at once will not register all the 
+ *          inputs. 
+ * 
+ * @see ui_status_update 
+ * 
  * @return ui_btn_num_t : button currently being pressed 
  */
 ui_btn_num_t ui_button_press(void); 
@@ -65,24 +75,53 @@ ui_btn_num_t ui_button_press(void);
 
 /**
  * @brief Button release check 
+ * 
+ * @details Called by the ui_status_update function using a periodic interrupt. 
+ *          Similar to ui_button_press but checks for buttons being newly released. If 
+ *          a button was just released then the LED for the button will be shut off. 
+ * 
+ * @see ui_status_update 
  */
 void ui_button_release(void); 
 
 
 /**
  * @brief Update the LED output 
+ * 
+ * @details Called by the ui_status_update function using a periodic interrupt. 
+ *          Increments an LED counter used for flashing/strobing/blinking LED that are 
+ *          controlled by the ui_led_state_update function. Also uses an internal counter 
+ *          to control when to write to the LEDs to update their colour as needed. 
+ * 
+ * @see ui_status_update 
+ * @see ui_led_state_update 
  */
 void ui_led_update(void); 
 
 
 /**
  * @brief Update the SOC calculation 
+ * 
+ * @details Called by the ui_status_update function using a periodic interrupt. 
+ *          Uses an internal counter to control when to re-calculate the battery SOC. The 
+ *          SOC can be fetched using the ui_get_soc getter. The SOC is used for user 
+ *          feedback and to put the system into low power mode if needed. 
+ * 
+ * @see ui_status_update 
+ * @see ui_get_soc 
  */
 void ui_soc_update(void); 
 
 
 /**
  * @brief Update screen message timer 
+ * 
+ * @details Called by the ui_status_update function using a periodic interrupt. 
+ *          Increments a counter used by the ui_msg_update function to control when 
+ *          screen messages get updated. 
+ * 
+ * @see ui_status_update 
+ * @see ui_msg_update 
  */
 void ui_msg_timer_update(void); 
 
@@ -93,7 +132,6 @@ void ui_msg_timer_update(void);
 // Variables 
 
 static mtbdl_ui_t mtbdl_ui; 
-
 
 // Function pointers to screen message formatting functions 
 static ui_screen_msg_func_ptr msg_table[UI_MSG_NUM] = 
@@ -396,6 +434,11 @@ void ui_gps_led_status_update(void)
 // Update screen message output 
 void ui_msg_update(ui_msg_update_index_t msg_index)
 {
+    if (msg_index >= UI_MSG_NUM)
+    {
+        return; 
+    }
+
     if (mtbdl_ui.msg_counter >= UI_MSG_COUNTER_PERIOD)
     {
         mtbdl_ui.msg_counter = CLEAR; 

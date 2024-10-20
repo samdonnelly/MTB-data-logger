@@ -101,6 +101,8 @@ mtbdl_param_t;
 
 /**
  * @brief System parameters init 
+ * 
+ * @details Initializes data for the module. 
  */
 void param_init(void); 
 
@@ -114,7 +116,8 @@ void param_init(void);
  *          exist then they will be read and stored into the data handling record. If not 
  *          then they will be created and intialized to default values. 
  *          
- *          This function should only be called after the SD card has been mounted. 
+ *          This function should only be called after the SD card has been mounted. It 
+ *          must also be called to get the already saved data. 
  */
 void param_file_sys_setup(void); 
 
@@ -127,6 +130,10 @@ void param_file_sys_setup(void);
 /**
  * @brief Write bike parameters to file 
  * 
+ * @details Takes the data stored in the data record and writes it to the file on the 
+ *          SD card. This should be done when a bike parameter is updated (for example 
+ *          when a user sets a new suspension setting in RX mode). 
+ * 
  * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */
 void param_write_bike_params(uint8_t mode); 
@@ -134,6 +141,10 @@ void param_write_bike_params(uint8_t mode);
 
 /**
  * @brief Read bike parameter on file 
+ * 
+ * @details Takes the data stored in the file on the SD card and populates the data 
+ *          record. This is typically only used when starting up and bike parameters 
+ *          that were previously saved need to be fetched. 
  * 
  * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */

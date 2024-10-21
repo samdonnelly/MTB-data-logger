@@ -154,6 +154,10 @@ void param_read_bike_params(uint8_t mode);
 /**
  * @brief Write system parameters to file 
  * 
+ * @details Takes the data stored in the data record and writes it to the file on the 
+ *          SD card. This should be done when a system parameter is updated (for example 
+ *          after calibration is complete). 
+ * 
  * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */
 void param_write_sys_params(uint8_t mode); 
@@ -161,6 +165,10 @@ void param_write_sys_params(uint8_t mode);
 
 /**
  * @brief Read system parameters on file 
+ * 
+ * @details Takes the data stored in the file on the SD card and populates the data 
+ *          record. This is typically only used when starting up and system parameters 
+ *          that were previously saved need to be fetched. 
  * 
  * @param mode : SD card file access mode (see HW125 driver mode flags) 
  */

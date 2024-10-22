@@ -236,6 +236,11 @@ void param_update_log_index(param_log_index_change_t log_index_change);
 /**
  * @brief Update bike setting 
  * 
+ * @details Will update a bike setting in the data record if the setting index is valid 
+ *          and the setting value is within range. If successful then the return status 
+ *          will be 1. 0 otherwise. Note that this function does not write the new value 
+ *          to the bike settings file on the SD card. 
+ * 
  * @param setting_index : bike setting index to set 
  * @param setting : value of bike setting to write 
  * @return uint8_t : update status - non-zero if parameter was updated successfully 
@@ -248,8 +253,10 @@ uint8_t param_update_bike_setting(
 /**
  * @brief Update system settings 
  * 
- * @details The setting value is cast to void because the system settings have different 
- *          data types. 
+ * @details Will update a system setting in the data record if the setting index is valid. 
+ *          The setting value is cast to void because the system settings have different 
+ *          data types. This function is typically called after calibration where system 
+ *          settings get determined. 
  * 
  * @param setting_index : system setting index to set 
  * @param setting : value of the system setting to write 
@@ -274,6 +281,9 @@ uint8_t param_get_log_index(void);
 
 /**
  * @brief Get bike settings 
+ * 
+ * @details Will return a bike setting if the provided index is valid. If the index is 
+ *          not valid then the max value of an unsigned 16-bit number will be returned. 
  * 
  * @param setting_index : bike setting index to get 
  * @return uint16_t : value of the bike setting on file 

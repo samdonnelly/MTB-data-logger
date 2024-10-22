@@ -127,21 +127,16 @@ mtbdl_log_t;
 /**
  * @brief Initialize data logging module 
  * 
- * @details Sets all the data handling info to its default value. This should be called 
- *          during the setup code. The arguments are saved into the data handling record 
- *          so they can be used where needed. 
- *          
- *          ADC DMA setup: 
- *          Called during system setup to configure the DMA stream. This function is 
- *          called instead of doing the initialization directly in the setup so that 
- *          the ADC buffer, used to store ADC values and exists in the scope of the 
- *          data handling file, can be associated with the setup. 
+ * @details Sets all the data handling info to its default value and configures the DMA 
+ *          stream. DMA stream configuration is done here instead of in the setup file so 
+ *          the buffer used to store ADC values (for suspension position and battery SOC) 
+ *          is within scope to set as the DMA memory address. 
  * 
  * @param rpm_irqn : wheel speed periodic interrupt index 
  * @param log_irqn : data sample periodic interrupt index 
- * @param adc : pointer to ADC port used 
+ * @param adc : ADC port used 
  * @param dma : DMA port to use 
- * @param dma_stream : pointer to DMA stream being used 
+ * @param dma_stream : DMA stream being used 
  */
 void log_init(
     IRQn_Type rpm_irqn, 
@@ -160,8 +155,8 @@ void log_init(
  * @brief Log name preparation 
  * 
  * @details Checks if there is room to create a new log file, and if so, generates a new 
- *          log file name. If the number of log file is at its capacity then the function 
- *          will return false. 
+ *          log file name. If the number of log files is at its capacity then the function 
+ *          will return false and a new name will not be generated. 
  * 
  * @return uint8_t : file availability status 
  */
@@ -189,7 +184,11 @@ void log_data_file_prep(void);
  * 
  * @details Resets data logging info and enables interrupts, all of which are needed 
  *          before beginning to log data correctly. Without a call to this function, no 
- *          data will be logged in the logging function. 
+ *          data will be logged in the logging function. A new file should be prepared 
+ *          before calling this function. 
+ * 
+ * @see log_data_name_prep 
+ * @see log_data_file_prep 
  */
 void log_data_prep(void); 
 
@@ -197,18 +196,31 @@ void log_data_prep(void);
 /**
  * @brief Logging data 
  * 
- * @details Logs bike data every sample period which is triggered by the sample period 
- *          interrupt. When triggered, data will be logged based on a predefined schedule 
- *          that samples data only as often as it's needed. Data includes trailmarkers 
- *          set by a user button press, suspension position potentiometer readings, wheel 
- *          speed calculations based on hall effect sensor frequency, IMU rates and GPS 
- *          position. Trailmarkers and suspension position are the only pieces of data 
- *          that get logged every interval/period. When data is read, it gets written to 
- *          the open log file on the SD card. This function should be called continuously 
- *          while in the data logging state. 
+ * @details Logs data at fixed intervals to the created log file. This function must be 
+ *          called continuously while in data logging mode in order for all data to be 
+ *          captured. 
  *          
- *          Before calling this function, the log file and data need to be prepared. 
+ *          A periodic interrupt will call the log_data_adc_handler function which 
+ *          records ADC data and increments an interrupt counter. This function looks for 
+ *          the interrupt counter to be greater than 0. If this is true then it writes 
+ *          data from the previous interval to the SD card. Data that can be written 
+ *          includes ADC data (suspension position), GPS location, IMU orientation, wheel 
+ *          speed and user input/flags. ADC data gets recorded each interval, while GPS, 
+ *          IMU and speed data gets recorded at a slower frequency but on a fixed 
+ *          schedule. The schedule for this data is defined in such a way that only 
+ *          one of GPS, IMU or speed data will get read and recorded during an interval. 
+ *          This is done because the interval is short and too much data handling could 
+ *          lead to a loss of data. 
+ *          
+ *          The perodic interrupt triggers every 10ms. 
+ *          
+ *          This function will also increment a revolution counter triggered by an 
+ *          external interrupt which is used to help with the wheel speed calculation. 
+ *          
+ *          Before calling this function, the log file and data need to be prepared using 
+ *          the prep functions above. 
  * 
+ * @see log_data_adc_handler 
  * @see log_data_name_prep 
  * @see log_data_file_prep 
  * @see log_data_prep 
@@ -218,16 +230,26 @@ void log_data(void);
 
 /**
  * @brief Data logging interrupt callback 
+ * 
+ * @details When in data logging mode, a periodic interrupt is used to keep track of 
+ *          when to record data. The interrupt handler calls this function. In this 
+ *          function an interrupt counter is incremented and ADC data from the previous 
+ *          interval recorded. The counter is used to trigger a data recording in the 
+ *          log file when the log_data function is called. Before exiting, this function 
+ *          will start the next ADC conversion which will be recored the next time the 
+ *          interrupt is triggered. 
+ * 
+ * @see log_data 
  */
 void log_data_adc_handler(void); 
 
 
 /**
- * @brief End the data logging 
+ * @brief End data logging 
  * 
- * @details Disables interrupts, saves and closes the log file, and updates the log index. 
- *          This function must be called after the logging function in order to finish 
- *          the logging process. 
+ * @details Disables interrupts and if a log file is currently open then saves and closes 
+ *          the file and updates the log file index. This function must be called once 
+ *          data logging is over. 
  */
 void log_data_end(void); 
 
@@ -240,13 +262,11 @@ void log_data_end(void);
 /**
  * @brief Calibration data prep 
  * 
- * @details Prepare the calibration data, enables reading from the IMU and potentiometers 
- *          and enables data sampling interrupt. This must be called before using the 
- *          calibration function. 
+ * @details Resets the data used to calibrate the system and enables data sampling 
+ *          interrupts. This must be called before using the calibration function. 
  *          
  *          Calibration requires finding the resting values/offsets of the bike IMU and 
- *          suspension potentiometers. These offsets are used "zero" the readings so 
- *          data logs values are more accurate. 
+ *          suspension potentiometers. These offsets are used "zero" the readings. 
  * 
  * @see log_calibration 
  */
@@ -256,16 +276,19 @@ void log_calibration_prep(void);
 /**
  * @brief Calibration 
  * 
- * @details Records IMU and suspension potentiometer values periodically (every time the 
- *          data sampling interrupt runs) by summing each successive reading. The number 
- *          of times the values are recorded is tracked. The sum of these values will be 
- *          used to find the average reading over a period of time in the calibration 
- *          calculation function. Note that since the values get summed together, the 
- *          amount of time this function is continuously called should be considered. 
+ * @details Records IMU and suspension ADC values periodically. All the read values for 
+ *          a particular parameter get summed and the number of samples recorded is 
+ *          kept track of. This data is then used by the log_calibration_calculation 
+ *          function to calculate the calibration value. The result of this operation 
+ *          is determining a value that will allow all IMU and ADC data to be "zeroed". 
  *          
- *          Calibration requires finding the resting values/offsets of the bike IMU and 
- *          suspension potentiometers. These offsets are used "zero" the readings so 
- *          data logs values are more accurate. 
+ *          This function must be called continuously during calibration mode so an 
+ *          appropriate amount of sample can be recorded. Note that the amount of time 
+ *          spent during calibration should be considered so that the sum of all 
+ *          parameter data does not exceed the maximum data size of the sum (signed 
+ *          32-bit). 
+ *          
+ *          Calibration runs for 5 seconds. 
  * 
  * @see log_calibration_prep 
  * @see log_calibration_calculation 
@@ -279,12 +302,9 @@ void log_calibration(void);
  * @details Disables the data sampling interrupt and averages the sensor readings 
  *          accumulated during the calibration function to provide new sensor calibration/
  *          offset values. This function only provides new calibration data if the 
- *          calibration function is called first. Note that this function does not update 
- *          the parameters file. That should be done separately if values are to be saved. 
- *          
- *          Calibration requires finding the resting values/offsets of the bike IMU and 
- *          suspension potentiometers. These offsets are used "zero" the readings so 
- *          data logs values are more accurate. 
+ *          calibration function is called first. After new values are found, they get 
+ *          written to the system parameters. The end result of calibration is having 
+ *          values that will allow all IMU and ADC data to be "zeroed". 
  * 
  * @see log_calibration 
  */
@@ -299,9 +319,11 @@ void log_calibration_calculation(void);
 /**
  * @brief Set trail marker flag 
  * 
- * @details Used by the run state while data logging to set the trail marker flag when 
- *          the marker button is pushed. The trail marker gets written to the log file 
- *          so the used can identify points within the log. 
+ * @details Sets the trail marker flag which gets recored in each interval while data 
+ *          logging. This function should be called when the user presses the trail 
+ *          marker button while in data logging mode. Calling this function outside of 
+ *          data logging mode will have no affect. A trail marker is used to help the 
+ *          user identify points of interest during a data log. 
  */
 void log_set_trailmark(void); 
 
@@ -313,6 +335,17 @@ void log_set_trailmark(void);
 
 /**
  * @brief Get battery voltage (ADC value) 
+ * 
+ * @details This function is used to fetch the current battery voltage so that the 
+ *          battery SOC can be calculated. Battery SOC is calculated in the UI module. 
+ *          While data logging, the ADC gets read constantly so there is no need to 
+ *          manually updated the battery voltage reading. However, when not in data 
+ *          logging mode, this function will trigger an ADC read to get the latest 
+ *          battery voltage data.
+ *          
+ *          Note that the value returned will depend on both the ADC resolution set and 
+ *          the voltage range of the battery. The SOC calculation should account for 
+ *          this. 
  * 
  * @return uint16_t : battery ADC that represents voltage 
  */

@@ -59,7 +59,6 @@ typedef enum {
 // Data record instance 
 static mtbdl_log_t mtbdl_log; 
 
-
 // Logging schedule data 
 typedef struct log_stream_schedule_s 
 {
@@ -76,32 +75,44 @@ log_stream_schedule_t;
 // Prototypes 
 
 /**
- * @brief Logging state machine function pointer 
+ * @brief Logging stream function pointer 
  */
 typedef void (*mtbdl_log_stream)(void); 
 
 
 /**
- * @brief Data logging stream: standard data only 
+ * @brief Data logging stream: standard 
  * 
- * @details This function is used during data logging only to record standard data for 
- *          the current logging interval. Standard data is data that gets recorded every 
- *          logging interval and it includes trail markers and suspension position 
- *          measurements. This is the default logging stream for when no other stream is 
- *          scheduled. See the 'stream_schedule' table for the data stream sequence. 
+ * @details When data logging, trail markers and ADC values get recorded every sampling 
+ *          interval, whereas GPS, IMU and wheel speed data gets recorded at a divided 
+ *          rate. This stream is used for recording only trail markers and ADC data, i.e. 
+ *          when no other data was scheduled to record in the interval. The 
+ *          "stream_table" is used to determine when other sets of data should be 
+ *          recorded. 
+ *          
+ *          Note that data is recorded every 10ms but data is only written to the SD card 
+ *          every 50ms. This means each SD card write contains 5 sets of data. If this 
+ *          function is called it means there was no other scheduled data for the 50ms 
+ *          interval. 
  */
 void log_stream_standard(void); 
 
 
 /**
- * @brief Data logging stream: GPS location 
+ * @brief Data logging stream: GPS position 
  * 
- * @details This function is used during data logging to record standard data and GPS 
- *          position for the current logging interval. The GPS device is only read from 
- *          during intervals where no other data besides standard data is being read 
- *          and recorded. That way an interval will not exceed its max time and this 
- *          stream can be only for recording the most recent GPS position. See the 
- *          'stream_schedule' table for the data stream sequence. 
+ * @details This function is used during data logging and it records all the same data 
+ *          as the standard logging stream but with the added addition of GPS position 
+ *          and ground speed. The GPS module will be read and the new values recorded 
+ *          when this is called. The "stream_table" is used to determine when other sets 
+ *          of data should be recorded. 
+ *          
+ *          Note that data is recorded every 10ms but data is only written to the SD card 
+ *          every 50ms. This means each SD card write contains 5 sets of data. If this 
+ *          function is called it means 4 sets of "standard" data were recorded and one 
+ *          set that also includes the GPS data. 
+ * 
+ * @see log_stream_standard 
  */
 void log_stream_gps(void); 
 
@@ -109,12 +120,18 @@ void log_stream_gps(void);
 /**
  * @brief Data logging stream: acceleration 
  * 
- * @details This function is used during data logging to record standard data and IMU 
- *          data for the current logging interval. This stream is executed across two 
- *          intervals, twice in a row. The first pass will trigger a read from the device 
- *          and the second pass will take the data and write it to the log file. This is 
- *          done to help prevent the interval time from being exceeded. See the 
- *          'stream_schedule' table for the data stream sequence. 
+ * @details This function is used during data logging and it records all the same data 
+ *          as the standard logging stream but with the added addition of IMU data for 
+ *          acceleration on each axis. The IMU module will be read and the new values 
+ *          recorded when this is called. The "stream_table" is used to determine when 
+ *          other sets of data should be recorded. 
+ *          
+ *          Note that data is recorded every 10ms but data is only written to the SD card 
+ *          every 50ms. This means each SD card write contains 5 sets of data. If this 
+ *          function is called it means 4 sets of "standard" data were recorded and one 
+ *          set that also includes the IMU data. 
+ * 
+ * @see log_stream_standard 
  */
 void log_stream_accel(void); 
 
@@ -122,11 +139,22 @@ void log_stream_accel(void);
 /**
  * @brief Data logging stream: wheel speed 
  * 
- * @details This function is used during data logging to record standard data for the 
- *          current logging interval and estimated wheel speed. Wheel speed is determined 
- *          by recording the number of hall effect sensor interrupts over a period of time 
- *          which means this stream has to look at previous sensor data. See the 
- *          'stream_schedule' table for the data stream sequence. 
+ * @details This function is used during data logging and it records all the same data 
+ *          as the standard logging stream but with the added addition of wheel 
+ *          revolution data. Wheel revolutions are recorded through the use of a Hall 
+ *          effect sensor and an external interrupt. The number of revolutions counted 
+ *          in an interval is recorded in a circular buffer so the X most recent 
+ *          intervals can be looked at. Wheel speed/RPM calculations are left for post 
+ *          processing because the revolution count and the interval time are known so 
+ *          there is no need to spend time doing that here. The "stream_table" is used 
+ *          to determine when other sets of data should be recorded. 
+ *          
+ *          Note that data is recorded every 10ms but data is only written to the SD card 
+ *          every 50ms. This means each SD card write contains 5 sets of data. If this 
+ *          function is called it means 4 sets of "standard" data were recorded and one 
+ *          set that also includes the wheel speed data. 
+ * 
+ * @see log_stream_standard 
  */
 void log_stream_speed(void); 
 
@@ -153,7 +181,7 @@ static mtbdl_log_stream stream_table[LOG_STREAM_NUM] =
 // - The standard log stream runs when no other stream needs to run so it does not 
 //   require a period or offset. 
 // - This table must order log streams in the same order that they are listed in 
-//   log_stream_t. 
+//   log_stream_t so the index corresponds to the correct function pointer. 
 static const log_stream_schedule_t stream_schedule[LOG_STREAM_NUM] = 
 {
     // { Log stream,      starting offset, counter period } 

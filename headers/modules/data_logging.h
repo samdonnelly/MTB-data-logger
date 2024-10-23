@@ -35,7 +35,7 @@
 #define LOG_MAX_LOG_LEN (LOG_PERIOD_DIVIDER*MTBDL_MAX_STR_LEN) 
 
 // Wheel RPM info 
-#define LOG_REV_SAMPLE_SIZE 4            // Number of samples for revolution calc 
+#define LOG_REV_SAMPLE_SIZE 20           // Number of samples for revolution calc 
 
 //=======================================================================================
 

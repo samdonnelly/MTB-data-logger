@@ -29,9 +29,6 @@
 #define LOG_PERIOD 10                   // (ms) Period between data samples 
 #define LOG_MAX_FILES 250               // Max data log file number 
 
-// Wheel RPM info 
-#define LOG_REV_FREQ 5                  // (Hz) Revolution calc frequency 
-
 // Timing 
 #define LOG_ADC_DMA_WAIT 1000           // Number of times to wait on ADC DMA to complete 
 
@@ -182,13 +179,15 @@ static mtbdl_log_stream stream_table[LOG_STREAM_NUM] =
 //   require a period or offset. 
 // - This table must order log streams in the same order that they are listed in 
 //   log_stream_t so the index corresponds to the correct function pointer. 
+// - A non-standard stream runs on multiples of 50ms periods. The counter period 
+//   determines the multiple. Counter period * 50ms == period of stream execution. 
 static const log_stream_schedule_t stream_schedule[LOG_STREAM_NUM] = 
 {
     // { Log stream,      starting offset, counter period } 
     {LOG_STREAM_STANDARD, 0,               0}, 
-    {LOG_STREAM_GPS,      0,               20}, 
-    {LOG_STREAM_ACCEL,    1,               2}, 
-    {LOG_STREAM_SPEED,    2,               4} 
+    {LOG_STREAM_GPS,      0,               20},   // 50ms * 20 == 1s period 
+    {LOG_STREAM_ACCEL,    1,               2},    // 50ms * 2 == 100ms period 
+    {LOG_STREAM_SPEED,    2,               4}     // 50ms * 4 == 200ms period 
 }; 
 
 //=======================================================================================
@@ -342,11 +341,13 @@ void log_data_file_prep(void)
         hw125_puts(mtbdl_log.data_str); 
 
         // Logging info 
+        uint16_t rev_period = LOG_PERIOD * LOG_PERIOD_DIVIDER * 
+                              stream_schedule[LOG_STREAM_SPEED].counter_period; 
         snprintf(mtbdl_log.data_str, 
                  MTBDL_MAX_STR_LEN, 
                  mtbdl_param_data, 
                  LOG_PERIOD, 
-                 LOG_REV_FREQ, 
+                 rev_period, 
                  LOG_REV_SAMPLE_SIZE); 
         hw125_puts(mtbdl_log.data_str); 
         
@@ -433,7 +434,7 @@ void log_data(void)
             // the use of 'interrupt_counter' and 'log_interval_divider') is designed to 
             // give time for longer processes to complete without dropping any data from 
             // each logging interval. 'overrun' keeps track of how many times the code 
-            // has lost data. 
+            // has lost data during a logging session. 
             if (mtbdl_log.interrupt_counter)
             {
                 mtbdl_log.overrun++; 

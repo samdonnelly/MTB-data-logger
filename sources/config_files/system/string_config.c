@@ -52,7 +52,7 @@ mtbdl_param_index[] = "File Index: %u\r\n",
 mtbdl_param_accel_rest[] = "IMU Offset: X:%d Y:%d Z:%d\r\n", 
 mtbdl_param_pot_rest[] = "Pot Offset: F:%u S:%u\r\n", 
 mtbdl_param_time[] = "UTC: %s %s\r\n", 
-mtbdl_param_data[] = "Data: T:%ums RPM_f:%uHz RPM_size:%u\r\n", 
+mtbdl_param_data[] = "Data: T:%ums REV_T:%ums REV_size:%u\r\n", 
 // Fault information 
 mtbdl_fault_info[] = "Fault code: %u", 
 // Data log information 

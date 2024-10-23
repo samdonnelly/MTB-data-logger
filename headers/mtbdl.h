@@ -103,16 +103,13 @@ extern mtbdl_trackers_t mtbdl_trackers;
 // Functions 
 
 /**
- * @brief Function that gets called once. Initialization function calls go here.
+ * @brief MTB data logger setup - called once 
  */
 void mtbdl_init(void); 
 
 
 /**
- * @brief MTB DL application 
- * 
- * @details Checks for system faults, updates the status of user buttons, executes the 
- *          systems state machine and calls devices controllers. 
+ * @brief MTB data logger main application 
  */
 void mtbdl_app(void); 
 

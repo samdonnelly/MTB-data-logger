@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief Battery configuration interface 
+ * @brief Battery config interface 
  * 
  * @version 0.1
  * @date 2024-09-11
@@ -24,7 +24,7 @@
 
 
 //=======================================================================================
-// Zeee - 11.1V (3 cell), 1500mAh, LiPo 
+// Battery: Zeee - 11.1V (3 cell), 1500mAh, LiPo 
 
 /**
  * @brief Battery SOC (state of charge) calculation 

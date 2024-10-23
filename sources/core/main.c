@@ -93,7 +93,7 @@ int main(void)
     MX_GPIO_Init();
     MX_FATFS_Init();
 
-    // Infinite loop 
+    // Run application 
     while (1)
     {
         mtbdl_app();

@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief Battery configuration 
+ * @brief Battery config 
  * 
  * @version 0.1
  * @date 2024-09-11
@@ -21,7 +21,7 @@
 
 
 //=======================================================================================
-// Zeee - 11.1V (3 cell), 1500mAh, LiPo 
+// Battery: Zeee - 11.1V (3 cell), 1500mAh, LiPo 
 
 // Notes: 
 // - STM32 ADC operates in the range of 0-V_ref volts where V_ref is between 2.4V and 

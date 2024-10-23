@@ -3,7 +3,7 @@
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief SAM-M8Q GPS configuration file interface 
+ * @brief SAM-M8Q GPS config interface 
  * 
  * @version 0.1
  * @date 2022-10-02

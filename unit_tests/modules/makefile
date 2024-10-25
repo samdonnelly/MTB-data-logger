@@ -125,7 +125,9 @@ INCLUDE_DIRS += ./../../../STM32F4-driver-library/headers/tools
 
 # MTBDL 
 INCLUDE_DIRS += mocks
-INCLUDE_DIRS += tests/main
+INCLUDE_DIRS += tests/data_logging
+INCLUDE_DIRS += tests/system_parameters
+INCLUDE_DIRS += tests/user_interface
 INCLUDE_DIRS += ./../../headers
 INCLUDE_DIRS += ./../../headers/core
 INCLUDE_DIRS += ./../../headers/config_files

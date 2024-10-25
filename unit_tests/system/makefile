@@ -94,7 +94,6 @@ INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Part
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/include
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Device/ST/STM32F4xx/Include
-INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/CMSIS/Include
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc
 INCLUDE_DIRS += ./../../../STM32F4-driver-library/stmcode/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
 

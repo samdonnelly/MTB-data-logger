@@ -22,17 +22,6 @@
 
 
 //=======================================================================================
-// Macros 
-
-#define PARAM_MAX_SUS_SETTING 20         // Max compression and rebound setting 
-#define PARAM_MAX_SUS_PSI 1000           // Max suspension pressure (psi) 
-#define PARAM_MAX_SUS_TRAVEL 500         // Max suspension travel distance (mm) 
-#define PARAM_MAX_WHEEL_SIZE 40          // Max wheel size/diameter (in) 
-
-//=======================================================================================
-
-
-//=======================================================================================
 // Variables 
 
 static mtbdl_param_t mtbdl_param; 

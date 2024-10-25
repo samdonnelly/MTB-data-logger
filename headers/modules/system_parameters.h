@@ -25,6 +25,18 @@
 
 
 //=======================================================================================
+// Macros 
+
+// Setting limits 
+#define PARAM_MAX_SUS_SETTING 20         // Max compression and rebound setting 
+#define PARAM_MAX_SUS_PSI 1000           // Max suspension pressure (psi) 
+#define PARAM_MAX_SUS_TRAVEL 500         // Max suspension travel distance (mm) 
+#define PARAM_MAX_WHEEL_SIZE 40          // Max wheel size/diameter (in) 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Enums 
 
 // Log index change type 
@@ -240,6 +252,20 @@ void param_update_log_index(param_log_index_change_t log_index_change);
  *          and the setting value is within range. If successful then the return status 
  *          will be 1. 0 otherwise. Note that this function does not write the new value 
  *          to the bike settings file on the SD card. 
+ *          
+ *          The maximum value for each bike setting is as follows: 
+ *          
+ *          Settings: Fork compression, fork rebound, shock lockout, shock rebound 
+ *          Max Value: PARAM_MAX_SUS_SETTING 
+ *          
+ *          Settings: Fork psi, shock psi 
+ *          Max Value: PARAM_MAX_SUS_PSI 
+ *          
+ *          Settings: Fork travel, shock travel 
+ *          Max Value: PARAM_MAX_SUS_TRAVEL 
+ *          
+ *          Settings: Wheel size 
+ *          Max Value: PARAM_MAX_WHEEL_SIZE 
  * 
  * @param setting_index : bike setting index to set 
  * @param setting : value of bike setting to write 
@@ -248,7 +274,6 @@ void param_update_log_index(param_log_index_change_t log_index_change);
 uint8_t param_update_bike_setting(
     param_bike_set_index_t setting_index, 
     uint16_t setting); 
-
 
 /**
  * @brief Update system settings 

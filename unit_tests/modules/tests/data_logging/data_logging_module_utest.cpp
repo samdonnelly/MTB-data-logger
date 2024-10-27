@@ -34,10 +34,8 @@ extern "C"
 // Macros 
 
 // Possible mocks needed: 
-// - HW125 driver 
 // - M8Q driver 
 // - ADC driver 
-// - NVIC 
 
 // Test list: 
 // - log_data_name_prep 
@@ -47,9 +45,6 @@ extern "C"
 //   - String formatting? 
 // - log_data 
 //   - Stream schedule & table works as expected 
-//   - Standard stream works as expected 
-//   - GPS stream works as expected 
-//   - IMU stream works as expected 
 //   - Wheel speed stream works as expected 
 //   - Overrun bit does not set 
 //   - Overrun bit force set 
@@ -64,6 +59,11 @@ extern "C"
 //   - Calculation performed correctly 
 // - log_get_batt_voltage 
 //   - Update ADC only if data logging interrupts are disabled 
+
+// Things that don't need testing: 
+// - The GPS and acclerometer data logging streams. These streams just call device 
+//   controllers and driver getters which is not within the scope of this module 
+//   unit test to check the functionality of. 
 
 //=======================================================================================
 

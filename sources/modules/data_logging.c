@@ -26,7 +26,6 @@
 // Macros 
 
 // Data logging 
-#define LOG_PERIOD 10                   // (ms) Period between data samples 
 #define LOG_MAX_FILES 250               // Max data log file number 
 
 // Timing 

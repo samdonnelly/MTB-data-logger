@@ -29,9 +29,10 @@
 // Macros 
 
 // Data logging 
+#define LOG_PERIOD 10                    // (ms) Period between data samples 
+#define LOG_PERIOD_DIVIDER 5             // LOG_PERIOD * this == non-ADC log stream period 
 #define LOG_GPS_BUFF_LEN 12              // GPS coordinate buffer size 
 #define LOG_TIME_BUFF_LEN 10             // UTC time and data buff size 
-#define LOG_PERIOD_DIVIDER 5             // LOG_PERIOD * this == non-ADC log stream period 
 #define LOG_MAX_LOG_LEN (LOG_PERIOD_DIVIDER*MTBDL_MAX_STR_LEN) 
 
 // Wheel RPM info 
@@ -79,7 +80,7 @@ typedef struct mtbdl_log_s
     uint8_t lat_str[LOG_GPS_BUFF_LEN];          // Latitude string 
     uint8_t NS;                                 // North/South indicator of latitude 
     uint8_t lon_str[LOG_GPS_BUFF_LEN];          // Longitude string 
-    uint8_t EW;                                 // Eeast/West indicator of longitude 
+    uint8_t EW;                                 // East/West indicator of longitude 
     uint8_t sog_str[LOG_GPS_BUFF_LEN];          // Speed over ground string 
 
     // Accelerometer data 

@@ -38,16 +38,9 @@ extern "C"
 // - ADC driver 
 
 // Test list: 
-// - log_data_name_prep 
-//   - Log name creation (index within bounds) 
-//   - Log index out of bounds 
-// - log_data_file_prep 
-//   - String formatting? 
 // - log_data 
 //   - Stream schedule & table works as expected 
 //   - Wheel speed stream works as expected 
-//   - Overrun bit does not set 
-//   - Overrun bit force set 
 //   - Interrupt callback execution 
 // - log_data_adc_handler 
 //   - ADC buffer populated but also capped 

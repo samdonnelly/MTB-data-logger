@@ -15,10 +15,6 @@
 //=======================================================================================
 // Notes 
 
-// Possible mocks needed: 
-// - M8Q driver 
-// - ADC driver 
-
 // Test list: 
 // - log_data 
 //   - Stream schedule & table works as expected 
@@ -75,7 +71,7 @@ TEST_GROUP(data_logging_test)
     // Constructor 
     void setup()
     {
-        // 
+        log_init(EXTI4_IRQn, TIM1_TRG_COM_TIM11_IRQn, ADC1, DMA2, DMA2_Stream0); 
     }
 
     // Destructor 
@@ -96,33 +92,35 @@ TEST_GROUP(data_logging_test)
 //=======================================================================================
 // Tests 
 
-// Log Data: Schedule 
+// Log Data: schedule 
 TEST(data_logging_test, log_data_schedule)
 {
     // This test makes sure no two streams get scheduled to run at the same time. This 
     // is done using the starting offsets and counter periods of each stream. 
 
-    uint16_t test_time = LOG_PERIOD * LOG_PERIOD_DIVIDER * LOG_TEST_NUM_INTERVALS; 
-    uint16_t overlap_count = CLEAR; 
+    uint16_t 
+    test_time = LOG_PERIOD * LOG_PERIOD_DIVIDER * LOG_TEST_NUM_INTERVALS, 
+    overlap_count = CLEAR;   // Number of times more than one stream was called 
+
     uint8_t 
-    gps_count = LOG_GPS_OFFSET, 
-    accel_count = LOG_ACCEL_OFFSET, 
-    speed_count = LOG_SPEED_OFFSET; 
-    uint8_t period_count = CLEAR; 
+    period_count = CLEAR,             // Keeps track of number of streams called at once 
+    gps_count = LOG_GPS_OFFSET,       // GPS log stream counter 
+    accel_count = LOG_ACCEL_OFFSET,   // Accelerometer log stream counter 
+    speed_count = LOG_SPEED_OFFSET;   // Wheel speed log stream counter 
 
     for (uint16_t i = CLEAR; i < test_time; i++)
     {
-        if (gps_count++ >= LOG_GPS_PERIOD)
+        if (++gps_count >= LOG_GPS_PERIOD)
         {
             gps_count = CLEAR; 
             period_count++; 
         }
-        if (accel_count++ >= LOG_ACCEL_PERIOD)
+        if (++accel_count >= LOG_ACCEL_PERIOD)
         {
             accel_count = CLEAR; 
             period_count++; 
         }
-        if (speed_count++ >= LOG_SPEED_PERIOD)
+        if (++speed_count >= LOG_SPEED_PERIOD)
         {
             speed_count = CLEAR; 
             period_count++; 
@@ -137,6 +135,14 @@ TEST(data_logging_test, log_data_schedule)
     }
 
     UNSIGNED_LONGS_EQUAL(TRUE, overlap_count == 0); 
+}
+
+
+// Log Data: data log output  
+TEST(data_logging_test, log_data_log_output)
+{
+    log_data_prep(); 
+    log_data(); 
 }
 
 //=======================================================================================

@@ -28,9 +28,17 @@
 //=======================================================================================
 // Macros 
 
-// Data logging 
+// Data logging sequence/timing 
 #define LOG_PERIOD 10                    // (ms) Period between data samples 
 #define LOG_PERIOD_DIVIDER 5             // LOG_PERIOD * this == non-ADC log stream period 
+#define LOG_GPS_OFFSET 0                 // GPS stream starting log offset 
+#define LOG_GPS_PERIOD 20                // GPS stream counter period 
+#define LOG_ACCEL_OFFSET 1               // ACCEL stream starting log offset 
+#define LOG_ACCEL_PERIOD 2               // ACCEL stream counter period 
+#define LOG_SPEED_OFFSET 2               // SPEED stream starting log offset 
+#define LOG_SPEED_PERIOD 4               // SPEED stream counter period 
+
+// Buffer sizes 
 #define LOG_GPS_BUFF_LEN 12              // GPS coordinate buffer size 
 #define LOG_TIME_BUFF_LEN 10             // UTC time and data buff size 
 #define LOG_MAX_LOG_LEN (LOG_PERIOD_DIVIDER*MTBDL_MAX_STR_LEN) 

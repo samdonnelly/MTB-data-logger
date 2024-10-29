@@ -451,6 +451,8 @@ void ui_msg_update(ui_msg_update_index_t msg_index)
 void ui_set_idle_msg(void)
 {
     hd44780u_msgs_t msg[MTBDL_MSG_LEN_4_LINE]; 
+    uint8_t str_len = HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET; 
+    char line1[str_len], line2[str_len], line3[str_len]; 
 
     // Create an editable copy of the message 
     for (uint8_t i = CLEAR; i < MTBDL_MSG_LEN_4_LINE; i++) 
@@ -464,29 +466,38 @@ void ui_set_idle_msg(void)
     // snprintf will NULL terminate the string at the screen line length so in order to use 
     // the last spot on the screen line the message length must be indexed up by one 
 
-    snprintf(msg[HD44780U_L1].msg, 
-             (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+    // snprintf(msg[HD44780U_L1].msg, 
+    snprintf(line1, 
+             //  (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+             str_len, 
              mtbdl_idle_msg[HD44780U_L1].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_FPSI), 
              param_get_bike_setting(PARAM_BIKE_SET_FC), 
              param_get_bike_setting(PARAM_BIKE_SET_FR), 
              param_get_bike_setting(PARAM_BIKE_SET_FT)); 
+    memcpy((void *)msg[HD44780U_L1].msg, (void *)line1, HD44780U_LINE_LEN); 
     
-    snprintf(msg[HD44780U_L2].msg, 
-             (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+    // snprintf(msg[HD44780U_L2].msg, 
+    snprintf(line2, 
+             //  (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+             str_len, 
              mtbdl_idle_msg[HD44780U_L2].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_SPSI), 
              param_get_bike_setting(PARAM_BIKE_SET_SL), 
              param_get_bike_setting(PARAM_BIKE_SET_SR), 
              param_get_bike_setting(PARAM_BIKE_SET_ST)); 
+    memcpy((void *)msg[HD44780U_L1].msg, (void *)line1, HD44780U_LINE_LEN); 
     
-    snprintf(msg[HD44780U_L3].msg, 
-             (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+    // snprintf(msg[HD44780U_L3].msg, 
+    snprintf(line3, 
+             //  (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
+             str_len, 
              mtbdl_idle_msg[HD44780U_L3].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_WS), 
              mtbdl_ui.soc, 
              (char)(mtbdl_ui.navstat >> SHIFT_8), 
              (char)(mtbdl_ui.navstat)); 
+    memcpy((void *)msg[HD44780U_L1].msg, (void *)line1, HD44780U_LINE_LEN); 
 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
 }

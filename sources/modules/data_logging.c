@@ -180,13 +180,14 @@ static mtbdl_log_stream stream_table[LOG_STREAM_NUM] =
 //   log_stream_t so the index corresponds to the correct function pointer. 
 // - A non-standard stream runs on multiples of 50ms periods. The counter period 
 //   determines the multiple. Counter period * 50ms == period of stream execution. 
+// - LOG_PERIOD * LOG_PERIOD_DIVIDER * LOG_X_PERIOD == X Stream period (time) 
 static const log_stream_schedule_t stream_schedule[LOG_STREAM_NUM] = 
 {
-    // { Log stream,      starting offset, counter period } 
-    {LOG_STREAM_STANDARD, 0,               0}, 
-    {LOG_STREAM_GPS,      0,               20},   // 50ms * 20 == 1s period 
-    {LOG_STREAM_ACCEL,    1,               2},    // 50ms * 2 == 100ms period 
-    {LOG_STREAM_SPEED,    2,               4}     // 50ms * 4 == 200ms period 
+    // { Log stream,      starting offset,  counter period } 
+    {LOG_STREAM_STANDARD, 0,                0}, 
+    {LOG_STREAM_GPS,      LOG_GPS_OFFSET,   LOG_GPS_PERIOD}, 
+    {LOG_STREAM_ACCEL,    LOG_ACCEL_OFFSET, LOG_ACCEL_PERIOD}, 
+    {LOG_STREAM_SPEED,    LOG_SPEED_OFFSET, LOG_SPEED_PERIOD} 
 }; 
 
 //=======================================================================================

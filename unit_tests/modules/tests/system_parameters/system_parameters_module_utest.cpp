@@ -68,13 +68,18 @@ TEST_GROUP(system_parameters_test)
 
 // Write then get system parameters 
 void write_get_sys_params(
-    int16_t *accel_x_rest, 
-    int16_t *accel_y_rest, 
-    int16_t *accel_z_rest, 
-    uint16_t *pot_fork_rest, 
-    uint16_t *pot_shock_rest)
+    int16_t& accel_x_rest, 
+    int16_t& accel_y_rest, 
+    int16_t& accel_z_rest, 
+    uint16_t& pot_fork_rest, 
+    uint16_t& pot_shock_rest)
 {
     char param_buff[HW125_MOCK_STR_SIZE]; 
+
+    // Temporary variables were added so that sscanf would work for the unit tests 
+    // across all platforms. 
+    int accel_x = CLEAR, accel_y = CLEAR, accel_z = CLEAR; 
+    unsigned int pot_fork = CLEAR, pot_shock = CLEAR; 
 
     // We use the hw125 controller mock to first "write" the parameters to an SD card 
     // before fetching them. 
@@ -90,16 +95,22 @@ void write_get_sys_params(
     hw125_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(param_buff, 
            mtbdl_param_accel_rest, 
-           accel_x_rest, 
-           accel_y_rest, 
-           accel_z_rest); 
+           &accel_x, 
+           &accel_y, 
+           &accel_z); 
 
     // Read potentiometer starting points 
     hw125_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(param_buff, 
            mtbdl_param_pot_rest, 
-           pot_fork_rest, 
-           pot_shock_rest); 
+           &pot_fork, 
+           &pot_shock); 
+
+    accel_x_rest = accel_x; 
+    accel_y_rest = accel_y; 
+    accel_z_rest = accel_z; 
+    pot_fork_rest = pot_fork; 
+    pot_shock_rest = pot_shock; 
 }
 
 //=======================================================================================
@@ -270,11 +281,11 @@ TEST(system_parameters_test, sys_param_set_invalid_setting)
     // Check initial value of system parameters. These values are initialized to zero 
     // in the module when we call the module init function (see constructor). 
     write_get_sys_params(
-        &accel_x_rest, 
-        &accel_y_rest, 
-        &accel_z_rest, 
-        &pot_fork_rest, 
-        &pot_shock_rest); 
+        accel_x_rest, 
+        accel_y_rest, 
+        accel_z_rest, 
+        pot_fork_rest, 
+        pot_shock_rest); 
 
     LONGS_EQUAL(CLEAR, accel_x_rest); 
     LONGS_EQUAL(CLEAR, accel_y_rest); 
@@ -295,11 +306,11 @@ TEST(system_parameters_test, sys_param_set_invalid_setting)
 
     // Check that no parameter value has changed 
     write_get_sys_params(
-        &accel_x_rest, 
-        &accel_y_rest, 
-        &accel_z_rest, 
-        &pot_fork_rest, 
-        &pot_shock_rest); 
+        accel_x_rest, 
+        accel_y_rest, 
+        accel_z_rest, 
+        pot_fork_rest, 
+        pot_shock_rest); 
 
     LONGS_EQUAL(CLEAR, accel_x_rest); 
     LONGS_EQUAL(CLEAR, accel_y_rest); 
@@ -330,11 +341,11 @@ TEST(system_parameters_test, sys_param_set)
 
     // Check that the parameters are updated 
     write_get_sys_params(
-        &accel_x_rest, 
-        &accel_y_rest, 
-        &accel_z_rest, 
-        &pot_fork_rest, 
-        &pot_shock_rest); 
+        accel_x_rest, 
+        accel_y_rest, 
+        accel_z_rest, 
+        pot_fork_rest, 
+        pot_shock_rest); 
 
     LONGS_EQUAL(accel_x_rest_set, accel_x_rest); 
     LONGS_EQUAL(accel_y_rest_set, accel_y_rest); 

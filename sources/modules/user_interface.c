@@ -464,11 +464,11 @@ void ui_set_idle_msg(void)
 
     // Format the messages with data 
     // snprintf will NULL terminate the string at the screen line length so in order to use 
-    // the last spot on the screen line the message length must be indexed up by one 
+    // the last spot on the screen line the message length must be indexed up by one. 
+    // But since indexing up by one would go over the screen line length, the data must 
+    // then be recopied to the message buffer to write to the screen. 
 
-    // snprintf(msg[HD44780U_L1].msg, 
     snprintf(line1, 
-             //  (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
              str_len, 
              mtbdl_idle_msg[HD44780U_L1].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_FPSI), 
@@ -477,9 +477,7 @@ void ui_set_idle_msg(void)
              param_get_bike_setting(PARAM_BIKE_SET_FT)); 
     memcpy((void *)msg[HD44780U_L1].msg, (void *)line1, HD44780U_LINE_LEN); 
     
-    // snprintf(msg[HD44780U_L2].msg, 
     snprintf(line2, 
-             //  (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
              str_len, 
              mtbdl_idle_msg[HD44780U_L2].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_SPSI), 
@@ -488,9 +486,7 @@ void ui_set_idle_msg(void)
              param_get_bike_setting(PARAM_BIKE_SET_ST)); 
     memcpy((void *)msg[HD44780U_L1].msg, (void *)line1, HD44780U_LINE_LEN); 
     
-    // snprintf(msg[HD44780U_L3].msg, 
     snprintf(line3, 
-             //  (HD44780U_LINE_LEN + UI_SCREEN_LINE_CHAR_OFFSET), 
              str_len, 
              mtbdl_idle_msg[HD44780U_L3].msg, 
              param_get_bike_setting(PARAM_BIKE_SET_WS), 

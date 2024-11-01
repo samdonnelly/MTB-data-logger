@@ -31,11 +31,6 @@
 // - log_get_batt_voltage 
 //   - Update ADC only if data logging interrupts are disabled 
 
-// Things that don't need testing: 
-// - The GPS and acclerometer data logging streams. These streams just call device 
-//   controllers and driver getters which is not within the scope of this module 
-//   unit test to check the functionality of. 
-
 //=======================================================================================
 
 

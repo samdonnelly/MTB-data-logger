@@ -22,8 +22,6 @@
 //   - Interrupt callback execution 
 // - log_data_adc_handler 
 //   - ADC buffer populated but also capped 
-// - log_data_end 
-//   - File closed and index decremented if file is open 
 // - log_calibration 
 //   - Data read sequence is correct 
 // - log_calibration_calculation 

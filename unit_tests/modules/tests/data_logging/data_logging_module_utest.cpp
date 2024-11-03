@@ -131,11 +131,35 @@ TEST(data_logging_test, log_data_schedule)
 }
 
 
-// Log Data: data log output  
+// Log Data: data log output 
 TEST(data_logging_test, log_data_log_output)
 {
+    // Set all the desired sensor data using the mocks 
+    // Record data logs until you can check the output of all streams. Check the 
+    // sequence as well. 
+
     log_data_prep(); 
     log_data(); 
+}
+
+
+// Log Data: wheel revolution calculation 
+TEST(data_logging_test, log_data_wheel_revs)
+{
+    // Fill up revolution buffer counter such that you will get a know sum. 
+    // Add one more rev value so one value is removed and the new one added. 
+    // Re-determine the rev sum with the one value difference so make sure the circular 
+    // buffer works and the sum works. 
+}
+
+
+// Calibration: calibration calculation 
+TEST(data_logging_test, calibration_calculation)
+{
+    // Set the needed sensor data. 
+    // Call the calibration function enough times to simulate an actual calibration. 
+    // Change the sensor data mid-way as needed. 
+    // Call the calculation function when done to check the averages. 
 }
 
 //=======================================================================================

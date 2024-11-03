@@ -413,7 +413,7 @@ void log_data(void)
     {
         handler_flags.exti4_flag = CLEAR; 
         mtbdl_log.rev_count++; 
-    }    
+    }
     
     // 'interrupt_counter' gets incremented in the perodic interrupt callback function 
     // below. Using this variable instead of just the interrupt handler flag to trigger 

@@ -14,21 +14,6 @@
 
 //=======================================================================================
 // Notes 
-
-// Test list: 
-// - log_data 
-//   - Stream schedule & table works as expected 
-//   - Wheel speed stream works as expected 
-//   - Interrupt callback execution 
-// - log_data_adc_handler 
-//   - ADC buffer populated but also capped 
-// - log_calibration 
-//   - Data read sequence is correct 
-// - log_calibration_calculation 
-//   - Calculation performed correctly 
-// - log_get_batt_voltage 
-//   - Update ADC only if data logging interrupts are disabled 
-
 //=======================================================================================
 
 

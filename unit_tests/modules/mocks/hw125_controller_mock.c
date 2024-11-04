@@ -100,7 +100,10 @@ void hw125_set_reset_flag(void)
 // Set directory 
 void hw125_set_dir(const TCHAR *dir)
 {
-    // 
+    if (dir == NULL)
+    {
+        return; 
+    }
 }
 
 
@@ -116,6 +119,11 @@ FRESULT hw125_open(
     const TCHAR *file_name, 
     uint8_t mode)
 {
+    if (file_name == NULL)
+    {
+        return FR_INVALID_OBJECT; 
+    }
+
     return FR_OK; 
 }
 

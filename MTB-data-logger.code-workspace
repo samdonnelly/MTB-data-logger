@@ -60,7 +60,8 @@
 			"i2c_comm_mock.h": "c",
 			"hd44780u_config.h": "c",
 			"core_cm4_mock.h": "c",
-			"core_cm4.h": "c"
+			"core_cm4.h": "c",
+			"m8q_driver_mock.h": "c"
 		}
 	}
 }

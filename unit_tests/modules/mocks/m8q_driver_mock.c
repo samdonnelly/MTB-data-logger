@@ -22,6 +22,26 @@
 
 
 //=======================================================================================
+// Global data 
+
+typedef struct m8q_mock_data_s 
+{
+    // The M8Q data buffers are made 1-byte larger than their driver size because here 
+    // they act as independent strings whereas in the driver the data is pullec from 
+    // one larger string. 
+
+    // Time info 
+    uint8_t time[BYTE_9 + BYTE_1];     // UTC time 
+    uint8_t date[BYTE_6 + BYTE_1];     // UTC date 
+}
+m8q_mock_data_t; 
+
+m8q_mock_data_t m8q_mock_data; 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Driver functions 
 
 // Device initialization 
@@ -245,6 +265,7 @@ M8Q_STATUS m8q_get_time_utc_time(
         return M8Q_INVALID_PTR; 
     }
 
+    memcpy((void *)utc_time, (void *)m8q_mock_data.time, BYTE_9); 
     return M8Q_OK; 
 }
 
@@ -259,6 +280,7 @@ M8Q_STATUS m8q_get_time_utc_date(
         return M8Q_INVALID_PTR; 
     }
 
+    memcpy((void *)utc_date, (void *)m8q_mock_data.date, BYTE_6); 
     return M8Q_OK; 
 }
 
@@ -267,4 +289,40 @@ M8Q_STATUS m8q_get_time_utc_date(
 
 //=======================================================================================
 // Mock functions 
+
+// M8Q driver mock init 
+void m8q_mock_init(void)
+{
+    memset((void *)m8q_mock_data.time, CLEAR, sizeof(m8q_mock_data.time)); 
+    memset((void *)m8q_mock_data.date, CLEAR, sizeof(m8q_mock_data.date)); 
+}
+
+
+// Set UTC time 
+void m8q_mock_set_time_utc_time(
+    char *time_str, 
+    uint8_t time_str_len)
+{
+    if ((time_str == NULL) || (sizeof(m8q_mock_data.time) < time_str_len))
+    {
+        return; 
+    }
+
+    memcpy((void *)m8q_mock_data.time, (void *)time_str, time_str_len); 
+}
+
+
+// Set UTC date 
+void m8q_mock_set_time_utc_date(
+    char *date_str, 
+    uint8_t date_str_len)
+{
+    if ((date_str == NULL) || (sizeof(m8q_mock_data.date) < date_str_len))
+    {
+        return; 
+    }
+
+    memcpy((void *)m8q_mock_data.date, (void *)date_str, date_str_len); 
+}
+
 //=======================================================================================

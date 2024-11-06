@@ -35,7 +35,10 @@ void mpu6050_init(
     mpu6050_afs_sel_set_t afs_sel,
     mpu6050_fs_sel_set_t fs_sel)
 {
-    // 
+    if (i2c == NULL)
+    {
+        return; 
+    }
 }
 
 
@@ -45,7 +48,10 @@ void mpu6050_int_pin_init(
     GPIO_TypeDef *gpio, 
     pin_selector_t pin)
 {
-    // 
+    if (gpio == NULL)
+    {
+        return; 
+    }
 }
 
 
@@ -128,7 +134,10 @@ void mpu6050_get_accel_raw(
     int16_t *accel_y_raw, 
     int16_t *accel_z_raw)
 {
-    // 
+    if ((accel_x_raw == NULL) || (accel_y_raw == NULL) || (accel_z_raw == NULL))
+    {
+        return; 
+    }
 }
 
 
@@ -139,7 +148,10 @@ void mpu6050_get_accel(
     float *accel_y, 
     float *accel_z)
 {
-    // 
+    if ((accel_x == NULL) || (accel_y == NULL) || (accel_z == NULL))
+    {
+        return; 
+    }
 }
 
 
@@ -150,7 +162,10 @@ void mpu6050_get_gyro_raw(
     int16_t *gyro_y_raw, 
     int16_t *gyro_z_raw)
 {
-    // 
+    if ((gyro_x_raw == NULL) || (gyro_y_raw == NULL) || (gyro_z_raw == NULL))
+    {
+        return; 
+    }
 }
 
 
@@ -161,7 +176,10 @@ void mpu6050_get_gyro(
     float *gyro_y, 
     float *gyro_z)
 {
-    // 
+    if ((gyro_x == NULL) || (gyro_y == NULL) || (gyro_z == NULL))
+    {
+        return; 
+    }
 }
 
 

@@ -22,6 +22,22 @@
 
 
 //=======================================================================================
+// Global data 
+
+typedef struct mpu6050_mock_data_s 
+{
+    int16_t ax_raw; 
+    int16_t ay_raw; 
+    int16_t az_raw; 
+}
+mpu6050_mock_data_t; 
+
+mpu6050_mock_data_t mpu6050_mock_data; 
+
+//=======================================================================================
+
+
+//=======================================================================================
 // Driver functions 
 
 // MPU6050 Initialization 
@@ -138,6 +154,10 @@ void mpu6050_get_accel_raw(
     {
         return; 
     }
+
+    *accel_x_raw = mpu6050_mock_data.ax_raw; 
+    *accel_y_raw = mpu6050_mock_data.ay_raw; 
+    *accel_z_raw = mpu6050_mock_data.az_raw; 
 }
 
 
@@ -201,4 +221,25 @@ float mpu6050_get_temp(device_number_t device_num)
 
 //=======================================================================================
 // Mock functions 
+
+// MPU-6050 driver mock init 
+void mpu6050_mock_init(void)
+{
+    mpu6050_mock_data.ax_raw = CLEAR; 
+    mpu6050_mock_data.ax_raw = CLEAR; 
+    mpu6050_mock_data.ax_raw = CLEAR; 
+}
+
+
+// Set axis acceleration 
+void mpu6050_mock_set_accel(
+    int16_t ax, 
+    int16_t ay, 
+    int16_t az)
+{
+    mpu6050_mock_data.ax_raw = ax; 
+    mpu6050_mock_data.ay_raw = ay; 
+    mpu6050_mock_data.az_raw = az; 
+}
+
 //=======================================================================================

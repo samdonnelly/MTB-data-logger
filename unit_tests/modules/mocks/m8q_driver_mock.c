@@ -196,7 +196,7 @@ M8Q_STATUS m8q_get_position_lat_str(
 // Get North/South hemisphere 
 uint8_t m8q_get_position_NS(void)
 {
-    return NONE; 
+    return m8q_mock_data.NS[BYTE_0]; 
 }
 
 
@@ -225,7 +225,7 @@ M8Q_STATUS m8q_get_position_lon_str(
 // Get East/West hemisphere 
 uint8_t m8q_get_position_EW(void)
 {
-    return NONE; 
+    return m8q_mock_data.EW[BYTE_0]; 
 }
 
 

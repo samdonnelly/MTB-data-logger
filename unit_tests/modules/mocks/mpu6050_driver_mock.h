@@ -27,6 +27,17 @@
 
 //=======================================================================================
 // Mock functions 
+
+// MPU-6050 driver mock init 
+void mpu6050_mock_init(void); 
+
+
+// Set axis acceleration 
+void mpu6050_mock_set_accel(
+    int16_t ax, 
+    int16_t ay, 
+    int16_t az); 
+
 //=======================================================================================
 
 #endif   // _MPU6050_DRIVER_MOCK_H_ 

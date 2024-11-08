@@ -20,6 +20,8 @@
 //=======================================================================================
 // Includes 
 
+#include <iostream>
+
 #include "CppUTest/TestHarness.h"
 
 extern "C"
@@ -27,6 +29,7 @@ extern "C"
 	// Add your C-only include files here 
     #include "data_logging.h" 
     #include "m8q_driver_mock.h" 
+    #include "mpu6050_driver_mock.h" 
     #include "hw125_controller_mock.h" 
 }
 
@@ -55,6 +58,7 @@ TEST_GROUP(data_logging_test)
 
         // Mock init 
         m8q_mock_init(); 
+        mpu6050_mock_init(); 
         hw125_controller_mock_init(); 
     }
 
@@ -240,9 +244,9 @@ TEST(data_logging_test, log_data_log_output)
 
     char 
     sog[] = "0.007", 
-    lat[] = "4717.113210", 
+    lat[] = "4717.11321", 
     ns[] = "N", 
-    lon[] = "00833.915187", 
+    lon[] = "00833.91518", 
     ew[] = "E"; 
 
     char 
@@ -256,11 +260,11 @@ TEST(data_logging_test, log_data_log_output)
     snprintf(log_default, HW125_MOCK_STR_SIZE, mtbdl_data_log_default, 
              trail_mark, fork_adc, shock_adc); 
     snprintf(log_gps, HW125_MOCK_STR_SIZE, mtbdl_data_log_gps, 
-             "", "", "", trail_mark, fork_adc, shock_adc, sog, lat, ns, lon, ew); 
+             "", "", "", "", trail_mark, fork_adc, shock_adc, sog, lat, ns[0], lon, ew[0]); 
     snprintf(log_accel, HW125_MOCK_STR_SIZE, mtbdl_data_log_accel, 
-             "", "", "", trail_mark, fork_adc, shock_adc, ax, ay, az); 
+             "", "", "", "", trail_mark, fork_adc, shock_adc, ax, ay, az); 
     snprintf(log_rev, HW125_MOCK_STR_SIZE, mtbdl_data_log_speed, 
-             "", "", "", trail_mark, fork_adc, shock_adc, wheel_speed); 
+             "", "", "", "", trail_mark, fork_adc, shock_adc, wheel_speed); 
     
     //==================================================
 
@@ -275,6 +279,7 @@ TEST(data_logging_test, log_data_log_output)
     m8q_mock_set_position_sog(sog, sizeof(sog)); 
 
     // MPU-6050 Accelerometer 
+    mpu6050_mock_set_accel(ax, ay, az); 
 
     //==================================================
 
@@ -282,21 +287,27 @@ TEST(data_logging_test, log_data_log_output)
     // Test log output 
 
     uint16_t 
-    standard_count = CLEAR, 
     gps_count = CLEAR, 
     accel_count = CLEAR, 
-    rev_count = CLEAR; 
+    rev_count = CLEAR, 
+    standard_count = CLEAR, 
+    gps_expected = LOG_TEST_NUM_INTERVALS / LOG_GPS_PERIOD, 
+    accel_expected = LOG_TEST_NUM_INTERVALS / LOG_ACCEL_PERIOD, 
+    rev_expected = LOG_TEST_NUM_INTERVALS / LOG_SPEED_PERIOD, 
+    standard_expected = LOG_PERIOD_DIVIDER * LOG_TEST_NUM_INTERVALS - 
+                        (gps_expected + accel_expected + rev_expected); 
 
     log_data_prep(); 
 
+    for (uint8_t i = CLEAR; i < LOG_TEST_NUM_INTERVALS; i++)
     {
-        for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
+        for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
         {
             log_data_adc_handler(); 
             log_data(); 
         }
 
-        for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
+        for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
         {
             hw125_controller_mock_get_str(log_line, HW125_MOCK_STR_SIZE); 
 
@@ -321,10 +332,10 @@ TEST(data_logging_test, log_data_log_output)
         hw125_controller_mock_init(); 
     }
 
-    UNSIGNED_LONGS_EQUAL(1, standard_count); 
-    UNSIGNED_LONGS_EQUAL(1, gps_count); 
-    UNSIGNED_LONGS_EQUAL(1, accel_count); 
-    UNSIGNED_LONGS_EQUAL(1, rev_count); 
+    UNSIGNED_LONGS_EQUAL(standard_expected, standard_count); 
+    UNSIGNED_LONGS_EQUAL(gps_expected, gps_count); 
+    UNSIGNED_LONGS_EQUAL(accel_expected, accel_count); 
+    UNSIGNED_LONGS_EQUAL(rev_expected, rev_count); 
     
     //==================================================
 }

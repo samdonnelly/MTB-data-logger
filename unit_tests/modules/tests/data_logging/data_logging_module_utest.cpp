@@ -224,12 +224,109 @@ TEST(data_logging_test, log_data_log_header_output)
 // Log Data: data log output 
 TEST(data_logging_test, log_data_log_output)
 {
-    // Set all the desired sensor data using the mocks 
-    // Record data logs until you can check the output of all streams. Check the 
-    // sequence as well. 
+    //==================================================
+    // Create sample data 
 
-    // log_data_prep(); 
-    // log_data(); 
+    uint16_t 
+    trail_mark = CLEAR, 
+    fork_adc = CLEAR, 
+    shock_adc = CLEAR, 
+    wheel_speed = CLEAR; 
+
+    int16_t 
+    ax = 500, 
+    ay = -450, 
+    az = -60; 
+
+    char 
+    sog[] = "0.007", 
+    lat[] = "4717.113210", 
+    ns[] = "N", 
+    lon[] = "00833.915187", 
+    ew[] = "E"; 
+
+    char 
+    log_line[HW125_MOCK_STR_SIZE], 
+    log_default[HW125_MOCK_STR_SIZE], 
+    log_gps[HW125_MOCK_STR_SIZE], 
+    log_accel[HW125_MOCK_STR_SIZE], 
+    log_rev[HW125_MOCK_STR_SIZE]; 
+
+    memset((void *)log_line, CLEAR, sizeof(log_line)); 
+    snprintf(log_default, HW125_MOCK_STR_SIZE, mtbdl_data_log_default, 
+             trail_mark, fork_adc, shock_adc); 
+    snprintf(log_gps, HW125_MOCK_STR_SIZE, mtbdl_data_log_gps, 
+             "", "", "", trail_mark, fork_adc, shock_adc, sog, lat, ns, lon, ew); 
+    snprintf(log_accel, HW125_MOCK_STR_SIZE, mtbdl_data_log_accel, 
+             "", "", "", trail_mark, fork_adc, shock_adc, ax, ay, az); 
+    snprintf(log_rev, HW125_MOCK_STR_SIZE, mtbdl_data_log_speed, 
+             "", "", "", trail_mark, fork_adc, shock_adc, wheel_speed); 
+    
+    //==================================================
+
+    //==================================================
+    // Set mock data 
+
+    // M8Q GPS 
+    m8q_mock_set_position_lat(lat, sizeof(lat)); 
+    m8q_mock_set_position_ns(ns, sizeof(ns)); 
+    m8q_mock_set_position_lon(lon, sizeof(lon)); 
+    m8q_mock_set_position_ew(ew, sizeof(ew)); 
+    m8q_mock_set_position_sog(sog, sizeof(sog)); 
+
+    // MPU-6050 Accelerometer 
+
+    //==================================================
+
+    //==================================================
+    // Test log output 
+
+    uint16_t 
+    standard_count = CLEAR, 
+    gps_count = CLEAR, 
+    accel_count = CLEAR, 
+    rev_count = CLEAR; 
+
+    log_data_prep(); 
+
+    {
+        for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
+        {
+            log_data_adc_handler(); 
+            log_data(); 
+        }
+
+        for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
+        {
+            hw125_controller_mock_get_str(log_line, HW125_MOCK_STR_SIZE); 
+
+            if (!strcmp(log_line, log_default))
+            {
+                standard_count++; 
+            }
+            else if (!strcmp(log_line, log_gps))
+            {
+                gps_count++; 
+            }
+            else if (!strcmp(log_line, log_accel))
+            {
+                accel_count++; 
+            }
+            else if (!strcmp(log_line, log_rev))
+            {
+                rev_count++; 
+            }
+        }
+
+        hw125_controller_mock_init(); 
+    }
+
+    UNSIGNED_LONGS_EQUAL(1, standard_count); 
+    UNSIGNED_LONGS_EQUAL(1, gps_count); 
+    UNSIGNED_LONGS_EQUAL(1, accel_count); 
+    UNSIGNED_LONGS_EQUAL(1, rev_count); 
+    
+    //==================================================
 }
 
 

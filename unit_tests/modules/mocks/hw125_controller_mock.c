@@ -147,14 +147,29 @@ FRESULT hw125_f_write(
 // Write a string to the open file 
 int16_t hw125_puts(const TCHAR *str)
 {
-    if (mock_data.write_index < HW125_MOCK_NUM_STRS)
+    if (str == NULL)
     {
-        memcpy((void *)mock_data.data_buff[mock_data.write_index++], 
-               (void *)str, 
-               HW125_MOCK_STR_SIZE); 
+        return FALSE; 
     }
 
-    return 0; 
+    // The data logging module will write multiple lines at a time while logging data 
+    // so instead of doing a memcpy of "str", the data is manually copied until the 
+    // end of a line is seen. This will allow each line of a single data log write 
+    // to be separated and looked at individually. 
+
+    while ((*str != NULL_CHAR) && (mock_data.write_index < HW125_MOCK_NUM_STRS))
+    {
+        int16_t index = CLEAR; 
+
+        while (*str != NL_CHAR)
+        {
+            mock_data.data_buff[mock_data.write_index][index++] = *str++; 
+        }
+
+        mock_data.data_buff[mock_data.write_index++][index] = *str++; 
+    }
+
+    return TRUE; 
 }
 
 

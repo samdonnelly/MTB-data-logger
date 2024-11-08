@@ -31,8 +31,15 @@ typedef struct m8q_mock_data_s
     // one larger string. 
 
     // Time info 
-    uint8_t time[BYTE_9 + BYTE_1];     // UTC time 
-    uint8_t date[BYTE_6 + BYTE_1];     // UTC date 
+    uint8_t time [BYTE_9 + BYTE_1];    // UTC time 
+    uint8_t date [BYTE_6 + BYTE_1];    // UTC date 
+
+    // Position info 
+    uint8_t lat [BYTE_11 + BYTE_1];    // Latitude 
+    uint8_t NS  [BYTE_1 + BYTE_1];     // North/South indicator 
+    uint8_t lon [BYTE_12 + BYTE_1];    // Longitude 
+    uint8_t EW  [BYTE_1 + BYTE_1];     // East/West indicator 
+    uint8_t SOG [BYTE_9 + BYTE_1];     // Speed over ground 
 }
 m8q_mock_data_t; 
 
@@ -181,6 +188,7 @@ M8Q_STATUS m8q_get_position_lat_str(
         return M8Q_INVALID_PTR; 
     }
 
+    memcpy((void *)lat_str, (void *)m8q_mock_data.lat, BYTE_11); 
     return M8Q_OK; 
 }
 
@@ -209,6 +217,7 @@ M8Q_STATUS m8q_get_position_lon_str(
         return M8Q_INVALID_PTR; 
     }
 
+    memcpy((void *)lon_str, (void *)m8q_mock_data.lon, BYTE_12); 
     return M8Q_OK; 
 }
 
@@ -251,6 +260,7 @@ M8Q_STATUS m8q_get_position_sog_str(
         return M8Q_INVALID_PTR; 
     }
 
+    memcpy((void *)sog_str, (void *)m8q_mock_data.SOG, BYTE_9); 
     return M8Q_OK; 
 }
 
@@ -295,6 +305,11 @@ void m8q_mock_init(void)
 {
     memset((void *)m8q_mock_data.time, CLEAR, sizeof(m8q_mock_data.time)); 
     memset((void *)m8q_mock_data.date, CLEAR, sizeof(m8q_mock_data.date)); 
+    memset((void *)m8q_mock_data.lat, CLEAR, sizeof(m8q_mock_data.lat)); 
+    memset((void *)m8q_mock_data.NS, CLEAR, sizeof(m8q_mock_data.NS)); 
+    memset((void *)m8q_mock_data.lon, CLEAR, sizeof(m8q_mock_data.lon)); 
+    memset((void *)m8q_mock_data.EW, CLEAR, sizeof(m8q_mock_data.EW)); 
+    memset((void *)m8q_mock_data.SOG, CLEAR, sizeof(m8q_mock_data.SOG)); 
 }
 
 
@@ -323,6 +338,76 @@ void m8q_mock_set_time_utc_date(
     }
 
     memcpy((void *)m8q_mock_data.date, (void *)date_str, date_str_len); 
+}
+
+
+// Set latitude string 
+void m8q_mock_set_position_lat(
+    char *lat_str, 
+    uint8_t lat_str_len)
+{
+    if ((lat_str == NULL) || (sizeof(m8q_mock_data.lat) < lat_str_len))
+    {
+        return; 
+    }
+
+    memcpy((void *)m8q_mock_data.lat, (void *)lat_str, lat_str_len); 
+}
+
+
+// Set NS string 
+void m8q_mock_set_position_ns(
+    char *ns_str, 
+    uint8_t ns_str_len)
+{
+    if ((ns_str == NULL) || (sizeof(m8q_mock_data.NS) < ns_str_len))
+    {
+        return; 
+    }
+
+    memcpy((void *)m8q_mock_data.NS, (void *)ns_str, ns_str_len); 
+}
+
+
+// Set longitude string 
+void m8q_mock_set_position_lon(
+    char *lon_str, 
+    uint8_t lon_str_len)
+{
+    if ((lon_str == NULL) || (sizeof(m8q_mock_data.lon) < lon_str_len))
+    {
+        return; 
+    }
+
+    memcpy((void *)m8q_mock_data.lon, (void *)lon_str, lon_str_len); 
+}
+
+
+// Set EW string 
+void m8q_mock_set_position_ew(
+    char *ew_str, 
+    uint8_t ew_str_len)
+{
+    if ((ew_str == NULL) || (sizeof(m8q_mock_data.EW) < ew_str_len))
+    {
+        return; 
+    }
+
+    memcpy((void *)m8q_mock_data.EW, (void *)ew_str, ew_str_len); 
+}
+
+
+// Set SOG string 
+void m8q_mock_set_position_sog(
+    char *sog_str, 
+    uint8_t sog_str_len)
+{
+    if ((sog_str == NULL) || (sizeof(m8q_mock_data.SOG) < sog_str_len))
+    {
+        return; 
+    }
+
+    memcpy((void *)m8q_mock_data.SOG, (void *)sog_str, sog_str_len); 
 }
 
 //=======================================================================================

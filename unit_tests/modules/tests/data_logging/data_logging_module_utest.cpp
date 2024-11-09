@@ -91,7 +91,7 @@ void wheel_rev_iso(uint8_t& index, uint8_t rev_num)
 
     index = CLEAR; 
 
-    for (uint8_t j = CLEAR; j < rev_num; j++)
+    for (uint8_t i = CLEAR; i < rev_num; i++)
     {
         EXTI4_IRQHandler(); 
         log_data(); 
@@ -99,7 +99,7 @@ void wheel_rev_iso(uint8_t& index, uint8_t rev_num)
 
     hw125_controller_mock_init(); 
 
-    for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
+    for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
     {
         log_data_adc_handler(); 
         log_data(); 
@@ -114,7 +114,7 @@ void wheel_rev_log_read(unsigned int& rev_count)
     memset((void *)log_line, CLEAR, sizeof(log_line)); 
     unsigned int dummy1 = CLEAR, dummy2 = CLEAR, dummy3 = CLEAR; 
 
-    for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
+    for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
     {
         hw125_controller_mock_get_str(log_line, HW125_MOCK_STR_SIZE); 
     }
@@ -444,10 +444,66 @@ TEST(data_logging_test, log_data_wheel_revs)
 // Calibration: calibration calculation 
 TEST(data_logging_test, calibration_calculation)
 {
-    // Set the needed sensor data. 
-    // Call the calibration function enough times to simulate an actual calibration. 
-    // Change the sensor data mid-way as needed. 
-    // Call the calculation function when done to check the averages. 
+    // System calibration performs data collection very similar to data logging. In this 
+    // test a calibration sequence is simulated by calling the calibration function X 
+    // number of times. The accelerometer data is updated at specific points in the 
+    // calibration sequence so that the data averaging of the whole calibration process 
+    // can be tested. Once the calibration sequence is over, the average accelerometer 
+    // values recorded from calibration are found through the calibration calculation 
+    // function. This average value is what is checked. 
+
+    char sys_param_line[HW125_MOCK_STR_SIZE]; 
+
+    int16_t 
+    ax[BYTE_2] = { 500, 1000 }, 
+    ay[BYTE_2] = { -450, 100 }, 
+    az[BYTE_2] = { -60, -540 }; 
+
+    int 
+    ax_calc = CLEAR, 
+    ay_calc = CLEAR, 
+    az_calc = CLEAR; 
+
+    uint8_t 
+    toggle = CLEAR_BIT, 
+    index = LOG_ACCEL_OFFSET, 
+    intervals = LOG_TEST_NUM_INTERVALS / LOG_ACCEL_PERIOD; 
+
+    log_calibration_prep(); 
+
+    // Simulate a system calibration 
+    for (uint8_t i = CLEAR; i < intervals; i++)
+    {
+        mpu6050_mock_set_accel(ax[toggle], ay[toggle], az[toggle]); 
+        toggle = SET_BIT - toggle; 
+
+        while (++index <= LOG_ACCEL_PERIOD)
+        {
+            for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
+            {
+                log_data_adc_handler(); 
+                log_calibration(); 
+            }
+        }
+
+        index = CLEAR; 
+    }
+
+    // Once calibration is done then calculate the average values of the samples. 
+    log_calibration_calculation(); 
+
+    // The data must be read in the order that it was written to the SD card. 
+    // Logging params 
+    hw125_controller_mock_get_str(sys_param_line, HW125_MOCK_STR_SIZE); 
+    // Accelerometer calibration 
+    hw125_controller_mock_get_str(sys_param_line, HW125_MOCK_STR_SIZE); 
+    sscanf(sys_param_line, mtbdl_param_accel_rest, &ax_calc, &ay_calc, &az_calc); 
+    // Voltage/potentiometer calibration 
+    hw125_controller_mock_get_str(sys_param_line, HW125_MOCK_STR_SIZE); 
+
+    LONGS_EQUAL((ax[BYTE_0] + ax[BYTE_1]) / BYTE_2, ax_calc); 
+    LONGS_EQUAL((ay[BYTE_0] + ay[BYTE_1]) / BYTE_2, ay_calc); 
+    LONGS_EQUAL((az[BYTE_0] + az[BYTE_1]) / BYTE_2, az_calc); 
 }
 
 //=======================================================================================

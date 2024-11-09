@@ -47,6 +47,9 @@ SRC_DIRS += tests/user_interface
 
 # SYSTEM 
 SRC_FILES += ./../../sources/config_files/system/string_config.c
+SRC_FILES += ./../../sources/config_files/system/battery_config.c
+SRC_FILES += ./../../sources/config_files/devices/hd44780u_config.c
+SRC_FILES += ./../../sources/config_files/devices/ws2812_config.c
 
 # ----------------------------------
 

@@ -111,7 +111,8 @@
 			"cfenv": "cpp",
 			"cinttypes": "cpp",
 			"typeinfo": "cpp",
-			"interrupt_driver_mock.h": "c"
+			"interrupt_driver_mock.h": "c",
+			"hc05_driver_mock.h": "c"
 		}
 	}
 }

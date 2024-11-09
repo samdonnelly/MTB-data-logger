@@ -39,4 +39,11 @@ void EXTI4_IRQHandler(void)
     handler_flags.exti4_flag = SET_BIT; 
 }
 
+
+// Timer 1 update + timer 10 global 
+void TIM1_UP_TIM10_IRQHandler(void)
+{
+    handler_flags.tim1_up_tim10_glbl_flag = SET_BIT; 
+}
+
 //=======================================================================================

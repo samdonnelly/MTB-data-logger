@@ -44,7 +44,7 @@
 //   battery and the system voltage divider resistor values to find the equivalent 
 //   voltage range within 0-3.3V. That equivalent voltage range was then converted to 
 //   a digital value which is the value that's listed below. 
-// - The max and min ADC voltage values below are currently based on 8-bit ADC 
+// - The max and min ADC voltage values below are currently based on 10-bit ADC 
 //   resolution. The range is quite narrow so to get a better estimation of battery 
 //   voltage for the user, a higher resolution must be used. 
 // - The battery voltage range used to get the below max and min ADC digital voltage 
@@ -60,6 +60,15 @@ adc_volt_max = 1023;   // Max voltage - 3.30V ADC - 11.8V battery
 // Battery SOC calculation 
 uint8_t battery_soc_calc(uint16_t voltage)
 {
+    if (voltage < adc_volt_min)
+    {
+        voltage = adc_volt_min; 
+    }
+    else if (voltage > adc_volt_max)
+    {
+        voltage = adc_volt_max; 
+    }
+
     // The SOC is found by taking the percentage the "voltage" is between the max and 
     // min values. In other words, the battery discharge is assumed to be linear between 
     // max and min. This is not 100% accurate but more information is needed on the 

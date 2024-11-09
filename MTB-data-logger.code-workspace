@@ -110,7 +110,8 @@
 			"streambuf": "cpp",
 			"cfenv": "cpp",
 			"cinttypes": "cpp",
-			"typeinfo": "cpp"
+			"typeinfo": "cpp",
+			"interrupt_driver_mock.h": "c"
 		}
 	}
 }

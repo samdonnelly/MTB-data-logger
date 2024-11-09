@@ -28,6 +28,7 @@ extern "C"
 {
 	// Add your C-only include files here 
     #include "data_logging.h" 
+    #include "stm32f4xx_it.h" 
     #include "m8q_driver_mock.h" 
     #include "mpu6050_driver_mock.h" 
     #include "hw125_controller_mock.h" 
@@ -40,6 +41,7 @@ extern "C"
 // Macros 
 
 #define LOG_TEST_NUM_INTERVALS 100 
+#define LOG_TEST_NUM_REVS 4 
 
 //=======================================================================================
 
@@ -74,6 +76,52 @@ TEST_GROUP(data_logging_test)
 
 //=======================================================================================
 // Helper functions 
+
+// Wheel rev stream isolation 
+void wheel_rev_iso(uint8_t& index, uint8_t rev_num)
+{
+    while (++index < LOG_SPEED_PERIOD)
+    {
+        for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
+        {
+            log_data_adc_handler(); 
+            log_data(); 
+        }
+    }
+
+    index = CLEAR; 
+
+    for (uint8_t j = CLEAR; j < rev_num; j++)
+    {
+        EXTI4_IRQHandler(); 
+        log_data(); 
+    }
+
+    hw125_controller_mock_init(); 
+
+    for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
+    {
+        log_data_adc_handler(); 
+        log_data(); 
+    }
+}
+
+
+// Wheel rev log read 
+void wheel_rev_log_read(unsigned int& rev_count)
+{
+    char log_line[HW125_MOCK_STR_SIZE]; 
+    memset((void *)log_line, CLEAR, sizeof(log_line)); 
+    unsigned int dummy1 = CLEAR, dummy2 = CLEAR, dummy3 = CLEAR; 
+
+    for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
+    {
+        hw125_controller_mock_get_str(log_line, HW125_MOCK_STR_SIZE); 
+    }
+
+    sscanf(log_line, "%u, %u, %u, %u", &dummy1, &dummy2, &dummy3, &rev_count); 
+}
+
 //=======================================================================================
 
 
@@ -228,6 +276,14 @@ TEST(data_logging_test, log_data_log_header_output)
 // Log Data: data log output 
 TEST(data_logging_test, log_data_log_output)
 {
+    // This test counts the number of times certain log messages are seen while logging 
+    // data and compares the count to the expected sum. Expected sums are determined 
+    // using the number of logging intervals divided by each logging streams period. The 
+    // standard or default stream sum is determined by taking the total intervals and 
+    // subtracting the sum of other streams as this stream runs when no other streams 
+    // are scheduled. A stream is counted when the read log line matches one of the 
+    // pre-defined log lines. 
+
     //==================================================
     // Create sample data 
 
@@ -344,10 +400,44 @@ TEST(data_logging_test, log_data_log_output)
 // Log Data: wheel revolution calculation 
 TEST(data_logging_test, log_data_wheel_revs)
 {
-    // Fill up revolution buffer counter such that you will get a know sum. 
-    // Add one more rev value so one value is removed and the new one added. 
-    // Re-determine the rev sum with the one value difference so make sure the circular 
-    // buffer works and the sum works. 
+    // The wheel revolution log stream records the number of detected wheel revolutions 
+    // since the last time the stream was called. The number of times gets recorded in a 
+    // circular buffer by taking the place of the oldest data. All interval numbers get 
+    // summed so the total rev count over X stream calls (known time delta) is know and 
+    // that sum gets logged. This test fills the circular buffer with each spot having 
+    // the same value so the expected sum is easy to determine. The stream is then run 
+    // once more but with a different number of detected revolutions and it's checked 
+    // that the oldest piece of data is replaced by the new piece of data. 
+
+    uint8_t 
+    index = LOG_SPEED_OFFSET, 
+    rev_num = LOG_TEST_NUM_REVS, 
+    rev_sum = rev_num * LOG_REV_SAMPLE_SIZE; 
+    unsigned int rev_count = CLEAR; 
+
+    log_data_prep(); 
+
+    // Run the wheel rev stream until it's buffer fills up and check that the rev count 
+    // is as expected by reading the data logged. 
+    for (uint8_t i = CLEAR; i < LOG_REV_SAMPLE_SIZE; i++)
+    {
+        wheel_rev_iso(index, rev_num); 
+    }
+
+    wheel_rev_log_read(rev_count); 
+    UNSIGNED_LONGS_EQUAL(rev_sum, rev_count); 
+
+    // Change the number of revs that occur between log samples. To show that we've 
+    // reached the rev sum buffer limit and the new value will replace an old value, 
+    // the expected sum gets updated. Run the log sequence until the next wheel rev 
+    // stream is reached and re-check the results. 
+    rev_sum -= rev_num; 
+    rev_num *= rev_num; 
+    rev_sum += rev_num; 
+
+    wheel_rev_iso(index, rev_num); 
+    wheel_rev_log_read(rev_count); 
+    UNSIGNED_LONGS_EQUAL(rev_sum, rev_count); 
 }
 
 

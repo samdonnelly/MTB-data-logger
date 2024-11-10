@@ -675,7 +675,7 @@ uint8_t ui_tx(void)
 // End the transmission 
 uint8_t ui_tx_end(void)
 {
-    uint8_t hs_status = FALSE; 
+    uint8_t handshake_status = FALSE; 
 
     // Close the log file then check for a response from the connected device that the 
     // data log file was successfully received or not. Responses that don't match the 
@@ -699,7 +699,7 @@ uint8_t ui_tx_end(void)
         }
         else if (!strcmp(mtbdl_tx_not_complete, mtbdl_ui.data_buff))
         {
-            hs_status = TRUE; 
+            handshake_status = TRUE; 
         }
         else 
         {
@@ -718,10 +718,10 @@ uint8_t ui_tx_end(void)
         hw125_unlink(mtbdl_ui.filename); 
         param_update_log_index(PARAM_LOG_INDEX_DEC); 
 
-        hs_status = TRUE; 
+        handshake_status = TRUE; 
     }
 
-    return hs_status; 
+    return handshake_status; 
 }
 
 //=======================================================================================

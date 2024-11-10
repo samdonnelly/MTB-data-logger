@@ -100,7 +100,7 @@ void hc05_read(
     char *receive_data, 
     uint8_t data_len)
 {
-    if ((receive_data == NULL) || (MTBDL_MAX_STR_LEN <= data_len))
+    if ((receive_data == NULL) || (data_len < MTBDL_MAX_STR_LEN))
     {
         return; 
     }
@@ -155,7 +155,7 @@ void hc05_mock_set_read_data(
     const char *read_data, 
     uint8_t len)
 {
-    if ((read_data == NULL) || (len <= MTBDL_MAX_STR_LEN))
+    if ((read_data == NULL) || (MTBDL_MAX_STR_LEN < len))
     {
         return; 
     }

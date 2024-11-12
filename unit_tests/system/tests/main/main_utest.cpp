@@ -14,6 +14,10 @@
 
 //=======================================================================================
 // Notes 
+
+// There are currenntly no unit tests needed for the main application. The file consists 
+// of calling driver/controllers and modules which all have their respective unit tests. 
+
 //=======================================================================================
 
 

@@ -124,10 +124,12 @@ void mtbdl_init()
         GPIOA, 
         PIN_3, 
         PIN_2, 
+        UART_PARAM_DISABLE, 
+        CLEAR, 
         UART_FRAC_42_9600, 
         UART_MANT_42_9600, 
-        UART_DMA_DISABLE, 
-        UART_DMA_ENABLE); 
+        UART_PARAM_DISABLE, 
+        UART_PARAM_ENABLE); 
 
     // HC-05 
     uart_init(
@@ -135,10 +137,12 @@ void mtbdl_init()
         GPIOA, 
         PIN_10, 
         PIN_9, 
+        UART_PARAM_DISABLE, 
+        CLEAR, 
         UART_FRAC_84_115200, 
         UART_MANT_84_115200, 
-        UART_DMA_DISABLE, 
-        UART_DMA_DISABLE); 
+        UART_PARAM_DISABLE, 
+        UART_PARAM_DISABLE); 
 
     //==================================================
 
@@ -260,7 +264,6 @@ void mtbdl_init()
         TIM9, 
         MPU6050_RATE); 
     // Set the sample type to accelerometer and read method to read on request 
-    mpu6050_set_smpl_type(DEVICE_ONE, MPU6050_READ_A); 
     mpu6050_set_read_state(DEVICE_ONE, MPU6050_READ_READY); 
 
     //==================================================

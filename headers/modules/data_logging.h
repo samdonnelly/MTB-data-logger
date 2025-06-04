@@ -92,9 +92,7 @@ typedef struct mtbdl_log_s
     uint8_t sog_str[LOG_GPS_BUFF_LEN];          // Speed over ground string 
 
     // Accelerometer data 
-    int16_t accel_x;                            // x-axis acceleration 
-    int16_t accel_y;                            // y-axis acceleration 
-    int16_t accel_z;                            // z-axis acceleration 
+    int16_t accel[NUM_AXES]; 
 
     // Wheel revolution data 
     uint8_t rev_count;                          // Wheel revolution counter 

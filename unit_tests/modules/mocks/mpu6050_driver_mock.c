@@ -144,7 +144,7 @@ MPU6050_INT_STATUS mpu6050_int_status(device_number_t device_num)
 
 
 // Accelerometer raw values 
-void mpu6050_get_accel_raw(
+void mpu6050_get_accel_axis(
     device_number_t device_num, 
     int16_t *accel_x_raw, 
     int16_t *accel_y_raw, 
@@ -162,13 +162,11 @@ void mpu6050_get_accel_raw(
 
 
 // Accelerometer calculation 
-void mpu6050_get_accel(
+void mpu6050_get_accel_axis_gs(
     device_number_t device_num, 
-    float *accel_x, 
-    float *accel_y, 
-    float *accel_z)
+    float *accel_axis_gs)
 {
-    if ((accel_x == NULL) || (accel_y == NULL) || (accel_z == NULL))
+    if (accel_axis_gs == NULL)
     {
         return; 
     }
@@ -176,13 +174,11 @@ void mpu6050_get_accel(
 
 
 // Gyroscope raw values 
-void mpu6050_get_gyro_raw(
+void mpu6050_get_gyro_axis(
     device_number_t device_num, 
-    int16_t *gyro_x_raw, 
-    int16_t *gyro_y_raw, 
-    int16_t *gyro_z_raw)
+    int16_t *gyro_axis)
 {
-    if ((gyro_x_raw == NULL) || (gyro_y_raw == NULL) || (gyro_z_raw == NULL))
+    if (gyro_axis == NULL)
     {
         return; 
     }
@@ -190,13 +186,11 @@ void mpu6050_get_gyro_raw(
 
 
 // Gyroscopic value calculation 
-void mpu6050_get_gyro(
+void mpu6050_get_gyro_axis_rate(
     device_number_t device_num, 
-    float *gyro_x, 
-    float *gyro_y, 
-    float *gyro_z)
+    float *gyro_axis_rate)
 {
-    if ((gyro_x == NULL) || (gyro_y == NULL) || (gyro_z == NULL))
+    if (gyro_axis_rate == NULL)
     {
         return; 
     }

@@ -308,10 +308,10 @@ void mtbdl_init()
     // SD card setup 
 
     // User initialization 
-    hw125_user_init(SPI2, GPIOB, GPIOX_PIN_12); 
+    fatfs_user_init(SPI2, GPIOB, GPIOX_PIN_12); 
 
     // Controller init 
-    hw125_controller_init(mtbdl_dir); 
+    fatfs_controller_init(mtbdl_dir); 
 
     //==================================================
 
@@ -364,7 +364,7 @@ void mtbdl_init()
     mtbdl_trackers.reset = CLEAR_BIT; 
 
     // Create a directory for logging fault codes if it does not already exit 
-    hw125_mkdir(mtbdl_fault_dir); 
+    fatfs_mkdir(mtbdl_fault_dir); 
 
     //==================================================
 

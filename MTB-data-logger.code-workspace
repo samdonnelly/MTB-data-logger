@@ -21,7 +21,7 @@
 			"cstdio": "c",
 			"ff.h": "c",
 			"fatfs.h": "c",
-			"hw125_driver.h": "c",
+			"fatfs_driver.h": "c",
 			"stm32f411xe.h": "c",
 			"tools.h": "c",
 			"screen_msgs.h": "c",
@@ -56,7 +56,7 @@
 			"cstdint": "c",
 			"m8q_driver.h": "c",
 			"string_config.h": "c",
-			"hw125_controller.h": "c",
+			"fatfs_controller.h": "c",
 			"i2c_comm_mock.h": "c",
 			"hd44780u_config.h": "c",
 			"core_cm4_mock.h": "c",
@@ -112,7 +112,8 @@
 			"cinttypes": "cpp",
 			"typeinfo": "cpp",
 			"interrupt_driver_mock.h": "c",
-			"hc05_driver_mock.h": "c"
+			"hc05_driver_mock.h": "c",
+			"fatfs_controller.h": "c"
 		}
 	}
 }

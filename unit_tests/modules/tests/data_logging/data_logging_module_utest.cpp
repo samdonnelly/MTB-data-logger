@@ -31,7 +31,7 @@ extern "C"
     #include "stm32f4xx_it.h" 
     #include "m8q_driver_mock.h" 
     #include "mpu6050_driver_mock.h" 
-    #include "hw125_controller_mock.h" 
+    #include "fatfs_controller_mock.h" 
 }
 
 //=======================================================================================
@@ -61,7 +61,7 @@ TEST_GROUP(data_logging_test)
         // Mock init 
         m8q_mock_init(); 
         mpu6050_mock_init(); 
-        hw125_controller_mock_init(); 
+        fatfs_controller_mock_init(); 
     }
 
     // Destructor 
@@ -97,7 +97,7 @@ void wheel_rev_iso(uint8_t& index, uint8_t rev_num)
         log_data(); 
     }
 
-    hw125_controller_mock_init(); 
+    fatfs_controller_mock_init(); 
 
     for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
     {
@@ -110,13 +110,13 @@ void wheel_rev_iso(uint8_t& index, uint8_t rev_num)
 // Wheel rev log read 
 void wheel_rev_log_read(unsigned int& rev_count)
 {
-    char log_line[HW125_MOCK_STR_SIZE]; 
+    char log_line[FATFS_MOCK_STR_SIZE]; 
     memset((void *)log_line, CLEAR, sizeof(log_line)); 
     unsigned int dummy1 = CLEAR, dummy2 = CLEAR, dummy3 = CLEAR; 
 
     for (uint8_t i = CLEAR; i < LOG_PERIOD_DIVIDER; i++)
     {
-        hw125_controller_mock_get_str(log_line, HW125_MOCK_STR_SIZE); 
+        fatfs_controller_mock_get_str(log_line, FATFS_MOCK_STR_SIZE); 
     }
 
     sscanf(log_line, "%u, %u, %u, %u", &dummy1, &dummy2, &dummy3, &rev_count); 
@@ -200,8 +200,8 @@ TEST(data_logging_test, log_data_log_header_output)
     utc_date[] = "091202"; 
 
     // Data buffer 
-    char header_line[HW125_MOCK_STR_SIZE]; 
-    char line_buff[HW125_MOCK_STR_SIZE]; 
+    char header_line[FATFS_MOCK_STR_SIZE]; 
+    char line_buff[FATFS_MOCK_STR_SIZE]; 
     memset((void *)header_line, CLEAR, sizeof(header_line)); 
     memset((void *)line_buff, CLEAR, sizeof(line_buff)); 
 
@@ -229,46 +229,46 @@ TEST(data_logging_test, log_data_log_header_output)
     log_data_file_prep(); 
 
     // Check each line of the header 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_fork_info, 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_fork_info, 
              fork_psi, fork_compression, fork_rebound); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_shock_info, 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_shock_info, 
              shock_psi, shock_lockout, shock_rebound); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_bike_info, 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_bike_info, 
              fork_travel, shock_travel, wheel_size); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_index, file_index); 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_index, file_index); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_accel_rest, 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_accel_rest, 
              ax_rest, ay_rest, az_rest); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_pot_rest, 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_pot_rest, 
              fork_rest, shock_rest); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_time, 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_time, 
              utc_time, utc_date); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
-    snprintf(line_buff, HW125_MOCK_STR_SIZE, mtbdl_param_data, 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
+    snprintf(line_buff, FATFS_MOCK_STR_SIZE, mtbdl_param_data, 
              LOG_PERIOD, LOG_PERIOD * LOG_PERIOD_DIVIDER * LOG_SPEED_PERIOD, LOG_REV_SAMPLE_SIZE); 
     STRCMP_EQUAL(line_buff, header_line); 
 
-    hw125_controller_mock_get_str(header_line, HW125_MOCK_STR_SIZE); 
+    fatfs_controller_mock_get_str(header_line, FATFS_MOCK_STR_SIZE); 
     STRCMP_EQUAL(mtbdl_data_log_start, header_line); 
 }
 
@@ -306,20 +306,20 @@ TEST(data_logging_test, log_data_log_output)
     ew[] = "E"; 
 
     char 
-    log_line[HW125_MOCK_STR_SIZE], 
-    log_default[HW125_MOCK_STR_SIZE], 
-    log_gps[HW125_MOCK_STR_SIZE], 
-    log_accel[HW125_MOCK_STR_SIZE], 
-    log_rev[HW125_MOCK_STR_SIZE]; 
+    log_line[FATFS_MOCK_STR_SIZE], 
+    log_default[FATFS_MOCK_STR_SIZE], 
+    log_gps[FATFS_MOCK_STR_SIZE], 
+    log_accel[FATFS_MOCK_STR_SIZE], 
+    log_rev[FATFS_MOCK_STR_SIZE]; 
 
     memset((void *)log_line, CLEAR, sizeof(log_line)); 
-    snprintf(log_default, HW125_MOCK_STR_SIZE, mtbdl_data_log_default, 
+    snprintf(log_default, FATFS_MOCK_STR_SIZE, mtbdl_data_log_default, 
              trail_mark, fork_adc, shock_adc); 
-    snprintf(log_gps, HW125_MOCK_STR_SIZE, mtbdl_data_log_gps, 
+    snprintf(log_gps, FATFS_MOCK_STR_SIZE, mtbdl_data_log_gps, 
              "", "", "", "", trail_mark, fork_adc, shock_adc, sog, lat, ns[0], lon, ew[0]); 
-    snprintf(log_accel, HW125_MOCK_STR_SIZE, mtbdl_data_log_accel, 
+    snprintf(log_accel, FATFS_MOCK_STR_SIZE, mtbdl_data_log_accel, 
              "", "", "", "", trail_mark, fork_adc, shock_adc, ax, ay, az); 
-    snprintf(log_rev, HW125_MOCK_STR_SIZE, mtbdl_data_log_speed, 
+    snprintf(log_rev, FATFS_MOCK_STR_SIZE, mtbdl_data_log_speed, 
              "", "", "", "", trail_mark, fork_adc, shock_adc, wheel_speed); 
     
     //==================================================
@@ -365,7 +365,7 @@ TEST(data_logging_test, log_data_log_output)
 
         for (uint8_t j = CLEAR; j < LOG_PERIOD_DIVIDER; j++)
         {
-            hw125_controller_mock_get_str(log_line, HW125_MOCK_STR_SIZE); 
+            fatfs_controller_mock_get_str(log_line, FATFS_MOCK_STR_SIZE); 
 
             if (!strcmp(log_line, log_default))
             {
@@ -385,7 +385,7 @@ TEST(data_logging_test, log_data_log_output)
             }
         }
 
-        hw125_controller_mock_init(); 
+        fatfs_controller_mock_init(); 
     }
 
     UNSIGNED_LONGS_EQUAL(standard_expected, standard_count); 
@@ -452,7 +452,7 @@ TEST(data_logging_test, calibration_calculation)
     // values recorded from calibration are found through the calibration calculation 
     // function. This average value is what is checked. 
 
-    char sys_param_line[HW125_MOCK_STR_SIZE]; 
+    char sys_param_line[FATFS_MOCK_STR_SIZE]; 
 
     int16_t 
     ax[BYTE_2] = { 500, 1000 }, 
@@ -494,12 +494,12 @@ TEST(data_logging_test, calibration_calculation)
 
     // The data must be read in the order that it was written to the SD card. 
     // Logging params 
-    hw125_controller_mock_get_str(sys_param_line, HW125_MOCK_STR_SIZE); 
+    fatfs_controller_mock_get_str(sys_param_line, FATFS_MOCK_STR_SIZE); 
     // Accelerometer calibration 
-    hw125_controller_mock_get_str(sys_param_line, HW125_MOCK_STR_SIZE); 
+    fatfs_controller_mock_get_str(sys_param_line, FATFS_MOCK_STR_SIZE); 
     sscanf(sys_param_line, mtbdl_param_accel_rest, &ax_calc, &ay_calc, &az_calc); 
     // Voltage/potentiometer calibration 
-    hw125_controller_mock_get_str(sys_param_line, HW125_MOCK_STR_SIZE); 
+    fatfs_controller_mock_get_str(sys_param_line, FATFS_MOCK_STR_SIZE); 
 
     LONGS_EQUAL((ax[BYTE_0] + ax[BYTE_1]) / BYTE_2, ax_calc); 
     LONGS_EQUAL((ay[BYTE_0] + ay[BYTE_1]) / BYTE_2, ay_calc); 

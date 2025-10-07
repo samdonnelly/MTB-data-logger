@@ -52,8 +52,8 @@ sources/config_files/m8q_config.c \
 ../STM32F4-driver-library/sources/devices/hc05_controller.c \
 ../STM32F4-driver-library/sources/devices/hd44780u_driver.c \
 ../STM32F4-driver-library/sources/devices/hd44780u_controller.c \
-../STM32F4-driver-library/sources/devices/hw125_driver.c \
-../STM32F4-driver-library/sources/devices/hw125_controller.c \
+../STM32F4-driver-library/sources/devices/fatfs_driver.c \
+../STM32F4-driver-library/sources/devices/fatfs_controller.c \
 ../STM32F4-driver-library/sources/devices/m8q_driver.c \
 ../STM32F4-driver-library/sources/devices/m8q_controller.c \
 ../STM32F4-driver-library/sources/devices/mpu6050_driver.c \

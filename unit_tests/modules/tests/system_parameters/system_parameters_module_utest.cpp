@@ -28,7 +28,7 @@ extern "C"
 {
 	// Add your C-only include files here 
     #include "system_parameters.h" 
-    #include "hw125_controller_mock.h" 
+    #include "fatfs_controller_mock.h" 
 }
 
 //=======================================================================================
@@ -50,7 +50,7 @@ TEST_GROUP(system_parameters_test)
     void setup()
     {
         param_init(); 
-        hw125_controller_mock_init(); 
+        fatfs_controller_mock_init(); 
     }
 
     // Destructor 
@@ -74,25 +74,25 @@ void write_get_sys_params(
     uint16_t& pot_fork_rest, 
     uint16_t& pot_shock_rest)
 {
-    char param_buff[HW125_MOCK_STR_SIZE]; 
+    char param_buff[FATFS_MOCK_STR_SIZE]; 
 
     // Temporary variables were added so that sscanf would work for the unit tests 
     // across all platforms. 
     int accel_x = CLEAR, accel_y = CLEAR, accel_z = CLEAR; 
     unsigned int pot_fork = CLEAR, pot_shock = CLEAR; 
 
-    // We use the hw125 controller mock to first "write" the parameters to an SD card 
+    // We use the fatfs controller mock to first "write" the parameters to an SD card 
     // before fetching them. 
     param_sys_format_write(); 
 
     // The below sequence is copied from the param_sys_read_format function. 
 
     // Read logging parameters - we don't check the data from this read but we read the 
-    // data so we can increment our read index in the hw125 controller mock. 
-    hw125_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
+    // data so we can increment our read index in the fatfs controller mock. 
+    fatfs_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
 
     // Read accelerometer calibration data 
-    hw125_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
+    fatfs_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(param_buff, 
            mtbdl_param_accel_rest, 
            &accel_x, 
@@ -100,7 +100,7 @@ void write_get_sys_params(
            &accel_z); 
 
     // Read potentiometer starting points 
-    hw125_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
+    fatfs_controller_mock_get_str(param_buff, MTBDL_MAX_STR_LEN); 
     sscanf(param_buff, 
            mtbdl_param_pot_rest, 
            &pot_fork, 

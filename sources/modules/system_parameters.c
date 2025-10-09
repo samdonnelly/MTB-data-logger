@@ -15,8 +15,9 @@
 //=======================================================================================
 // Includes 
 
-#include "system_parameters.h" 
-#include "stm32f4xx_it.h" 
+#include "system_parameters.h"
+#include "stm32f4xx_it.h"
+#include "fatfs_controller.h"
 
 //=======================================================================================
 

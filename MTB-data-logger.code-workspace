@@ -113,7 +113,7 @@
 			"typeinfo": "cpp",
 			"interrupt_driver_mock.h": "c",
 			"hc05_driver_mock.h": "c",
-			"fatfs_controller.h": "c"
+			"hc05_controller.h": "c"
 		}
 	}
 }

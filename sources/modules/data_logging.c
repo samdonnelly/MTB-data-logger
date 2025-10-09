@@ -15,9 +15,12 @@
 //=======================================================================================
 // Includes 
 
-#include "data_logging.h" 
-#include "ws2812_config.h" 
-#include "stm32f4xx_it.h" 
+#include "data_logging.h"
+#include "stm32f4xx_it.h"
+#include "ws2812_config.h"
+#include "fatfs_controller.h"
+#include "mpu6050_controller.h"
+#include "m8q_controller.h"
 
 //=======================================================================================
 

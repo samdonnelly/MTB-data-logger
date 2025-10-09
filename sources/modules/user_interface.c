@@ -15,14 +15,14 @@
 //=======================================================================================
 // Includes 
 
-#include "user_interface.h" 
-#include "data_logging.h" 
-#include "system_parameters.h" 
-
-#include "ws2812_config.h" 
-#include "hd44780u_config.h" 
-#include "battery_config.h" 
-#include "stm32f4xx_it.h" 
+#include "user_interface.h"
+#include "data_logging.h"
+#include "system_parameters.h"
+#include "stm32f4xx_it.h"
+#include "ws2812_config.h"
+#include "hd44780u_config.h"
+#include "battery_config.h"
+#include "hd44780u_controller.h"
 
 //=======================================================================================
 
@@ -669,18 +669,19 @@ uint8_t ui_tx_prep(void)
 uint8_t ui_tx(void)
 {
     // Read a line from the data log and send it out via the Bluetooth module. 
-    fatfs_gets(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
-    hc05_send(mtbdl_ui.data_buff); 
+    fatfs_gets(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN);
+    hc05_send(mtbdl_ui.data_buff);
 
     // Check for end of file - if true we can stop the transaction 
     if (fatfs_eof())
     {
-        mtbdl_ui.tx_send_status = SET_BIT; 
-        hc05_send(mtbdl_tx_prompt); 
-        return TRUE; 
+        mtbdl_ui.tx_send_status = SET_BIT;
+        handler_flags.usart1_flag = CLEAR_BIT;
+        hc05_send(mtbdl_tx_prompt);
+        return TRUE;
     }
 
-    return FALSE; 
+    return FALSE;
 }
 
 
@@ -703,7 +704,7 @@ uint8_t ui_tx_end(void)
     // New SiK radio module data received 
     if (handler_flags.usart1_flag)
     {
-        handler_flags.usart1_flag = CLEAR_BIT; 
+        handler_flags.usart1_flag = CLEAR_BIT;
         const char *user_msg = mtbdl_rx_confirm;
 
         // Parse the new radio data from the circular buffer into the data buffer. 

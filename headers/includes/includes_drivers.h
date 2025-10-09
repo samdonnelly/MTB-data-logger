@@ -26,13 +26,6 @@
 #include "m8q_driver.h"
 #include "ws2812_driver.h"
 
-// Controllers 
-#include "hc05_controller.h" 
-#include "hd44780u_controller.h"
-#include "fatfs_controller.h" 
-#include "m8q_controller.h" 
-#include "mpu6050_controller.h"
-
 // Communication drivers 
 #include "i2c_comm.h"
 #include "uart_comm.h"
@@ -40,7 +33,7 @@
 
 // Other drivers 
 #include "analog_driver.h"
-#include "dma_driver.h" 
+#include "dma_driver.h"
 #include "gpio_driver.h"
 #include "interrupt_driver.h"
 #include "linked_list_driver.h"

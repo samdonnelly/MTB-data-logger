@@ -407,9 +407,9 @@ void log_data(void)
     // External wheel revolution interrupt. This interrupt does not happen fast enough 
     // for the revolution counter to need to be in the interrupt handler so it's easier 
     // to keep it here. 
-    if (handler_flags.exti4_flag)
+    if (handler_flags.exti0_flag)
     {
-        handler_flags.exti4_flag = CLEAR; 
+        handler_flags.exti0_flag = CLEAR; 
         mtbdl_log.rev_count++; 
     }
     

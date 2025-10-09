@@ -152,7 +152,9 @@ void ui_init(
     pin_selector_t btn1, 
     pin_selector_t btn2, 
     pin_selector_t btn3, 
-    pin_selector_t btn4)
+    pin_selector_t btn4,
+    USART_TypeDef *uart,
+    DMA_Stream_TypeDef *dma_stream)
 {
     // Peripheral initialization 
     mtbdl_ui.user_btn_port = btn_port; 
@@ -205,13 +207,33 @@ void ui_init(
     // Initialize screen info 
     mtbdl_ui.msg_counter = CLEAR; 
 
+    // Bluetooth data (HC-05) 
+    mtbdl_ui.dma_stream = dma_stream;
+    mtbdl_ui.uart = uart;
+    memset((void *)mtbdl_ui.cb, CLEAR, sizeof(mtbdl_ui.cb));
+    mtbdl_ui.cb_index.cb_size = UI_HC05_BUFF_SIZE;
+    mtbdl_ui.cb_index.head = CLEAR;
+    mtbdl_ui.cb_index.tail = CLEAR;
+    mtbdl_ui.dma_index.data_size = CLEAR;
+    mtbdl_ui.dma_index.ndt_old = dma_ndt_read(mtbdl_ui.dma_stream);
+    mtbdl_ui.dma_index.ndt_new = CLEAR;
+    memset((void *)mtbdl_ui.data_in_buff, CLEAR, sizeof(mtbdl_ui.data_in_buff));
+
     // TX mode info 
     mtbdl_ui.tx_send_status = CLEAR_BIT; 
     mtbdl_ui.tx_hs_status = CLEAR_BIT; 
 
     // Initialize SD card info 
     memset((void *)mtbdl_ui.data_buff, CLEAR, sizeof(mtbdl_ui.data_buff)); 
-    memset((void *)mtbdl_ui.filename, CLEAR, sizeof(mtbdl_ui.filename)); 
+    memset((void *)mtbdl_ui.filename, CLEAR, sizeof(mtbdl_ui.filename));
+
+    // HC-05 UART RX DMA stream config 
+    dma_stream_config(
+        mtbdl_ui.dma_stream, 
+        (uint32_t)(&mtbdl_ui.uart->DR), 
+        (uint32_t)mtbdl_ui.cb, 
+        (uint32_t)NULL, 
+        (uint16_t)UI_HC05_BUFF_SIZE);
 }
 
 //=======================================================================================
@@ -484,7 +506,7 @@ void ui_set_idle_msg(void)
              param_get_bike_setting(PARAM_BIKE_SET_SL), 
              param_get_bike_setting(PARAM_BIKE_SET_SR), 
              param_get_bike_setting(PARAM_BIKE_SET_ST)); 
-    memcpy((void *)msg[HD44780U_L1].msg, (void *)line1, HD44780U_LINE_LEN); 
+    memcpy((void *)msg[HD44780U_L2].msg, (void *)line2, HD44780U_LINE_LEN); 
     
     snprintf(line3, 
              str_len, 
@@ -493,7 +515,7 @@ void ui_set_idle_msg(void)
              mtbdl_ui.soc, 
              (char)(mtbdl_ui.navstat >> SHIFT_8), 
              (char)(mtbdl_ui.navstat)); 
-    memcpy((void *)msg[HD44780U_L1].msg, (void *)line1, HD44780U_LINE_LEN); 
+    memcpy((void *)msg[HD44780U_L3].msg, (void *)line3, HD44780U_LINE_LEN); 
 
     hd44780u_set_msg(msg, MTBDL_MSG_LEN_4_LINE); 
 }
@@ -566,35 +588,25 @@ void ui_rx(void)
     // These are set to their max value so they won't accidentally update any of the 
     // parameters. They are also unsigned ints because other data types were causing 
     // scanning issues. 
-    unsigned int param_index = ~CLEAR, setting_data = ~CLEAR; 
+    unsigned int param_index = ~CLEAR, setting_data = ~CLEAR;
 
-    // Check if Bluetooth data is available 
-    if (hc05_data_status())
+    // New SiK radio module data received 
+    if (handler_flags.usart1_flag)
     {
-        // Read the data from the HC-05 
-        hc05_read(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
+        handler_flags.usart1_flag = CLEAR_BIT; 
 
-        // Check if the transmission was successful. If so then parse the input and 
-        // check if the input provided by the user is valid. If it is then send a 
-        // confirmation message back to the user. If the transmission was not 
-        // successful or the input is not valid then ignore the input. If the 
-        // transaction is not successful, we ignore the input and reset the Bluetooth 
-        // module status so the system doesn't enter the fault state as this is not a 
-        // critical fault. 
-        if (!hc05_get_status())
+        // Parse the new radio data from the circular buffer into the data buffer. 
+        dma_cb_index(mtbdl_ui.dma_stream, &mtbdl_ui.dma_index, &mtbdl_ui.cb_index); 
+        cb_parse(mtbdl_ui.cb, &mtbdl_ui.cb_index, mtbdl_ui.data_in_buff);
+
+        sscanf(mtbdl_ui.data_buff, mtbdl_rx_input, &param_index, &setting_data); 
+
+        if (param_index < PARAM_BIKE_SET_NONE)
         {
-            sscanf(mtbdl_ui.data_buff, 
-                   mtbdl_rx_input, 
-                   &param_index, 
-                   &setting_data); 
-
-            if (param_index < PARAM_BIKE_SET_NONE)
+            if (param_update_bike_setting((param_bike_set_index_t)param_index, 
+                                            (uint16_t)setting_data))
             {
-                if (param_update_bike_setting((param_bike_set_index_t)param_index, 
-                                              (uint16_t)setting_data))
-                {
-                    hc05_send(mtbdl_rx_confirm); 
-                }
+                hc05_send(mtbdl_rx_confirm); 
             }
         }
 
@@ -686,18 +698,23 @@ uint8_t ui_tx_end(void)
     // such as a lost Bluetooth connection or a fault will simply close the log file and 
     // ignore the feedback from the connected device. 
 
-    fatfs_close(); 
+    fatfs_close();
 
-    if (hc05_data_status())
+    // New SiK radio module data received 
+    if (handler_flags.usart1_flag)
     {
-        hc05_read(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN); 
-        const char *user_msg = mtbdl_rx_confirm; 
+        handler_flags.usart1_flag = CLEAR_BIT; 
+        const char *user_msg = mtbdl_rx_confirm;
 
-        if (!strcmp(mtbdl_tx_complete, mtbdl_ui.data_buff))
+        // Parse the new radio data from the circular buffer into the data buffer. 
+        dma_cb_index(mtbdl_ui.dma_stream, &mtbdl_ui.dma_index, &mtbdl_ui.cb_index); 
+        cb_parse(mtbdl_ui.cb, &mtbdl_ui.cb_index, mtbdl_ui.data_in_buff);
+
+        if (strcmp(mtbdl_tx_complete, (char *)mtbdl_ui.data_in_buff) == 0)
         {
             mtbdl_ui.tx_hs_status = SET_BIT; 
         }
-        else if (!strcmp(mtbdl_tx_not_complete, mtbdl_ui.data_buff))
+        else if (strcmp(mtbdl_tx_not_complete, (char *)mtbdl_ui.data_in_buff) == 0)
         {
             handshake_status = TRUE; 
         }
@@ -706,7 +723,8 @@ uint8_t ui_tx_end(void)
             user_msg = mtbdl_tx_prompt; 
         }
 
-        hc05_send(user_msg); 
+        hc05_send(user_msg);
+        hc05_clear();
     }
 
     if (mtbdl_ui.tx_send_status && mtbdl_ui.tx_hs_status)

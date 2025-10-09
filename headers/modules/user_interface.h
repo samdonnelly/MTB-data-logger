@@ -31,6 +31,9 @@
 #define UI_LED_DUTY_SHORT 20        // 5ms interrupt * 20 == 100ms duty cycle 
 #define UI_LED_DUTY_LONG 100        // 5ms interrupt * 100 == 500ms duty cycle 
 
+// Buffer sizes 
+#define UI_HC05_BUFF_SIZE 200 
+
 //=======================================================================================
 
 
@@ -99,6 +102,14 @@ typedef struct mtbdl_ui_s
     // Screen 
     uint16_t msg_counter;                       // Screen message write counter 
 
+    // Bluetooth data 
+    USART_TypeDef *uart; 
+    DMA_Stream_TypeDef *dma_stream; 
+    uint8_t cb[UI_HC05_BUFF_SIZE];              // Circular buffer populated by DMA 
+    cb_index_t cb_index;                        // Circular buffer indexing info 
+    dma_index_t dma_index;                      // DMA transfer indexing info 
+    uint8_t data_in_buff[UI_HC05_BUFF_SIZE];    // Buffer that stores latest UART input 
+
     // TX mode 
     uint8_t tx_send_status : 1;                 // TX log file send status 
     uint8_t tx_hs_status   : 1;                 // TX log file handshake status 
@@ -129,13 +140,17 @@ mtbdl_ui_t;
  * @param btn2 : button 2 pin 
  * @param btn3 : button 3 pin 
  * @param btn4 : button 4 pin 
+ * @param uart : UART port of HC-05 
+ * @param dma_stream : DMA stream address of HC-05 
  */
 void ui_init(
     GPIO_TypeDef *btn_port, 
     pin_selector_t btn1, 
     pin_selector_t btn2, 
     pin_selector_t btn3, 
-    pin_selector_t btn4); 
+    pin_selector_t btn4,
+    USART_TypeDef *uart,
+    DMA_Stream_TypeDef *dma_stream); 
 
 //=======================================================================================
 

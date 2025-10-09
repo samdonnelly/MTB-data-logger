@@ -129,20 +129,31 @@ void mtbdl_init()
         UART_FRAC_42_9600, 
         UART_MANT_42_9600, 
         UART_PARAM_DISABLE, 
-        UART_PARAM_ENABLE); 
+        UART_PARAM_ENABLE);
 
-    // HC-05 
+    // UART1 init - HC-05 
     uart_init(
         USART1, 
         GPIOA, 
         PIN_10, 
         PIN_9, 
-        UART_PARAM_DISABLE, 
-        CLEAR, 
+        UART_PARAM_DISABLE,    // Word length 
+        CLEAR_BIT,             // STOP bits 
         UART_FRAC_84_115200, 
         UART_MANT_84_115200, 
         UART_PARAM_DISABLE, 
-        UART_PARAM_DISABLE); 
+        UART_PARAM_ENABLE); 
+        
+    // UART1 interrupt init - HC-05 - IDLE line (RX) interrupts 
+    uart_interrupt_init(
+        USART1, 
+        UART_PARAM_DISABLE, 
+        UART_PARAM_DISABLE, 
+        UART_PARAM_DISABLE, 
+        UART_PARAM_DISABLE, 
+        UART_PARAM_ENABLE, 
+        UART_PARAM_DISABLE, 
+        UART_PARAM_DISABLE);
 
     //==================================================
 
@@ -197,7 +208,21 @@ void mtbdl_init()
         DMA_ADDR_INCREMENT, 
         DMA_ADDR_FIXED, 
         DMA_DATA_SIZE_HALF, 
-        DMA_DATA_SIZE_HALF); 
+        DMA_DATA_SIZE_HALF);
+
+    // DMA1 stream init - UART1 - HC-05 
+    dma_stream_init(
+        DMA2, 
+        DMA2_Stream2, 
+        DMA_CHNL_4, 
+        DMA_DIR_PM, 
+        DMA_CM_ENABLE,
+        DMA_PRIOR_HI, 
+        DMA_DBM_DISABLE, 
+        DMA_ADDR_INCREMENT,   // Increment the buffer pointer to fill the buffer 
+        DMA_ADDR_FIXED,       // No peripheral increment - copy from DR only 
+        DMA_DATA_SIZE_BYTE, 
+        DMA_DATA_SIZE_BYTE);
 
     // Configure the DMA stream 
     // The ADC DMA stream is configured in the data logging module init function. This 
@@ -217,11 +242,11 @@ void mtbdl_init()
 
     // Wheel revolutions interrupt configuration 
     exti_config(
-        GPIOC, 
-        EXTI_PC, 
-        PIN_4, 
+        GPIOB, 
+        EXTI_PB, 
+        PIN_0, 
         PUPDR_PU, 
-        EXTI_L4, 
+        EXTI_L0, 
         EXTI_INT_NOT_MASKED, 
         EXTI_EVENT_MASKED, 
         EXTI_RISE_TRIG_DISABLE, 
@@ -308,10 +333,10 @@ void mtbdl_init()
     // SD card setup 
 
     // User initialization 
-    fatfs_user_init(SPI2, GPIOB, GPIOX_PIN_12); 
+    fatfs_user_init(SPI2, GPIOB, GPIOX_PIN_12);
 
     // Controller init 
-    fatfs_controller_init(mtbdl_dir); 
+    fatfs_controller_init(mtbdl_dir);
 
     //==================================================
 
@@ -363,15 +388,12 @@ void mtbdl_init()
     mtbdl_trackers.fault = CLEAR_BIT; 
     mtbdl_trackers.reset = CLEAR_BIT; 
 
-    // Create a directory for logging fault codes if it does not already exit 
-    fatfs_mkdir(mtbdl_fault_dir); 
-
     //==================================================
 
     //==================================================
     // User interface setup 
 
-    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3); 
+    ui_init(GPIOC, PIN_0, PIN_1, PIN_2, PIN_3, USART1, DMA2_Stream2); 
 
     //==================================================
 
@@ -380,7 +402,7 @@ void mtbdl_init()
 
     // This function handles DMA stream init so that the correct ADC buffer can be used. 
     log_init(
-        EXTI4_IRQn, 
+        EXTI0_IRQn, 
         TIM1_TRG_COM_TIM11_IRQn, 
         ADC1, 
         DMA2, 
@@ -400,7 +422,8 @@ void mtbdl_init()
 
     // Enable the DMA stream. This is done here because the data logging module does 
     // further DMA configuration after the DMA setup section. 
-    dma_stream_enable(DMA2_Stream0); 
+    dma_stream_enable(DMA2_Stream0);    // ADC1 
+    dma_stream_enable(DMA2_Stream2);    // UART1 - HC-05 
 
     // Periodic interrupt (button and LED updates): Enable the interrupt handler 
     nvic_config(TIM1_UP_TIM10_IRQn, EXTI_PRIORITY_2); 
@@ -412,8 +435,11 @@ void mtbdl_init()
 
     // External interrupt (wheel speed sensor): Set the interrupt priority and disable 
     // until data logging starts 
-    NVIC_SetPriority(EXTI4_IRQn, EXTI_PRIORITY_0); 
-    NVIC_DisableIRQ(EXTI4_IRQn); 
+    NVIC_SetPriority(EXTI0_IRQn, EXTI_PRIORITY_0); 
+    NVIC_DisableIRQ(EXTI0_IRQn); 
+
+    // UART1 RX interrupt (HC-05 receive) 
+    nvic_config(USART1_IRQn, EXTI_PRIORITY_3);
 
     //==================================================
 }

@@ -599,7 +599,7 @@ void ui_rx(void)
         dma_cb_index(mtbdl_ui.dma_stream, &mtbdl_ui.dma_index, &mtbdl_ui.cb_index); 
         cb_parse(mtbdl_ui.cb, &mtbdl_ui.cb_index, mtbdl_ui.data_in_buff);
 
-        sscanf(mtbdl_ui.data_buff, mtbdl_rx_input, &param_index, &setting_data); 
+        sscanf((char *)mtbdl_ui.data_in_buff, mtbdl_rx_input, &param_index, &setting_data); 
 
         if (param_index < PARAM_BIKE_SET_NONE)
         {

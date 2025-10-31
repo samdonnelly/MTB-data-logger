@@ -333,10 +333,10 @@ void mtbdl_init()
     // SD card setup 
 
     // User initialization 
-    fatfs_user_init(SPI2, GPIOB, GPIOX_PIN_12);
+    sd_user_init(SPI2, GPIOB, TIM9, GPIOX_PIN_12);
 
     // Controller init 
-    fatfs_controller_init(mtbdl_dir);
+    sd_controller_init(mtbdl_dir);
 
     //==================================================
 

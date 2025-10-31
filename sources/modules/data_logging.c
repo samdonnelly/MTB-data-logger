@@ -18,7 +18,7 @@
 #include "data_logging.h"
 #include "stm32f4xx_it.h"
 #include "ws2812_config.h"
-#include "fatfs_controller.h"
+#include "sd_controller.h"
 #include "mpu6050_controller.h"
 #include "m8q_controller.h"
 
@@ -310,13 +310,13 @@ void log_data_file_prep(void)
 {
     // The code moves to the directory that stores the data log files and attempts to create 
     // and open the next indexed log file. If this is successful then information and data 
-    // will be written to the file. If unsuccessful then the fatfs controller will record a 
+    // will be written to the file. If unsuccessful then the sd card controller will record a 
     // fault and the system will enter the fault state instead of proceeding to the data 
     // logging state. 
     
-    fatfs_set_dir(mtbdl_data_dir); 
+    sd_set_dir(mtbdl_data_dir); 
 
-    if (fatfs_open(mtbdl_log.filename, FATFS_MODE_WWX) == FR_OK)
+    if (sd_open(mtbdl_log.filename, SD_MODE_WWX) == FR_OK)
     {
         // File successfully created 
         // Write the bike and system parameters, file creation time stamp (UTC format) and 
@@ -339,7 +339,7 @@ void log_data_file_prep(void)
                  mtbdl_param_time, 
                  (char *)mtbdl_log.utc_time, 
                  (char *)mtbdl_log.utc_date); 
-        fatfs_puts(mtbdl_log.data_str); 
+        sd_puts(mtbdl_log.data_str); 
 
         // Logging info 
         uint16_t rev_period = LOG_PERIOD * LOG_PERIOD_DIVIDER * 
@@ -350,9 +350,9 @@ void log_data_file_prep(void)
                  LOG_PERIOD, 
                  rev_period, 
                  LOG_REV_SAMPLE_SIZE); 
-        fatfs_puts(mtbdl_log.data_str); 
+        sd_puts(mtbdl_log.data_str); 
         
-        fatfs_puts(mtbdl_data_log_start); 
+        sd_puts(mtbdl_data_log_start); 
     }
 }
 
@@ -476,7 +476,7 @@ void log_data(void)
 
             stream_table[log_stream](); 
 
-            fatfs_puts(mtbdl_log.data_str); 
+            sd_puts(mtbdl_log.data_str); 
             mtbdl_log.data_buff_index = CLEAR; 
         }
         else 
@@ -678,15 +678,15 @@ void log_data_end(void)
     // an open log file first because this function is called in the post run state which 
     // is executed even when low power or fault events occur. 
 
-    if (fatfs_get_file_status())
+    if (sd_get_file_status())
     {
         snprintf(mtbdl_log.data_str, 
                  LOG_MAX_LOG_LEN, 
                  mtbdl_data_log_end, 
                  mtbdl_log.overrun); 
-        fatfs_puts(mtbdl_log.data_str); 
+        sd_puts(mtbdl_log.data_str); 
 
-        fatfs_close(); 
+        sd_close(); 
         param_update_log_index(PARAM_LOG_INDEX_INC); 
     }
 }
@@ -792,7 +792,7 @@ void log_calibration_calculation(void)
     param_update_system_setting(PARAM_SYS_SET_FORK_REST, (void *)&mtbdl_log.adc_buff[ADC_FORK]); 
     param_update_system_setting(PARAM_SYS_SET_SHOCK_REST, (void *)&mtbdl_log.adc_buff[ADC_SHOCK]); 
 
-    param_write_sys_params(FATFS_MODE_OEW); 
+    param_write_sys_params(SD_MODE_OEW); 
 }
 
 //=======================================================================================

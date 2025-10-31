@@ -146,7 +146,7 @@ void param_file_sys_setup(void);
  *          SD card. This should be done when a bike parameter is updated (for example 
  *          when a user sets a new suspension setting in RX mode). 
  * 
- * @param mode : SD card file access mode (see FATFS driver mode flags) 
+ * @param mode : SD card file access mode (see SD card driver mode flags) 
  */
 void param_write_bike_params(uint8_t mode); 
 
@@ -158,7 +158,7 @@ void param_write_bike_params(uint8_t mode);
  *          record. This is typically only used when starting up and bike parameters 
  *          that were previously saved need to be fetched. 
  * 
- * @param mode : SD card file access mode (see FATFS driver mode flags) 
+ * @param mode : SD card file access mode (see SD card driver mode flags) 
  */
 void param_read_bike_params(uint8_t mode); 
 
@@ -170,7 +170,7 @@ void param_read_bike_params(uint8_t mode);
  *          SD card. This should be done when a system parameter is updated (for example 
  *          after calibration is complete). 
  * 
- * @param mode : SD card file access mode (see FATFS driver mode flags) 
+ * @param mode : SD card file access mode (see SD card driver mode flags) 
  */
 void param_write_sys_params(uint8_t mode); 
 
@@ -182,7 +182,7 @@ void param_write_sys_params(uint8_t mode);
  *          record. This is typically only used when starting up and system parameters 
  *          that were previously saved need to be fetched. 
  * 
- * @param mode : SD card file access mode (see FATFS driver mode flags) 
+ * @param mode : SD card file access mode (see SD card driver mode flags) 
  */
 void param_read_sys_params(uint8_t mode); 
 

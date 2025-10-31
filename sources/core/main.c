@@ -16,11 +16,10 @@
 // Includes 
 
 // Library 
-#include "stm32f4xx_hal.h" 
-#include "fatfs.h" 
+#include "stm32f4xx_hal.h"
 
 // Application 
-#include "mtbdl.h" 
+#include "mtbdl.h"
 
 //=======================================================================================
 
@@ -91,7 +90,6 @@ int main(void)
 
     // Initialize all configured peripherals 
     MX_GPIO_Init();
-    MX_FATFS_Init();
 
     // Run application 
     while (1)

@@ -636,7 +636,7 @@ uint8_t ui_tx_prep(void)
     }
 
     // Log files exist. Move to the data directory. 
-    fatfs_set_dir(mtbdl_data_dir); 
+    sd_set_dir(mtbdl_data_dir); 
 
     // Generate a log file name. The log index is adjusted because it will be one ahead 
     // of the most recent log file number after the most recent log has been created 
@@ -646,7 +646,7 @@ uint8_t ui_tx_prep(void)
              (log_index - UI_LOG_INDEX_OFFSET)); 
 
     // Check for the existance of the specified file number 
-    if (fatfs_get_exists(mtbdl_ui.filename) == FR_NO_FILE)
+    if (sd_get_exists(mtbdl_ui.filename) == FR_NO_FILE)
     {
         // If the file does not exist then decrement the file index. At the top of this 
         // function we already check if the index is 0 which means if we get to this 
@@ -655,7 +655,7 @@ uint8_t ui_tx_prep(void)
         return FALSE; 
     }
 
-    fatfs_open(mtbdl_ui.filename, FATFS_MODE_OAWR); 
+    sd_open(mtbdl_ui.filename, SD_MODE_OAWR); 
 
     // Initialize the user interface for sending a log file. This is helpful when 
     // multiple log files are sent and they need seperation between one another. 
@@ -669,11 +669,11 @@ uint8_t ui_tx_prep(void)
 uint8_t ui_tx(void)
 {
     // Read a line from the data log and send it out via the Bluetooth module. 
-    fatfs_gets(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN);
+    sd_gets(mtbdl_ui.data_buff, MTBDL_MAX_STR_LEN);
     hc05_send(mtbdl_ui.data_buff);
 
     // Check for end of file - if true we can stop the transaction 
-    if (fatfs_eof())
+    if (sd_eof())
     {
         mtbdl_ui.tx_send_status = SET_BIT;
         handler_flags.usart1_flag = CLEAR_BIT;
@@ -699,7 +699,7 @@ uint8_t ui_tx_end(void)
     // such as a lost Bluetooth connection or a fault will simply close the log file and 
     // ignore the feedback from the connected device. 
 
-    fatfs_close();
+    sd_close();
 
     // New SiK radio module data received 
     if (handler_flags.usart1_flag)
@@ -734,7 +734,7 @@ uint8_t ui_tx_end(void)
         mtbdl_ui.tx_hs_status = CLEAR_BIT; 
 
         // Transaction completed - delete the file and update the log index 
-        fatfs_unlink(mtbdl_ui.filename); 
+        sd_unlink(mtbdl_ui.filename); 
         param_update_log_index(PARAM_LOG_INDEX_DEC); 
 
         handshake_status = TRUE; 

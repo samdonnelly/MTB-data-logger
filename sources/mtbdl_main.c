@@ -793,7 +793,7 @@ void mtbdl_app(void)
 
     // Call device controllers 
     hd44780u_controller(); 
-    fatfs_controller(); 
+    sd_controller(); 
     mpu6050_controller(DEVICE_ONE); 
     m8q_controller(); 
 }
@@ -826,7 +826,7 @@ void system_status_checks(void)
     {
         mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_2); 
     }
-    if (fatfs_get_fault_code())
+    if (sd_get_fault_code())
     {
         mtbdl_trackers.fault_code |= (SET_BIT << SHIFT_3); 
     }
@@ -867,9 +867,9 @@ void mtbdl_init_state(mtbdl_trackers_t *mtbdl)
 
     mtbdl_init_user_input_check(mtbdl); 
 
-    if (fatfs_get_state() == FATFS_ACCESS_STATE)
+    if (sd_get_state() == SD_ACCESS_STATE)
     {
-        fatfs_set_check_flag(); 
+        sd_set_check_flag(); 
         param_file_sys_setup(); 
     }
 
@@ -1181,7 +1181,7 @@ void mtbdl_run_countdown_state_entry(mtbdl_trackers_t *mtbdl)
     log_data_file_prep(); 
 
     // SD card will be written to constantly so no need for the check state 
-    fatfs_clear_check_flag(); 
+    sd_clear_check_flag(); 
 
     // Take the MPU-6050 out of low power mode 
     mpu6050_clear_low_power(DEVICE_ONE); 
@@ -1368,7 +1368,7 @@ void mtbdl_postrun_state_exit(mtbdl_trackers_t *mtbdl)
     hd44780u_set_clear_flag(); 
 
     // Set the SD card controller check flag 
-    fatfs_set_check_flag(); 
+    sd_set_check_flag(); 
 
     // Turn off the data logging and GPS LEDs 
     ui_led_colour_change(WS2812_LED_0, mtbdl_led_clear); 
@@ -1784,7 +1784,7 @@ void mtbdl_postrx_state_entry(mtbdl_trackers_t *mtbdl)
     hd44780u_set_msg(mtbdl->msg, mtbdl->msg_len); 
     
     // Save the parameters to file and update tracking info 
-    param_write_bike_params(FATFS_MODE_OEW); 
+    param_write_bike_params(SD_MODE_OEW); 
 
     // Set the Bluetooth LED colour and blink rate 
     ui_led_colour_set(WS2812_LED_2, mtbdl_led2_1); 
@@ -2452,15 +2452,15 @@ void mtbdl_fault_state_entry(mtbdl_trackers_t *mtbdl)
     ui_led_colour_change(WS2812_LED_3, mtbdl_led3_1); 
 
     // Close any file that may be open 
-    fatfs_close(); 
+    sd_close(); 
 
     // Write the fault code to a file on the SD card 
     char fault_str_buff[MTBDL_MAX_STR_LEN]; 
-    fatfs_set_dir(mtbdl_fault_dir); 
-    fatfs_open(mtbdl_bike_param_file, FATFS_MODE_W); 
+    sd_set_dir(mtbdl_fault_dir); 
+    sd_open(mtbdl_bike_param_file, SD_MODE_W); 
     snprintf(fault_str_buff, MTBDL_MAX_STR_LEN, mtbdl_fault_info, mtbdl->fault_code); 
-    fatfs_puts(fault_str_buff); 
-    fatfs_close(); 
+    sd_puts(fault_str_buff); 
+    sd_close(); 
 
     // Set user button LED colours 
     ui_led_colour_set(WS2812_LED_7, mtbdl_led_clear); 
@@ -2538,7 +2538,7 @@ void mtbdl_reset_state_exit(mtbdl_trackers_t *mtbdl)
     mtbdl->fault_code = CLEAR; 
 
     // Reset devices 
-    fatfs_set_reset_flag(); 
+    sd_set_reset_flag(); 
     hc05_clear_status(); 
 }
 

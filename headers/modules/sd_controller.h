@@ -1,9 +1,9 @@
 /**
- * @file fatfs_controller.h
+ * @file sd_controller.h
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief FATFS controller interface 
+ * @brief SD card controller interface 
  * 
  * @version 0.1
  * @date 2023-01-12
@@ -12,8 +12,8 @@
  * 
  */
 
-#ifndef _FATFS_CONTROLLER_H_ 
-#define _FATFS_CONTROLLER_H_ 
+#ifndef _SD_CARD_CONTROLLER_H_ 
+#define _SD_CARD_CONTROLLER_H_ 
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,11 +22,8 @@ extern "C" {
 //=======================================================================================
 // Includes 
 
-// Drivers 
-#include "fatfs_driver.h" 
-
-// STM drivers 
-#include "fatfs.h"
+#include "sd_driver.h" 
+#include "ff.h"
 
 //=======================================================================================
 
@@ -35,17 +32,12 @@ extern "C" {
 // Macros 
 
 // State machine 
-#define FATFS_NUM_STATES 7             // Number of possible states for the controller 
+#define SD_NUM_STATES 7             // Number of possible states for the controller 
 
 // Controller tracker 
-#define FATFS_PATH_SIZE 50             // Volume path max length 
-#define FATFS_INFO_SIZE 30             // Device info buffer size 
-#define FATFS_FREE_THRESH 0x0000C350   // Free space threshold before disk full fault (KB) 
-
-// Volume numbers 
-#define FATFS_VOL_NUM_0 0              // Logical drive number 0 (default number) 
-#define FATFS_VOL_NUM_1 1              // Logical drive number 1 
-#define FATFS_VOL_NUM_2 2              // Logical drive number 2 
+#define SD_PATH_SIZE 50             // Volume path max length 
+#define SD_INFO_SIZE 30             // Device info buffer size 
+#define SD_FREE_THRESH 0x0000C350   // Free space threshold before disk full fault (KB) 
 
 //=======================================================================================
 
@@ -54,32 +46,32 @@ extern "C" {
 // Enums 
 
 /**
- * @brief FATFS controller states 
+ * @brief SD card controller states 
  */
 typedef enum {
-    FATFS_INIT_STATE, 
-    FATFS_NOT_READY_STATE, 
-    FATFS_ACCESS_STATE, 
-    FATFS_ACCESS_CHECK_STATE, 
-    FATFS_EJECT_STATE, 
-    FATFS_FAULT_STATE, 
-    FATFS_RESET_STATE 
-} fatfs_states_t; 
+    SD_INIT_STATE, 
+    SD_NOT_READY_STATE, 
+    SD_ACCESS_STATE, 
+    SD_ACCESS_CHECK_STATE, 
+    SD_EJECT_STATE, 
+    SD_FAULT_STATE, 
+    SD_RESET_STATE 
+} sd_states_t; 
 
 
 /**
- * @brief FATFS fault code bit indexes 
+ * @brief SD card fault code bit indexes 
  */
 typedef enum {
-    FATFS_FAULT_DIR,          // Directory access - make or delete (unlink) 
-    FATFS_FAULT_OPEN,         // Open 
-    FATFS_FAULT_CLOSE,        // Close 
-    FATFS_FAULT_WRITE,        // Write 
-    FATFS_FAULT_READ,         // Read 
-    FATFS_FAULT_SEEK,         // Seek 
-    FATFS_FAULT_FREE,         // Free space 
-    FATFS_FAULT_COMMS         // Comms 
-} fatfs_fault_codes_t; 
+    SD_FAULT_DIR,          // Directory access - make or delete (unlink) 
+    SD_FAULT_OPEN,         // Open 
+    SD_FAULT_CLOSE,        // Close 
+    SD_FAULT_WRITE,        // Write 
+    SD_FAULT_READ,         // Read 
+    SD_FAULT_SEEK,         // Seek 
+    SD_FAULT_FREE,         // Free space 
+    SD_FAULT_COMMS         // Comms 
+} sd_fault_codes_t; 
 
 //=======================================================================================
 
@@ -87,11 +79,11 @@ typedef enum {
 //=======================================================================================
 // Structures 
 
-// FATFS controller trackers 
-typedef struct fatfs_trackers_s 
+// SD card controller trackers 
+typedef struct sd_trackers_s 
 {
     // Controller information 
-    fatfs_states_t state;                        // State of the controller 
+    sd_states_t state;                        // State of the controller 
     uint16_t fault_code;                         // Fault code 
     DWORD fault_mode;                            // Fault mode - based on FRESULT 
 
@@ -100,8 +92,8 @@ typedef struct fatfs_trackers_s
     FIL file;                                    // File object 
     FRESULT fresult;                             // Store result of FatFs operation 
     UINT br, bw;                                 // Read and write counters 
-    TCHAR path[FATFS_PATH_SIZE];                 // Path to project directory 
-    TCHAR dir[FATFS_PATH_SIZE];                  // Sub-directory in project directory 
+    TCHAR path[SD_PATH_SIZE];                    // Path to project directory 
+    TCHAR dir[SD_PATH_SIZE];                     // Sub-directory in project directory 
 
     // Card capacity 
     FATFS *pfs;                                  // Pointer to file system object 
@@ -109,7 +101,7 @@ typedef struct fatfs_trackers_s
     DWORD total, free_space;                     // Volume total and free space 
     
     // Volume tracking 
-    TCHAR vol_label[FATFS_INFO_SIZE];            // Volume label 
+    TCHAR vol_label[SD_INFO_SIZE];               // Volume label 
     DWORD serial_num;                            // Volume serial number 
 
     // State trackers 
@@ -121,7 +113,7 @@ typedef struct fatfs_trackers_s
     uint8_t reset      : 1;                      // Reset state trigger 
     uint8_t startup    : 1;                      // Ensures the init state is run 
 }
-fatfs_trackers_t; 
+sd_trackers_t; 
 
 //=======================================================================================
 
@@ -129,11 +121,11 @@ fatfs_trackers_t;
 //=======================================================================================
 // Datatypes 
 
-typedef fatfs_states_t FATFS_STATE; 
-typedef uint16_t FATFS_FAULT_CODE; 
-typedef DWORD FATFS_FAULT_MODE; 
-typedef uint8_t FATFS_FILE_STATUS; 
-typedef int8_t FATFS_EOF; 
+typedef sd_states_t SD_STATE; 
+typedef uint16_t SD_FAULT_CODE; 
+typedef DWORD SD_FAULT_MODE; 
+typedef uint8_t SD_FILE_STATUS; 
+typedef int8_t SD_EOF; 
 
 //=======================================================================================
 
@@ -142,11 +134,11 @@ typedef int8_t FATFS_EOF;
 // Function pointers 
 
 /**
- * @brief FATFS state machine function pointer 
+ * @brief SD card state machine function pointer 
  * 
- * @param fatfs_device : device tracker that defines control characteristics 
+ * @param sd_device : device tracker that defines control characteristics 
  */
-typedef void (*fatfs_state_functions_t)(fatfs_trackers_t *fatfs_device); 
+typedef void (*sd_state_functions_t)(sd_trackers_t *sd_device); 
 
 //=======================================================================================
 
@@ -155,28 +147,28 @@ typedef void (*fatfs_state_functions_t)(fatfs_trackers_t *fatfs_device);
 // Control functions 
 
 /**
- * @brief FATFS controller initialization 
+ * @brief SD card controller initialization 
  * 
  * @details Initializes the controller tracker information. The 'path' argument specifies 
  *          the directory where files will be saved on the volume. This directory is the 
  *          applications root directory and all subsequent folders and files will be saved 
  *          here. This allows for files from different applications to be easily separated. 
- *          Note that the path length must be less than FATFS_PATH_SIZE to prevent overrun. 
+ *          Note that the path length must be less than SD_PATH_SIZE to prevent overrun. 
  *          If the path length is too long then the project/applications directory will not 
  *          be set. 
  * 
  * @param path : path to directory to use on the volume 
  */
-void fatfs_controller_init(const char *path); 
+void sd_controller_init(const char *path); 
 
 
 /**
- * @brief FATFS controller 
+ * @brief SD card controller 
  * 
  * @details Contains the state machine to control the flow of the controller. Should be 
  *          called continuously by the application while the device is in use. 
  */
-void fatfs_controller(void); 
+void sd_controller(void); 
 
 //=======================================================================================
 
@@ -194,7 +186,7 @@ void fatfs_controller(void);
  *          performed in this state, however there will be the added overhead of checking 
  *          for the volume presence on each pass. 
  */
-void fatfs_set_check_flag(void); 
+void sd_set_check_flag(void); 
 
 
 /**
@@ -205,7 +197,7 @@ void fatfs_set_check_flag(void);
  *          is best when the volume is being accessed consistently so a check is not needed 
  *          and when you don't want to waste cycle on a ping of the volume. 
  */
-void fatfs_clear_check_flag(void); 
+void sd_clear_check_flag(void); 
 
 
 /**
@@ -215,16 +207,16 @@ void fatfs_clear_check_flag(void);
  *          preps the volume for removal. This flag is set by the application if the user 
  *          wants to remove the volume while the system still has power. 
  */
-void fatfs_set_eject_flag(void); 
+void sd_set_eject_flag(void); 
 
 
 /**
  * @brief Clear the eject flag 
  * 
  * @details The eject flag must be cleared in order for the volume to be properly mounted 
- *          and used. This setter is only needed after fatfs_set_eject_flag has been called. 
+ *          and used. This setter is only needed after sd_set_eject_flag has been called. 
  */
-void fatfs_clear_eject_flag(void); 
+void sd_clear_eject_flag(void); 
 
 
 /**
@@ -233,7 +225,7 @@ void fatfs_clear_eject_flag(void);
  * @details The reset flag triggers a controller reset. This flag will be cleared 
  *          automatically after being set. 
  */
-void fatfs_set_reset_flag(void); 
+void sd_set_reset_flag(void); 
 
 
 /**
@@ -243,7 +235,7 @@ void fatfs_set_reset_flag(void);
  * 
  * @param dir : project directory to access 
  */
-void fatfs_set_dir(const TCHAR *dir); 
+void sd_set_dir(const TCHAR *dir); 
 
 
 /**
@@ -262,7 +254,7 @@ void fatfs_set_dir(const TCHAR *dir);
  *          with the sub-directory added to the end and separated by a "/". 
  *          
  *          The length of 'dir' and 'path' together should be less than twice the length of 
- *          FATFS_PATH_SIZE. 
+ *          SD_PATH_SIZE. 
  *          
  *          If 'dir' is an invalid pointer then the function will return before attempting to 
  *          create a directory. 
@@ -270,7 +262,7 @@ void fatfs_set_dir(const TCHAR *dir);
  * @param dir : sub directory to creae within the project directory 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_mkdir(const TCHAR *dir); 
+FRESULT sd_mkdir(const TCHAR *dir); 
 
 
 /**
@@ -281,15 +273,15 @@ FRESULT fatfs_mkdir(const TCHAR *dir);
  *          Concatenates the file name ('file_name') onto the project directory and attempts to 
  *          open the specified file. If there is an error opening the file then the fault code 
  *          will be updated accordingly. Note that if a subdirectory for the project has been 
- *          created using fatfs_mkdir then the file will be made in that directory. If you 
- *          want the file in a different directory then use fatfs_mkdir to update the 
- *          subdirectory accordingly (can specify 'dir' as "" in fatfs_mkdir to go to the 
+ *          created using sd_mkdir then the file will be made in that directory. If you 
+ *          want the file in a different directory then use sd_mkdir to update the 
+ *          subdirectory accordingly (can specify 'dir' as "" in sd_mkdir to go to the 
  *          project root directory). 
  *          
  *          When the function attempts to open the specified file it will use the method 
- *          specified by 'mode' to do so. For example, if you specify FATFS_MODE_W as the mode 
+ *          specified by 'mode' to do so. For example, if you specify sd_MODE_W as the mode 
  *          then the function will create a file if it does not already exist and open it in 
- *          write mode. See the FATFS driver header for possible modes. 
+ *          write mode. See the SD card driver header for possible modes. 
  *           
  *          If a file is already open then there will be no attempt to open another. The result 
  *          can be observed in the return value. 
@@ -298,7 +290,7 @@ FRESULT fatfs_mkdir(const TCHAR *dir);
  * @param mode : mode to open the file in (read, write, etc.) 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_open(
+FRESULT sd_open(
     const TCHAR *file_name, 
     uint8_t mode); 
 
@@ -315,7 +307,7 @@ FRESULT fatfs_open(
  * 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_close(void); 
+FRESULT sd_close(void); 
 
 
 /**
@@ -331,7 +323,7 @@ FRESULT fatfs_close(void);
  * @param btw : number of bytes to write 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_f_write(
+FRESULT sd_f_write(
     const void *buff, 
     UINT btw); 
 
@@ -354,7 +346,7 @@ FRESULT fatfs_f_write(
  * @param str : pointer to string to write 
  * @return int8_t : number of character encoding units written to the file 
  */
-int16_t fatfs_puts(const TCHAR *str); 
+int16_t sd_puts(const TCHAR *str); 
 
 
 /**
@@ -385,7 +377,7 @@ int16_t fatfs_puts(const TCHAR *str);
  * @param fmt_value : unsigned integer to write with the formatted string 
  * @return int8_t : number of character encoding units written to the file 
  */
-int8_t fatfs_printf(
+int8_t sd_printf(
     const TCHAR *fmt_str, 
     uint16_t fmt_value); 
 
@@ -413,7 +405,7 @@ int8_t fatfs_printf(
  * @param offset : byte position in the file to point to 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_lseek(FSIZE_t offset); 
+FRESULT sd_lseek(FSIZE_t offset); 
 
 
 /**
@@ -425,7 +417,7 @@ FRESULT fatfs_lseek(FSIZE_t offset);
  * @param filename : name of file 
  * @return FRESULT : status of the delete operation 
  */
-FRESULT fatfs_unlink(const TCHAR* filename); 
+FRESULT sd_unlink(const TCHAR* filename); 
 
 //=======================================================================================
 
@@ -438,9 +430,9 @@ FRESULT fatfs_unlink(const TCHAR* filename);
  * 
  * @details Returns the current state of the controllers state machine. 
  * 
- * @return FATFS_STATE : state machine state 
+ * @return SD_STATE : state machine state 
  */
-FATFS_STATE fatfs_get_state(void); 
+SD_STATE sd_get_state(void); 
 
 
 /**
@@ -448,16 +440,16 @@ FATFS_STATE fatfs_get_state(void);
  * 
  * @details Returns the controllers fault code. The fault code indicates the FATFS file 
  *          system function that caused a fault. Each bit of the code corresponds to a file 
- *          operation which is defined by fatfs_fault_codes_t. When one of these operations 
+ *          operation which is defined by sd_fault_codes_t. When one of these operations 
  *          is unsuccessful on a valid file then the fault code will be set. The fault code 
  *          is used by the state machine to determine whether to enter the fault state. 
  *          The fault code is cleared on a controller reset. 
  * 
- * @see fatfs_fault_codes_t 
+ * @see sd_fault_codes_t 
  * 
- * @return FATFS_FAULT_CODE : controller fault code 
+ * @return SD_FAULT_CODE : controller fault code 
  */
-FATFS_FAULT_CODE fatfs_get_fault_code(void); 
+SD_FAULT_CODE sd_get_fault_code(void); 
 
 
 /**
@@ -470,9 +462,9 @@ FATFS_FAULT_CODE fatfs_get_fault_code(void);
  *          controller, this flag will be set and can be used to identify the cause of 
  *          the problem along with the fault code. 
  * 
- * @return FATFS_FAULT_MODE : controller fault mode 
+ * @return SD_FAULT_MODE : controller fault mode 
  */
-FATFS_FAULT_MODE fatfs_get_fault_mode(void); 
+SD_FAULT_MODE sd_get_fault_mode(void); 
 
 
 /**
@@ -480,23 +472,23 @@ FATFS_FAULT_MODE fatfs_get_fault_mode(void);
  * 
  * @details Returns the open file flag state. 
  * 
- * @return FATFS_FILE_STATUS : open file flag state 
+ * @return SD_FILE_STATUS : open file flag state 
  */
-FATFS_FILE_STATUS fatfs_get_file_status(void); 
+SD_FILE_STATUS sd_get_file_status(void); 
 
 
 /**
  * @brief Check for the existance of a file or directory 
  *       
  * NOTE: The root directory is set during the controller init and the sub-directory 
- *       is set by the fatfs_set_dir function. 'str', passed as an argument to this 
+ *       is set by the sd_set_dir function. 'str', passed as an argument to this 
  *       function, is concatenated onto the root + sub-directory that is already 
  *       defined so do not include those in 'str'. 
  * 
  * @param str : string to file or directory to check for 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_get_exists(const TCHAR *str); 
+FRESULT sd_get_exists(const TCHAR *str); 
 
 
 /**
@@ -507,16 +499,16 @@ FRESULT fatfs_get_exists(const TCHAR *str);
  *          Attempts to read data from an open file and updates the fault code if there 
  *          is an error during the read process. If there is no file open then nothing 
  *          will happen. Note that the read will start at the read/write pointer which 
- *          can be changed using fatfs_lseek. There is no data type during the read 
+ *          can be changed using sd_lseek. There is no data type during the read 
  *          process so a void pointer type buffer is used. 
  * 
- * @see fatfs_lseek 
+ * @see sd_lseek 
  * 
  * @param buff : void pointer to buffer to store read data 
  * @param btr : number of bytes to read 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_f_read(
+FRESULT sd_f_read(
     void *buff, 
     UINT btr); 
 
@@ -537,7 +529,7 @@ FRESULT fatfs_f_read(
  * @param len : lengh of string to read (bytes) 
  * @return TCHAR : pointer to buff (if read successful) 
  */
-TCHAR* fatfs_gets(
+TCHAR* sd_gets(
     TCHAR *buff, 
     uint16_t len); 
 
@@ -552,9 +544,9 @@ TCHAR* fatfs_gets(
  *          open file. If at the end of the file then this function will return a non-zero 
  *          value and zero otherwise. 
  * 
- * @return FATFS_EOF : end of file status 
+ * @return SD_EOF : end of file status 
  */
-FATFS_EOF fatfs_eof(void); 
+SD_EOF sd_eof(void); 
 
 //=======================================================================================
 
@@ -562,4 +554,4 @@ FATFS_EOF fatfs_eof(void);
 }
 #endif
 
-#endif   // _FATFS_CONTROLLER_H_
+#endif   // _SD_CARD_CONTROLLER_H_

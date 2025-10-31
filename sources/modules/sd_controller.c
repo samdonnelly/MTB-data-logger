@@ -1,9 +1,9 @@
 /**
- * @file fatfs_controller.c
+ * @file sd_controller.c
  * 
  * @author Sam Donnelly (samueldonnelly11@gmail.com)
  * 
- * @brief FATFS controller 
+ * @brief SD card controller 
  * 
  * @version 0.1
  * @date 2023-01-12
@@ -15,7 +15,7 @@
 //=======================================================================================
 // Includes 
 
-#include "fatfs_controller.h"
+#include "sd_controller.h"
 
 //=======================================================================================
 
@@ -24,23 +24,23 @@
 // Function prototypes 
 
 /**
- * @brief FATFS initialization state 
+ * @brief SD card controller initialization state 
  * 
  * @details Attempts to mount the volume. If successful, the project directory saved in 
- *          fatfs_trackers_t will be made if it does not already exist and the state 
+ *          sd_trackers_t will be made if it does not already exist and the state 
  *          machine will move to the "access" state. If unsuccessful, the "not ready" state
  *          will be entered. The init state is called on startup and controller reset as 
  *          well as from the "not ready" state once a device is seen. If there is a fault 
  *          during one of the volume read operations, excluding the mounting procedure, 
  *          then the fault flag will be set and the "fault" state will be entered. 
  * 
- * @param fatfs_device : device tracker that defines control characteristics 
+ * @param sd_device : device tracker that defines control characteristics 
  */
-void fatfs_init_state(fatfs_trackers_t *fatfs_device); 
+void sd_init_state(sd_trackers_t *sd_device); 
 
 
 /**
- * @brief FATFS not ready state 
+ * @brief SD card controller not ready state 
  * 
  * @details Continuously checks for the presence of the volume to see if it shows up. This 
  *          state indicates that the volume is not seen by the system (not ready flag set) 
@@ -58,21 +58,21 @@ void fatfs_init_state(fatfs_trackers_t *fatfs_device);
  *          so these reads/writes won't work or the eject flag is set which will unmount 
  *          the device and therefore make the reads/writes not possible. 
  * 
- * @param fatfs_device : device tracker that defines control characteristics 
+ * @param sd_device : device tracker that defines control characteristics 
  */
-void fatfs_not_ready_state(fatfs_trackers_t *fatfs_device); 
+void sd_not_ready_state(sd_trackers_t *sd_device); 
 
 
 /**
- * @brief FATFS access state 
+ * @brief SD card controller access state 
  * 
- * @param fatfs_device : data record 
+ * @param sd_device : data record 
  */
-void fatfs_access_state(fatfs_trackers_t *fatfs_device); 
+void sd_access_state(sd_trackers_t *sd_device); 
 
 
 /**
- * @brief FATFS access check state 
+ * @brief SD card controller access check state 
  * 
  * @details Continuously checks for the presence of the volume to see if it goes missing. If 
  *          it is missing the not ready flag will be set. This state indicates that the volume 
@@ -81,61 +81,61 @@ void fatfs_access_state(fatfs_trackers_t *fatfs_device);
  *          successful. It is left when the fault or reset flags are set, or if either of the 
  *          not ready or eject flags are set. 
  * 
- * @param fatfs_device : device tracker that defines control characteristics 
+ * @param sd_device : device tracker that defines control characteristics 
  */
-void fatfs_access_check_state(fatfs_trackers_t *fatfs_device); 
+void sd_access_check_state(sd_trackers_t *sd_device); 
 
 
 /**
- * @brief FATFS eject state 
+ * @brief SD card controller eject state 
  * 
  * @details If there is an open file this state closes it then unmounts the volume. This state 
  *          is triggered by the eject flag being set which is set by the application through 
- *          the fatfs_set_eject_flag setter. This can be used to safely remove the disk while 
+ *          the sd_set_eject_flag setter. This can be used to safely remove the disk while 
  *          the system is still powered on. After this state is run it immediately goes to 
  *          the "not ready" state. The eject flag is cleared through the application code using 
- *          the fatfs_clear_eject_flag setter. 
+ *          the sd_clear_eject_flag setter. 
  * 
- * @see fatfs_set_eject_flag 
- * @see fatfs_clear_eject_flag 
+ * @see sd_set_eject_flag 
+ * @see sd_clear_eject_flag 
  * 
- * @param fatfs_device : device tracker that defines control characteristics 
+ * @param sd_device : device tracker that defines control characteristics 
  */
-void fatfs_eject_state(fatfs_trackers_t *fatfs_device); 
+void sd_eject_state(sd_trackers_t *sd_device); 
 
 
 /**
- * @brief FATFS fault state 
+ * @brief SD card controller fault state 
  * 
  * @details Currently this state does nothing until the reset flag is set. This state can be 
  *          entered from the "init" or "access" states after the fault flag has been set. The 
  *          fault flag can be set in the getter/setter functions when a FATFS file operation 
  *          is performed if one of these operations is not successful. To leave this state, the 
- *          reset flag has to be set using the fatfs_set_reset_flag setter at which point the 
+ *          reset flag has to be set using the sd_set_reset_flag setter at which point the 
  *          "reset" state will be entered. 
  * 
- * @see fatfs_set_reset_flag 
+ * @see sd_set_reset_flag 
  * 
- * @param fatfs_device : device tracker that defines control characteristics 
+ * @param sd_device : device tracker that defines control characteristics 
  */
-void fatfs_fault_state(fatfs_trackers_t *fatfs_device); 
+void sd_fault_state(sd_trackers_t *sd_device); 
 
 
 /**
- * @brief FATFS reset state 
+ * @brief SD card controller reset state 
  * 
  * @details Closes any open file, resets the projects subdirectory, unmounts the volumes and 
  *          resets controller trackers as needed. This state is triggered by setting the reset 
- *          flag using fatfs_set_reset_flag and can be entered from the "not ready", "access" or 
+ *          flag using sd_set_reset_flag and can be entered from the "not ready", "access" or 
  *          "fault" states. This state is called typically when there is an issue in the system 
  *          and it needs to re-initialize itself. After this state is run it will go directly to 
  *          the "init" state and the reset flag will be automatically cleared. 
  * 
- * @see fatfs_set_reset_flag 
+ * @see sd_set_reset_flag 
  * 
- * @param fatfs_device : device tracker that defines control characteristics 
+ * @param sd_device : device tracker that defines control characteristics 
  */
-void fatfs_reset_state(fatfs_trackers_t *fatfs_device); 
+void sd_reset_state(sd_trackers_t *sd_device); 
 
 
 /**
@@ -147,18 +147,16 @@ void fatfs_reset_state(fatfs_trackers_t *fatfs_device);
  * 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_mount(fatfs_trackers_t *fatfs_device); 
+FRESULT sd_mount(sd_trackers_t *sd_device); 
 
 
 /**
  * @brief Unmount the volume 
  * 
- * @details This function unmounts the volume. It also clears the init status flag in the FATFS 
- *          code memory (which is why 'disk' is included as an extern below) which is needed in 
- *          order to be able to re-mount the volume without a power cycle. The mount flag is 
- *          also cleared. This function is called buy the "init" state if mounting fails, and 
- *          also by the "eject" and "reset" states. If power remains on in the system, then 
- *          unmounting should be done before removing the volume. 
+ * @details This function unmounts the volume and clears the mount flag. This function is 
+ *          called buy the "init" state if mounting fails, and also by the "eject" and "reset" 
+ *          states. If power remains on in the system, then unmounting should be done before 
+ *          removing the volume. 
  *          
  *          Note that this controller/driver only support a single volume right now so this 
  *          function is hard coded to unmount logical drive 0 which is the default volume 
@@ -166,7 +164,7 @@ FRESULT fatfs_mount(fatfs_trackers_t *fatfs_device);
  * 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_unmount(fatfs_trackers_t *fatfs_device); 
+FRESULT sd_unmount(sd_trackers_t *sd_device); 
 
 
 /**
@@ -177,10 +175,10 @@ FRESULT fatfs_unmount(fatfs_trackers_t *fatfs_device);
  *          successful and will update the fault code in the process if something goes wrong 
  *          while reading the label. 
  * 
- * @param fatfs_device : data record 
+ * @param sd_device : data record 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_getlabel(fatfs_trackers_t *fatfs_device); 
+FRESULT sd_getlabel(sd_trackers_t *sd_device); 
 
 
 /**
@@ -193,7 +191,7 @@ FRESULT fatfs_getlabel(fatfs_trackers_t *fatfs_device);
  * 
  * @return FRESULT : FATFS file function return code 
  */
-FRESULT fatfs_getfree(fatfs_trackers_t *fatfs_device); 
+FRESULT sd_getfree(sd_trackers_t *sd_device); 
 
 //=======================================================================================
 
@@ -201,22 +199,19 @@ FRESULT fatfs_getfree(fatfs_trackers_t *fatfs_device);
 //=======================================================================================
 // Variables 
 
-// FatFs volume tracker - included to ensure re-mounting is possible 
-extern Disk_drvTypeDef disk; 
-
 // Device tracker record instance 
-static fatfs_trackers_t fatfs_device_trackers; 
+static sd_trackers_t sd_device_trackers; 
 
 // Function pointers to controller states 
-static fatfs_state_functions_t state_table[FATFS_NUM_STATES] = 
+static sd_state_functions_t state_table[SD_NUM_STATES] = 
 {
-    &fatfs_init_state, 
-    &fatfs_not_ready_state, 
-    &fatfs_access_state, 
-    &fatfs_access_check_state, 
-    &fatfs_eject_state, 
-    &fatfs_fault_state, 
-    &fatfs_reset_state 
+    &sd_init_state, 
+    &sd_not_ready_state, 
+    &sd_access_state, 
+    &sd_access_check_state, 
+    &sd_eject_state, 
+    &sd_fault_state, 
+    &sd_reset_state 
 }; 
 
 //=======================================================================================
@@ -225,178 +220,178 @@ static fatfs_state_functions_t state_table[FATFS_NUM_STATES] =
 //=======================================================================================
 // Control functions 
 
-// FATFS controller initialization 
-void fatfs_controller_init(const char *path)
+// SD card controller initialization 
+void sd_controller_init(const char *path)
 {
     // Check that the path length is not too long 
 
     // Controller information 
-    fatfs_device_trackers.state = FATFS_INIT_STATE; 
-    fatfs_device_trackers.fault_code = CLEAR; 
-    fatfs_device_trackers.fault_mode = CLEAR; 
+    sd_device_trackers.state = SD_INIT_STATE; 
+    sd_device_trackers.fault_code = CLEAR; 
+    sd_device_trackers.fault_mode = CLEAR; 
 
     // File system information 
-    memset((void *)fatfs_device_trackers.path, CLEAR, FATFS_PATH_SIZE); 
-    strcpy(fatfs_device_trackers.path, path); 
-    memset((void *)fatfs_device_trackers.dir, CLEAR, FATFS_PATH_SIZE); 
+    memset((void *)sd_device_trackers.path, CLEAR, SD_PATH_SIZE); 
+    strcpy(sd_device_trackers.path, path); 
+    memset((void *)sd_device_trackers.dir, CLEAR, SD_PATH_SIZE); 
     
     // State trackers 
-    fatfs_device_trackers.mount = CLEAR_BIT; 
-    fatfs_device_trackers.not_ready = CLEAR_BIT; 
-    fatfs_device_trackers.check = CLEAR_BIT; 
-    fatfs_device_trackers.eject = CLEAR_BIT; 
-    fatfs_device_trackers.open_file = CLEAR_BIT; 
-    fatfs_device_trackers.startup = SET_BIT; 
+    sd_device_trackers.mount = CLEAR_BIT; 
+    sd_device_trackers.not_ready = CLEAR_BIT; 
+    sd_device_trackers.check = CLEAR_BIT; 
+    sd_device_trackers.eject = CLEAR_BIT; 
+    sd_device_trackers.open_file = CLEAR_BIT; 
+    sd_device_trackers.startup = SET_BIT; 
 }
 
 
-// FATFS controller 
-void fatfs_controller(void)
+// SD card controller 
+void sd_controller(void)
 {
-    fatfs_states_t next_state = fatfs_device_trackers.state; 
+    sd_states_t next_state = sd_device_trackers.state; 
 
     //==================================================
     // State machine 
 
     switch (next_state)
     {
-        case FATFS_INIT_STATE: 
+        case SD_INIT_STATE: 
             // Make sure the init state runs at least once 
-            if (!fatfs_device_trackers.startup)
+            if (!sd_device_trackers.startup)
             {
                 // Fault during drive access 
-                if (fatfs_device_trackers.fault_code) 
+                if (sd_device_trackers.fault_code) 
                 {
-                    next_state = FATFS_FAULT_STATE; 
+                    next_state = SD_FAULT_STATE; 
                 }
 
                 // Device successfully mounted and access check requested 
-                else if (fatfs_device_trackers.mount && fatfs_device_trackers.check) 
+                else if (sd_device_trackers.mount && sd_device_trackers.check) 
                 {
-                    next_state = FATFS_ACCESS_CHECK_STATE; 
+                    next_state = SD_ACCESS_CHECK_STATE; 
                 }
 
                 // Device successfully mounted 
-                else if (fatfs_device_trackers.mount) 
+                else if (sd_device_trackers.mount) 
                 {
-                    next_state = FATFS_ACCESS_STATE; 
+                    next_state = SD_ACCESS_STATE; 
                 }
 
                 // Default to the not ready state if not mounted 
                 else 
                 {
-                    next_state = FATFS_NOT_READY_STATE; 
+                    next_state = SD_NOT_READY_STATE; 
                 }
             }
 
             break; 
 
-        case FATFS_NOT_READY_STATE: 
+        case SD_NOT_READY_STATE: 
             // Reset flag set 
-            if (fatfs_device_trackers.reset) 
+            if (sd_device_trackers.reset) 
             {
-                next_state = FATFS_RESET_STATE; 
+                next_state = SD_RESET_STATE; 
             }
 
             // Drive accessible and application code clears eject flag 
-            else if (!fatfs_device_trackers.not_ready && !fatfs_device_trackers.eject) 
+            else if (!sd_device_trackers.not_ready && !sd_device_trackers.eject) 
             {
-                next_state = FATFS_INIT_STATE; 
+                next_state = SD_INIT_STATE; 
             }
 
             break; 
 
-        case FATFS_ACCESS_STATE: 
+        case SD_ACCESS_STATE: 
             // File access fault 
-            if (fatfs_device_trackers.fault_code) 
+            if (sd_device_trackers.fault_code) 
             {
-                next_state = FATFS_FAULT_STATE; 
+                next_state = SD_FAULT_STATE; 
             }
 
             // Reset flag set 
-            else if (fatfs_device_trackers.reset) 
+            else if (sd_device_trackers.reset) 
             {
-                next_state = FATFS_RESET_STATE; 
+                next_state = SD_RESET_STATE; 
             }
 
             // Eject flag set 
-            else if (fatfs_device_trackers.eject)
+            else if (sd_device_trackers.eject)
             {
-                next_state = FATFS_EJECT_STATE; 
+                next_state = SD_EJECT_STATE; 
             }
 
             // Check flag set 
-            else if (fatfs_device_trackers.check)
+            else if (sd_device_trackers.check)
             {
-                next_state = FATFS_ACCESS_CHECK_STATE; 
+                next_state = SD_ACCESS_CHECK_STATE; 
             }
 
             break; 
 
-        case FATFS_ACCESS_CHECK_STATE: 
+        case SD_ACCESS_CHECK_STATE: 
             // File access fault 
-            if (fatfs_device_trackers.fault_code) 
+            if (sd_device_trackers.fault_code) 
             {
-                next_state = FATFS_FAULT_STATE; 
+                next_state = SD_FAULT_STATE; 
             }
 
             // Reset flag set 
-            else if (fatfs_device_trackers.reset) 
+            else if (sd_device_trackers.reset) 
             {
-                next_state = FATFS_RESET_STATE; 
+                next_state = SD_RESET_STATE; 
             }
 
             // Volume not seen or eject flag set 
-            else if (fatfs_device_trackers.not_ready || fatfs_device_trackers.eject)
+            else if (sd_device_trackers.not_ready || sd_device_trackers.eject)
             {
-                next_state = FATFS_EJECT_STATE; 
+                next_state = SD_EJECT_STATE; 
             }
 
             // Check flag cleared 
-            else if (!fatfs_device_trackers.check)
+            else if (!sd_device_trackers.check)
             {
-                next_state = FATFS_ACCESS_STATE; 
+                next_state = SD_ACCESS_STATE; 
             }
 
             break; 
 
-        case FATFS_EJECT_STATE: 
+        case SD_EJECT_STATE: 
             // Default to the not ready state if the eject flag has been set 
-            next_state = FATFS_NOT_READY_STATE; 
+            next_state = SD_NOT_READY_STATE; 
             break; 
 
-        case FATFS_FAULT_STATE: 
+        case SD_FAULT_STATE: 
             // Wait for reset flag to set 
-            if (fatfs_device_trackers.reset) 
+            if (sd_device_trackers.reset) 
             {
-                next_state = FATFS_RESET_STATE; 
+                next_state = SD_RESET_STATE; 
             }
 
             // Eject flag set 
-            if (fatfs_device_trackers.eject) 
+            if (sd_device_trackers.eject) 
             {
-                next_state = FATFS_EJECT_STATE; 
+                next_state = SD_EJECT_STATE; 
             }
 
             break; 
 
-        case FATFS_RESET_STATE: 
-            next_state = FATFS_INIT_STATE; 
+        case SD_RESET_STATE: 
+            next_state = SD_INIT_STATE; 
             break; 
 
         default: 
             // Default back to the init state 
-            next_state = FATFS_INIT_STATE; 
+            next_state = SD_INIT_STATE; 
             break; 
     }
 
     //==================================================
 
     // Go to state function 
-    (state_table[next_state])(&fatfs_device_trackers); 
+    (state_table[next_state])(&sd_device_trackers); 
 
     // Update the state 
-    fatfs_device_trackers.state = next_state; 
+    sd_device_trackers.state = next_state; 
 }
 
 //=======================================================================================
@@ -405,101 +400,101 @@ void fatfs_controller(void)
 //=======================================================================================
 // State functions 
 
-// FATFS initialization state 
-void fatfs_init_state(fatfs_trackers_t *fatfs_device) 
+// SD card controller initialization state 
+void sd_init_state(sd_trackers_t *sd_device) 
 {
     // Clear startup flag 
-    fatfs_device->startup = CLEAR_BIT; 
+    sd_device->startup = CLEAR_BIT; 
 
     // Clear reset flag 
-    fatfs_device->reset = CLEAR_BIT; 
+    sd_device->reset = CLEAR_BIT; 
 
     // Attempt to mount the volume 
-    if (fatfs_mount(fatfs_device) == FR_OK) 
+    if (sd_mount(sd_device) == FR_OK) 
     {
         // Mounting successful 
         // Read the volume, serial number, free space and make the directory specified by 
         // "path" if it does not exist 
-        fatfs_getlabel(fatfs_device); 
-        fatfs_getfree(fatfs_device); 
-        fatfs_mkdir(""); 
+        sd_getlabel(sd_device); 
+        sd_getfree(sd_device); 
+        sd_mkdir(""); 
     }
     else 
     {
         // Mounting unsuccessful 
         // Go to the not ready state and unmount the volume 
-        fatfs_device->not_ready = SET_BIT; 
-        fatfs_unmount(fatfs_device); 
+        sd_device->not_ready = SET_BIT; 
+        sd_unmount(sd_device); 
     }
 }
 
 
-// FATFS not ready state 
-void fatfs_not_ready_state(fatfs_trackers_t *fatfs_device)
+// SD card controller not ready state 
+void sd_not_ready_state(sd_trackers_t *sd_device)
 {
     // Check if the volume is present 
-    if (fatfs_get_existance() == FATFS_RES_OK) 
+    if (sd_get_existance() == (DISK_STATUS)TRUE) 
     {
         // Present - clear the not ready flag so we can try remounting 
-        fatfs_device->not_ready = CLEAR_BIT; 
+        sd_device->not_ready = CLEAR_BIT; 
     }
 }
 
 
-// FATFS access state 
-void fatfs_access_state(fatfs_trackers_t *fatfs_device)
+// SD card controller access state 
+void sd_access_state(sd_trackers_t *sd_device)
 {
     // Do nothing while the volume is accessed 
 }
 
 
-// FATFS access file state 
-void fatfs_access_check_state(fatfs_trackers_t *fatfs_device) 
+// SD card controller access file state 
+void sd_access_check_state(sd_trackers_t *sd_device) 
 {
     // Check for the presence of the volume 
-    if (fatfs_ready_rec()) 
+    if (sd_ready_rec() == (DISK_STATUS)FALSE)
     {
         // If not seen then set the not_ready flag 
-        fatfs_device->not_ready = SET_BIT; 
+        sd_device->not_ready = SET_BIT; 
     }
 }
 
 
-// FATFS eject state 
-void fatfs_eject_state(fatfs_trackers_t *fatfs_device)
+// SD card controller eject state 
+void sd_eject_state(sd_trackers_t *sd_device)
 {
     // Attempt to close the open file 
-    fatfs_close(); 
+    sd_close(); 
 
     // Unmount the volume 
-    fatfs_unmount(fatfs_device); 
+    sd_unmount(sd_device); 
 }
 
 
-// FATFS fault state 
-void fatfs_fault_state(fatfs_trackers_t *fatfs_device) 
+// SD card controller fault state 
+void sd_fault_state(sd_trackers_t *sd_device) 
 {
     // Idle until the reset flag is set 
 }
 
 
-// FATFS reset state 
-void fatfs_reset_state(fatfs_trackers_t *fatfs_device) 
+// SD card controller reset state 
+void sd_reset_state(sd_trackers_t *sd_device) 
 {
     // Attempt to close a file 
-    fatfs_close(); 
+    sd_close(); 
 
     // Reset sub directory 
-    memset((void *)fatfs_device_trackers.dir, CLEAR, FATFS_PATH_SIZE); 
+    memset((void *)sd_device_trackers.dir, CLEAR, SD_PATH_SIZE); 
 
     // Unmount the volume 
-    fatfs_unmount(fatfs_device); 
+    sd_unmount(sd_device); 
 
     // Clear device trackers 
-    fatfs_device->fault_code = CLEAR; 
-    fatfs_device->fault_mode = CLEAR; 
-    fatfs_device->not_ready = CLEAR_BIT; 
-    fatfs_device->eject = CLEAR_BIT; 
+    sd_device->fault_code = CLEAR; 
+    sd_device->fault_mode = CLEAR; 
+    sd_device->not_ready = CLEAR_BIT; 
+    sd_device->eject = CLEAR_BIT; 
 }
 
 //=======================================================================================
@@ -509,78 +504,77 @@ void fatfs_reset_state(fatfs_trackers_t *fatfs_device)
 // Controller volume access functions 
 
 // Mount the volume 
-FRESULT fatfs_mount(fatfs_trackers_t *fatfs_device) 
+FRESULT sd_mount(sd_trackers_t *sd_device) 
 {
-    fatfs_device->fresult = f_mount(&fatfs_device->file_sys, "", FATFS_MOUNT_NOW); 
+    sd_device->fresult = f_mount(&sd_device->file_sys, "", SD_MOUNT_NOW); 
 
-    if (fatfs_device->fresult == FR_OK) 
+    if (sd_device->fresult == FR_OK) 
     {
-        fatfs_device->mount = SET_BIT; 
+        sd_device->mount = SET_BIT; 
     }
 
-    return fatfs_device_trackers.fresult; 
+    return sd_device_trackers.fresult; 
 }
 
 
 // Unmount the volume 
-FRESULT fatfs_unmount(fatfs_trackers_t *fatfs_device) 
+FRESULT sd_unmount(sd_trackers_t *sd_device) 
 {
     // Unmount, clear the init status so it can be re-mounted, and clear the mount bit 
     f_unmount(""); 
-    disk.is_initialized[FATFS_VOL_NUM_0] = CLEAR;  // Logical drive number 0 - default number 
-    fatfs_device->mount = CLEAR_BIT; 
+    sd_device->mount = CLEAR_BIT; 
 
     return FR_OK; 
 }
 
 
 // Get the volume label 
-FRESULT fatfs_getlabel(fatfs_trackers_t *fatfs_device) 
+FRESULT sd_getlabel(sd_trackers_t *sd_device) 
 {
-    fatfs_device->fresult = f_getlabel("", fatfs_device->vol_label, &fatfs_device->serial_num); 
+    sd_device->fresult = f_getlabel("", sd_device->vol_label, &sd_device->serial_num); 
 
-    if (fatfs_device->fresult) 
+    if (sd_device->fresult) 
     {
-        fatfs_device->fault_mode |= (SET_BIT << fatfs_device->fresult); 
-        fatfs_device->fault_code |= (SET_BIT << FATFS_FAULT_COMMS); 
+        sd_device->fault_mode |= (SET_BIT << sd_device->fresult); 
+        sd_device->fault_code |= (SET_BIT << SD_FAULT_COMMS); 
     }
 
-    return fatfs_device->fresult; 
+    return sd_device->fresult; 
 }
 
 
 // Get free space 
-FRESULT fatfs_getfree(fatfs_trackers_t *fatfs_device) 
+FRESULT sd_getfree(sd_trackers_t *sd_device) 
 {
-    fatfs_device->fresult = f_getfree("", &fatfs_device->fre_clust, &fatfs_device->pfs); 
+    sd_device->fresult = f_getfree("", &sd_device->fre_clust, &sd_device->pfs); 
 
-    if (fatfs_device->fresult == FR_OK) 
+    if (sd_device->fresult == FR_OK) 
     {
         // Calculate the total space 
         // (n_fatent - 2) * csize / 2
-        fatfs_device->total = (uint32_t)(((fatfs_device->pfs->n_fatent - 2) * 
-                                           fatfs_device->pfs->csize) >> SHIFT_1);
+        sd_device->total = (uint32_t)(((sd_device->pfs->n_fatent - 2) * 
+                                           sd_device->pfs->csize) >> SHIFT_1);
         
         // Calculate the free space 
         // fre_clust * csize / 2 
-        fatfs_device->free_space = (uint32_t)((fatfs_device->fre_clust * 
-                                               fatfs_device->pfs->csize) >> SHIFT_1); 
+        sd_device->free_space = (uint32_t)((sd_device->fre_clust * 
+                                               sd_device->pfs->csize) >> SHIFT_1); 
 
         // Check if there is sufficient disk space 
-        if (fatfs_device->free_space < FATFS_FREE_THRESH) 
+        if (sd_device->free_space < SD_FREE_THRESH) 
         {
-            fatfs_device->fault_mode |= (SET_BIT << FR_DENIED); 
-            fatfs_device->fault_code |= (SET_BIT << FATFS_FAULT_FREE); 
+            sd_device->fault_mode |= (SET_BIT << FR_DENIED); 
+            sd_device->fault_code |= (SET_BIT << SD_FAULT_FREE); 
         }
 
     }
     else   // Communication fault 
     {
-        fatfs_device->fault_mode |= (SET_BIT << fatfs_device->fresult); 
-        fatfs_device->fault_code |= (SET_BIT << FATFS_FAULT_COMMS); 
+        sd_device->fault_mode |= (SET_BIT << sd_device->fresult); 
+        sd_device->fault_code |= (SET_BIT << SD_FAULT_COMMS); 
     }
 
-    return fatfs_device->fresult; 
+    return sd_device->fresult; 
 }
 
 //=======================================================================================
@@ -590,51 +584,51 @@ FRESULT fatfs_getfree(fatfs_trackers_t *fatfs_device)
 // Setters 
 
 // Set the check flag 
-void fatfs_set_check_flag(void)
+void sd_set_check_flag(void)
 {
-    fatfs_device_trackers.check = SET_BIT; 
+    sd_device_trackers.check = SET_BIT; 
 }
 
 
 // Clear the check flag 
-void fatfs_clear_check_flag(void)
+void sd_clear_check_flag(void)
 {
-    fatfs_device_trackers.check = CLEAR_BIT; 
+    sd_device_trackers.check = CLEAR_BIT; 
 }
 
 
 // Set the eject flag 
-void fatfs_set_eject_flag(void) 
+void sd_set_eject_flag(void) 
 {
-    fatfs_device_trackers.eject = SET_BIT; 
+    sd_device_trackers.eject = SET_BIT; 
 }
 
 
 // Clear the eject flag 
-void fatfs_clear_eject_flag(void) 
+void sd_clear_eject_flag(void) 
 {
-    fatfs_device_trackers.eject = CLEAR_BIT; 
+    sd_device_trackers.eject = CLEAR_BIT; 
 }
 
 
 // Set reset flag 
-void fatfs_set_reset_flag(void) 
+void sd_set_reset_flag(void) 
 {
-    fatfs_device_trackers.reset = SET_BIT; 
+    sd_device_trackers.reset = SET_BIT; 
 }
 
 
 // Set directory 
-void fatfs_set_dir(const TCHAR *dir)
+void sd_set_dir(const TCHAR *dir)
 {
     // Reset the saved directory and set the new directory 
-    memset((void *)fatfs_device_trackers.dir, CLEAR, FATFS_PATH_SIZE); 
-    strcpy(fatfs_device_trackers.dir, dir); 
+    memset((void *)sd_device_trackers.dir, CLEAR, SD_PATH_SIZE); 
+    strcpy(sd_device_trackers.dir, dir); 
 }
 
 
 // Make a new directory in the project directory 
-FRESULT fatfs_mkdir(const TCHAR *dir) 
+FRESULT sd_mkdir(const TCHAR *dir) 
 {
     // Check for NULL pointer 
     if (dir == NULL) 
@@ -642,44 +636,44 @@ FRESULT fatfs_mkdir(const TCHAR *dir)
         return FR_INVALID_OBJECT; 
     }
     
-    TCHAR sub_dir[FATFS_PATH_SIZE*2]; 
+    TCHAR sub_dir[SD_PATH_SIZE*2]; 
 
     // Record 'dir' for future use and establish 'path' as the base of the sub directory 
-    fatfs_set_dir(dir); 
-    strcpy(sub_dir, fatfs_device_trackers.path); 
+    sd_set_dir(dir); 
+    strcpy(sub_dir, sd_device_trackers.path); 
 
     // If 'dir' is not a null character then prepare the sub-directory to be concatenated. 
     // 'dir' will be a null character when it's empty such as in the "init" state. 
-    if (*fatfs_device_trackers.dir != NULL_CHAR)
+    if (*sd_device_trackers.dir != NULL_CHAR)
     {
         strcat(sub_dir, "/"); 
     }
 
     // Concatenate 'dir' to complete the sub directory string 
-    strcat(sub_dir, fatfs_device_trackers.dir); 
+    strcat(sub_dir, sd_device_trackers.dir); 
 
     // Check for the existance of the directory 
-    fatfs_device_trackers.fresult = f_stat(sub_dir, (FILINFO *)NULL); 
+    sd_device_trackers.fresult = f_stat(sub_dir, (FILINFO *)NULL); 
 
     // Only proceed to make the directory if it does not exist 
-    if (fatfs_device_trackers.fresult)
+    if (sd_device_trackers.fresult)
     {
-        fatfs_device_trackers.fresult = f_mkdir(sub_dir); 
+        sd_device_trackers.fresult = f_mkdir(sub_dir); 
 
         // Set fault code if there is an access error 
-        if (fatfs_device_trackers.fresult) 
+        if (sd_device_trackers.fresult) 
         {
-            fatfs_device_trackers.fault_mode |= (SET_BIT << fatfs_device_trackers.fresult); 
-            fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_DIR); 
+            sd_device_trackers.fault_mode |= (SET_BIT << sd_device_trackers.fresult); 
+            sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_DIR); 
         }
     }
 
-    return fatfs_device_trackers.fresult; 
+    return sd_device_trackers.fresult; 
 }
 
 
 // Open file 
-FRESULT fatfs_open(
+FRESULT sd_open(
     const TCHAR *file_name, 
     uint8_t mode) 
 {
@@ -689,39 +683,39 @@ FRESULT fatfs_open(
         return FR_INVALID_OBJECT; 
     }
 
-    TCHAR file_dir[FATFS_PATH_SIZE*3]; 
+    TCHAR file_dir[SD_PATH_SIZE*3]; 
 
     // Attempt to open file if a file is not already open 
-    if (!fatfs_device_trackers.open_file) 
+    if (!sd_device_trackers.open_file) 
     {
         // Establish 'path' as the root of the file directory 
-        strcpy(file_dir, fatfs_device_trackers.path); 
+        strcpy(file_dir, sd_device_trackers.path); 
 
         // If 'dir' is not a null character then concatenate it to the file directory 
-        if (*fatfs_device_trackers.dir != NULL_CHAR)
+        if (*sd_device_trackers.dir != NULL_CHAR)
         {
             strcat(file_dir, "/"); 
-            strcat(file_dir, fatfs_device_trackers.dir); 
+            strcat(file_dir, sd_device_trackers.dir); 
         }
 
         strcat(file_dir, "/"); 
         strcat(file_dir, file_name); 
         
-        fatfs_device_trackers.fresult = f_open(&fatfs_device_trackers.file, 
+        sd_device_trackers.fresult = f_open(&sd_device_trackers.file, 
                                                file_dir, 
                                                mode); 
 
-        if (fatfs_device_trackers.fresult == FR_OK) 
+        if (sd_device_trackers.fresult == FR_OK) 
         {
-            fatfs_device_trackers.open_file = SET_BIT; 
+            sd_device_trackers.open_file = SET_BIT; 
         }
         else   // Open fault - record the fault types 
         {
-            fatfs_device_trackers.fault_mode |= (SET_BIT << fatfs_device_trackers.fresult); 
-            fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_OPEN); 
+            sd_device_trackers.fault_mode |= (SET_BIT << sd_device_trackers.fresult); 
+            sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_OPEN); 
         }
 
-        return fatfs_device_trackers.fresult; 
+        return sd_device_trackers.fresult; 
     }
 
     return FR_TOO_MANY_OPEN_FILES; 
@@ -729,27 +723,27 @@ FRESULT fatfs_open(
 
 
 // Close the open file 
-FRESULT fatfs_close(void) 
+FRESULT sd_close(void) 
 {
     // Attempt to close a file if it's open 
-    if (fatfs_device_trackers.open_file) 
+    if (sd_device_trackers.open_file) 
     {
-        fatfs_device_trackers.fresult = f_close(&fatfs_device_trackers.file); 
+        sd_device_trackers.fresult = f_close(&sd_device_trackers.file); 
 
-        if (fatfs_device_trackers.fresult) 
+        if (sd_device_trackers.fresult) 
         {
             // Close file fault 
-            fatfs_device_trackers.fault_mode |= (SET_BIT << fatfs_device_trackers.fresult); 
-            fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_CLOSE); 
+            sd_device_trackers.fault_mode |= (SET_BIT << sd_device_trackers.fresult); 
+            sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_CLOSE); 
         }
 
         // Clear the open file flag regardless of the fault code 
-        fatfs_device_trackers.open_file = CLEAR_BIT; 
+        sd_device_trackers.open_file = CLEAR_BIT; 
 
         // Update the free space 
-        fatfs_getfree(&fatfs_device_trackers); 
+        sd_getfree(&sd_device_trackers); 
 
-        return fatfs_device_trackers.fresult; 
+        return sd_device_trackers.fresult; 
     }
 
     return FR_OK; 
@@ -757,7 +751,7 @@ FRESULT fatfs_close(void)
 
 
 // Write to the open file 
-FRESULT fatfs_f_write(
+FRESULT sd_f_write(
     const void *buff, 
     UINT btw) 
 {
@@ -765,36 +759,36 @@ FRESULT fatfs_f_write(
     // Check for open file? 
 
     // Write to the file 
-    fatfs_device_trackers.fresult = f_write(&fatfs_device_trackers.file, 
+    sd_device_trackers.fresult = f_write(&sd_device_trackers.file, 
                                             buff, 
                                             btw, 
-                                            &fatfs_device_trackers.bw); 
+                                            &sd_device_trackers.bw); 
 
     // Set fault code if there is an access error and a file is open 
-    if (fatfs_device_trackers.fresult && fatfs_device_trackers.open_file) 
+    if (sd_device_trackers.fresult && sd_device_trackers.open_file) 
     {
-        fatfs_device_trackers.fault_mode |= (SET_BIT << fatfs_device_trackers.fresult); 
-        fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_WRITE); 
+        sd_device_trackers.fault_mode |= (SET_BIT << sd_device_trackers.fresult); 
+        sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_WRITE); 
     }
 
-    return fatfs_device_trackers.fresult; 
+    return sd_device_trackers.fresult; 
 }
 
 
 // Write a string to the open file 
-int16_t fatfs_puts(const TCHAR *str) 
+int16_t sd_puts(const TCHAR *str) 
 {
     // Check for void pointer? 
     // Check for open file? 
 
     // Writes a string to the file 
-    int16_t puts_return = f_puts(str, &fatfs_device_trackers.file); 
+    int16_t puts_return = f_puts(str, &sd_device_trackers.file); 
 
     // Set fault code if there is a function error and a file is open 
-    if ((puts_return < 0) && fatfs_device_trackers.open_file) 
+    if ((puts_return < 0) && sd_device_trackers.open_file) 
     {
-        fatfs_device_trackers.fault_mode |= (SET_BIT << FR_DISK_ERR); 
-        fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_WRITE); 
+        sd_device_trackers.fault_mode |= (SET_BIT << FR_DISK_ERR); 
+        sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_WRITE); 
     }
 
     return puts_return; 
@@ -802,7 +796,7 @@ int16_t fatfs_puts(const TCHAR *str)
 
 
 // Write a formatted string to the open file 
-int8_t fatfs_printf(
+int8_t sd_printf(
     const TCHAR *fmt_str, 
     uint16_t fmt_value) 
 {
@@ -810,15 +804,15 @@ int8_t fatfs_printf(
     // Check for open file? 
 
     // Writes a formatted string to the file 
-    int8_t printf_return = f_printf(&fatfs_device_trackers.file, 
+    int8_t printf_return = f_printf(&sd_device_trackers.file, 
                                     fmt_str, 
                                     fmt_value); 
 
     // Set fault code if there is a function error and a file is open 
-    if ((printf_return < 0) && fatfs_device_trackers.open_file) 
+    if ((printf_return < 0) && sd_device_trackers.open_file) 
     {
-        fatfs_device_trackers.fault_mode |= (SET_BIT << FR_DISK_ERR); 
-        fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_WRITE); 
+        sd_device_trackers.fault_mode |= (SET_BIT << FR_DISK_ERR); 
+        sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_WRITE); 
     }
 
     return printf_return; 
@@ -826,24 +820,24 @@ int8_t fatfs_printf(
 
 
 // Navigate within the open file 
-FRESULT fatfs_lseek(FSIZE_t offset) 
+FRESULT sd_lseek(FSIZE_t offset) 
 {
     // Move to the specified position in the file 
-    fatfs_device_trackers.fresult = f_lseek(&fatfs_device_trackers.file, offset); 
+    sd_device_trackers.fresult = f_lseek(&sd_device_trackers.file, offset); 
 
     // Set fault code if there is an access error and a file is open 
-    if (fatfs_device_trackers.fresult && fatfs_device_trackers.open_file) 
+    if (sd_device_trackers.fresult && sd_device_trackers.open_file) 
     {
-        fatfs_device_trackers.fault_mode |= (SET_BIT << fatfs_device_trackers.fresult); 
-        fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_SEEK); 
+        sd_device_trackers.fault_mode |= (SET_BIT << sd_device_trackers.fresult); 
+        sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_SEEK); 
     }
 
-    return fatfs_device_trackers.fresult; 
+    return sd_device_trackers.fresult; 
 }
 
 
 // Delete a file 
-FRESULT fatfs_unlink(const TCHAR* filename)
+FRESULT sd_unlink(const TCHAR* filename)
 {
     // Check that path validity 
     if (filename == NULL) 
@@ -851,32 +845,32 @@ FRESULT fatfs_unlink(const TCHAR* filename)
         return FR_INVALID_OBJECT; 
     }
 
-    TCHAR file_dir[FATFS_PATH_SIZE*3]; 
+    TCHAR file_dir[SD_PATH_SIZE*3]; 
 
     // Establish 'path' as the root of the file directory 
-    strcpy(file_dir, fatfs_device_trackers.path); 
+    strcpy(file_dir, sd_device_trackers.path); 
 
     // If 'dir' is not a null character then concatenate it to the file directory 
-    if (*fatfs_device_trackers.dir != NULL_CHAR)
+    if (*sd_device_trackers.dir != NULL_CHAR)
     {
         strcat(file_dir, "/"); 
-        strcat(file_dir, fatfs_device_trackers.dir); 
+        strcat(file_dir, sd_device_trackers.dir); 
     }
 
     strcat(file_dir, "/"); 
     strcat(file_dir, filename); 
 
     // Attempt to delete the specified file 
-    fatfs_device_trackers.fresult = f_unlink(file_dir); 
+    sd_device_trackers.fresult = f_unlink(file_dir); 
 
     // Set the fault code if the file failed to be deleted 
-    if (fatfs_device_trackers.fresult)
+    if (sd_device_trackers.fresult)
     {
-        fatfs_device_trackers.fault_mode |= (SET_BIT << fatfs_device_trackers.fresult); 
-        fatfs_device_trackers.fault_code |= (SET_BIT << FATFS_FAULT_DIR); 
+        sd_device_trackers.fault_mode |= (SET_BIT << sd_device_trackers.fresult); 
+        sd_device_trackers.fault_code |= (SET_BIT << SD_FAULT_DIR); 
     }
 
-    return fatfs_device_trackers.fresult; 
+    return sd_device_trackers.fresult; 
 }
 
 //=======================================================================================
@@ -886,35 +880,35 @@ FRESULT fatfs_unlink(const TCHAR* filename)
 // Getters 
 
 // Get state 
-FATFS_STATE fatfs_get_state(void) 
+SD_STATE sd_get_state(void) 
 {
-    return fatfs_device_trackers.state; 
+    return sd_device_trackers.state; 
 }
 
 
 // Get fault code 
-FATFS_FAULT_CODE fatfs_get_fault_code(void) 
+SD_FAULT_CODE sd_get_fault_code(void) 
 {
-    return fatfs_device_trackers.fault_code; 
+    return sd_device_trackers.fault_code; 
 }
 
 
 // Get fault mode 
-FATFS_FAULT_MODE fatfs_get_fault_mode(void)
+SD_FAULT_MODE sd_get_fault_mode(void)
 {
-    return fatfs_device_trackers.fault_mode; 
+    return sd_device_trackers.fault_mode; 
 }
 
 
 // Get open file flag 
-FATFS_FILE_STATUS fatfs_get_file_status(void)
+SD_FILE_STATUS sd_get_file_status(void)
 {
-    return fatfs_device_trackers.open_file; 
+    return sd_device_trackers.open_file; 
 }
 
 
 // Check for the existance of a file or directory 
-FRESULT fatfs_get_exists(const TCHAR *str)
+FRESULT sd_get_exists(const TCHAR *str)
 {
     // Check for a valid file name 
     if ((str == NULL) || (*str == NULL_CHAR)) 
@@ -923,16 +917,16 @@ FRESULT fatfs_get_exists(const TCHAR *str)
     }
 
     // Local variables 
-    TCHAR directory[FATFS_PATH_SIZE*3]; 
+    TCHAR directory[SD_PATH_SIZE*3]; 
 
     // Establish 'path' as the root of the file directory 
-    strcpy(directory, fatfs_device_trackers.path); 
+    strcpy(directory, sd_device_trackers.path); 
 
     // If 'dir' is not a null character then concatenate it to the file directory 
-    if (*fatfs_device_trackers.dir != NULL_CHAR)
+    if (*sd_device_trackers.dir != NULL_CHAR)
     {
         strcat(directory, "/"); 
-        strcat(directory, fatfs_device_trackers.dir); 
+        strcat(directory, sd_device_trackers.dir); 
     }
 
     strcat(directory, "/"); 
@@ -944,40 +938,40 @@ FRESULT fatfs_get_exists(const TCHAR *str)
 
 
 // Read data from open file 
-FRESULT fatfs_f_read(
+FRESULT sd_f_read(
     void *buff, 
     UINT btr) 
 {
     // Read from the file 
-    fatfs_device_trackers.fresult = f_read(&fatfs_device_trackers.file, 
+    sd_device_trackers.fresult = f_read(&sd_device_trackers.file, 
                                            buff, 
                                            btr, 
-                                           &fatfs_device_trackers.br); 
+                                           &sd_device_trackers.br); 
     
     // Set fault code if there is an access error and a file is open 
-    if (fatfs_device_trackers.fresult && fatfs_device_trackers.open_file) 
+    if (sd_device_trackers.fresult && sd_device_trackers.open_file) 
     {
-        fatfs_device_trackers.fault_mode |= (SET_BIT << fatfs_device_trackers.fresult); 
-        fatfs_device_trackers.fault_code |= FATFS_FAULT_READ; 
+        sd_device_trackers.fault_mode |= (SET_BIT << sd_device_trackers.fresult); 
+        sd_device_trackers.fault_code |= SD_FAULT_READ; 
     }
 
-    return fatfs_device_trackers.fresult; 
+    return sd_device_trackers.fresult; 
 }
 
 
 // Reads a string from open file 
-TCHAR* fatfs_gets(
+TCHAR* sd_gets(
     TCHAR *buff, 
     uint16_t len)
 {
     // Read a string from the file 
-    TCHAR *gets_return = f_gets(buff, len, &fatfs_device_trackers.file); 
+    TCHAR *gets_return = f_gets(buff, len, &sd_device_trackers.file); 
 
     // Set fault code if there was a read operation error and a file is open 
-    if ((gets_return == NULL) && (!fatfs_eof()) && fatfs_device_trackers.open_file) 
+    if ((gets_return == NULL) && (!sd_eof()) && sd_device_trackers.open_file) 
     {
-        fatfs_device_trackers.fault_mode |= (SET_BIT << FR_DISK_ERR); 
-        fatfs_device_trackers.fault_code |= FATFS_FAULT_READ; 
+        sd_device_trackers.fault_mode |= (SET_BIT << FR_DISK_ERR); 
+        sd_device_trackers.fault_code |= SD_FAULT_READ; 
     }
 
     return gets_return; 
@@ -985,9 +979,9 @@ TCHAR* fatfs_gets(
 
 
 // Test for end of file on open file 
-FATFS_EOF fatfs_eof(void) 
+SD_EOF sd_eof(void) 
 {
-    return (FATFS_EOF)f_eof(&fatfs_device_trackers.file); 
+    return (SD_EOF)f_eof(&sd_device_trackers.file); 
 }
 
 //=======================================================================================
